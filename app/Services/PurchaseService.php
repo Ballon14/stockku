@@ -1,0 +1,79 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\Product;
+use App\Models\Purchase;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+
+class PurchaseService
+{
+    public function __construct(
+        protected StockService $stockService
+    ) {}
+
+    public function createPurchase(int $supplierId, string $tanggal, array $items, ?string $keterangan = null): Purchase
+    {
+        return DB::transaction(function () use ($supplierId, $tanggal, $items, $keterangan) {
+            $total = 0;
+
+            foreach ($items as &$item) {
+                $item['subtotal'] = $item['harga'] * $item['qty'];
+                $total += $item['subtotal'];
+            }
+
+            $purchase = Purchase::create([
+                'invoice_number' => Purchase::generateInvoiceNumber(),
+                'supplier_id' => $supplierId,
+                'user_id' => Auth::id(),
+                'tanggal' => $tanggal,
+                'total' => $total,
+                'status' => 'received',
+                'keterangan' => $keterangan,
+            ]);
+
+            foreach ($items as $item) {
+                $purchase->items()->create([
+                    'product_id' => $item['product_id'],
+                    'qty' => $item['qty'],
+                    'harga' => $item['harga'],
+                    'subtotal' => $item['subtotal'],
+                ]);
+
+                // Tambah stok
+                $product = Product::find($item['product_id']);
+                if (!empty($item['update_harga_beli'])) {
+                    $product->update(['harga_beli' => $item['harga']]);
+                }
+                $this->stockService->recordMovement(
+                    $product,
+                    'in',
+                    $item['qty'],
+                    Purchase::class,
+                    $purchase->id,
+                    'Pembelian ' . $purchase->invoice_number
+                );
+            }
+
+            return $purchase;
+        });
+    }
+
+    public function getPurchases($startDate = null, $endDate = null, $supplierId = null)
+    {
+        $query = Purchase::with(['supplier', 'user', 'items.product'])->latest();
+
+        if ($startDate) {
+            $query->whereDate('tanggal', '>=', $startDate);
+        }
+        if ($endDate) {
+            $query->whereDate('tanggal', '<=', $endDate);
+        }
+        if ($supplierId) {
+            $query->where('supplier_id', $supplierId);
+        }
+
+        return $query->paginate(15);
+    }
+}
