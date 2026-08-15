@@ -15,6 +15,7 @@ class CategoryService
     public function store(array $data): Category
     {
         $data['slug'] = Str::slug($data['name']);
+
         return Category::create($data);
     }
 
@@ -22,6 +23,7 @@ class CategoryService
     {
         $data['slug'] = Str::slug($data['name']);
         $category->update($data);
+
         return $category;
     }
 

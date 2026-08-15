@@ -26,10 +26,10 @@ class EmployeeRequest extends FormRequest
 
         if ($this->input('create_account')) {
             $userId = $this->route('employee')?->user_id;
-            $rules['user_email'] = 'required|email|unique:users,email,' . $userId;
+            $rules['user_email'] = 'required|email|unique:users,email,'.$userId;
             $rules['user_role'] = 'required|in:admin,kasir,karyawan,manager';
 
-            if (!$this->route('employee')) {
+            if (! $this->route('employee')) {
                 $rules['user_password'] = 'required|string|min:8';
             } else {
                 $rules['user_password'] = 'nullable|string|min:8';

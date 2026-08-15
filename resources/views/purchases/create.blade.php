@@ -40,7 +40,8 @@
                 </div>
 
                 <div class="border rounded-xl border-slate-200 overflow-hidden">
-                    <table class="w-full text-sm">
+                    <div class="overflow-x-auto">
+    <table class="w-full text-sm">
                         <thead class="bg-slate-50 border-b border-slate-200">
                             <tr>
                                 <th class="text-left py-2 px-3 font-medium text-slate-600">Produk</th>
@@ -86,6 +87,7 @@
                             </tr>
                         </tfoot>
                     </table>
+    </div>
                 </div>
                 @error('items') <p class="text-xs text-red-500 mt-2">{{ $message }}</p> @enderror
             </div>

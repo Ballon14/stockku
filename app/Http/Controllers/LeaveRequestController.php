@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\LeaveRequest;
+use App\Services\ActivityLogger;
 use App\Services\AttendanceService;
 use Illuminate\Http\Request;
 
@@ -22,7 +23,7 @@ class LeaveRequestController extends Controller
                 ->paginate(15);
         } else {
             $employee = $user->employee;
-            if (!$employee) {
+            if (! $employee) {
                 return redirect()->route('dashboard')->with('error', 'Data karyawan tidak ditemukan.');
             }
             $leaveRequests = $employee->leaveRequests()
@@ -48,13 +49,15 @@ class LeaveRequestController extends Controller
         ]);
 
         $employee = auth()->user()->employee;
-        if (!$employee) {
+        if (! $employee) {
             return back()->with('error', 'Data karyawan tidak ditemukan.');
         }
 
-        $this->attendanceService->createLeaveRequest($employee, $request->only([
-            'jenis', 'tanggal_mulai', 'tanggal_selesai', 'keterangan'
+        $leaveRequest = $this->attendanceService->createLeaveRequest($employee, $request->only([
+            'jenis', 'tanggal_mulai', 'tanggal_selesai', 'keterangan',
         ]));
+
+        app(ActivityLogger::class)->log('leave.create', 'Pengajuan '.$leaveRequest->jenis.' ('.$leaveRequest->tanggal_mulai.' s/d '.$leaveRequest->tanggal_selesai.') dibuat.');
 
         return redirect()->route('leave-requests.index')->with('success', 'Pengajuan berhasil dikirim.');
     }
@@ -67,6 +70,8 @@ class LeaveRequestController extends Controller
             $request->input('catatan_approval')
         );
 
+        app(ActivityLogger::class)->log('leave.approve', 'Pengajuan '.$leaveRequest->jenis.' milik '.$leaveRequest->employee->nama.' disetujui.');
+
         return back()->with('success', 'Pengajuan disetujui.');
     }
 
@@ -77,6 +82,8 @@ class LeaveRequestController extends Controller
             auth()->id(),
             $request->input('catatan_approval')
         );
+
+        app(ActivityLogger::class)->log('leave.reject', 'Pengajuan '.$leaveRequest->jenis.' milik '.$leaveRequest->employee->nama.' ditolak.');
 
         return back()->with('success', 'Pengajuan ditolak.');
     }

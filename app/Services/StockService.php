@@ -21,7 +21,15 @@ class StockService
         if ($type === 'in' || $type === 'return') {
             $product->increment('stok', $qty);
         } elseif ($type === 'out') {
+            if ($product->stok < $qty) {
+                throw new \RuntimeException(
+                    "Stok {$product->name} tidak mencukupi untuk pengurangan {$qty} (tersisa {$product->stok})."
+                );
+            }
+
             $product->decrement('stok', $qty);
+        } else {
+            throw new \InvalidArgumentException("Tipe mutasi stok tidak dikenal: {$type}");
         }
 
         $product->refresh();

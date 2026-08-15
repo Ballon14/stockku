@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\AttendanceService;
 use App\Services\ReportService;
 
 class DashboardController extends Controller
@@ -16,11 +17,13 @@ class DashboardController extends Controller
 
         if ($user->hasRole(['admin', 'manager'])) {
             $data = $this->reportService->getDashboardData();
+
             return view('dashboard.admin', compact('data'));
         }
 
         if ($user->hasRole('kasir')) {
             $data = $this->reportService->getDashboardData();
+
             return view('dashboard.admin', compact('data'));
         }
 
@@ -30,7 +33,7 @@ class DashboardController extends Controller
         $recentAttendances = collect();
 
         if ($employee) {
-            $todayAttendance = app(\App\Services\AttendanceService::class)->getTodayAttendance($employee);
+            $todayAttendance = app(AttendanceService::class)->getTodayAttendance($employee);
             $recentAttendances = $employee->attendances()->latest('tanggal')->limit(7)->get();
         }
 

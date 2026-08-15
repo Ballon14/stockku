@@ -18,6 +18,8 @@ class Sale extends Model
         'kembalian',
         'status',
         'catatan',
+        'sumber',
+        'offline_id',
     ];
 
     protected $casts = [
@@ -45,8 +47,8 @@ class Sale extends Model
 
     public static function generateInvoiceNumber(): string
     {
-        $prefix = 'INV-' . date('Ymd');
-        $lastSale = static::where('invoice_number', 'like', $prefix . '%')
+        $prefix = 'INV-'.date('Ymd');
+        $lastSale = static::where('invoice_number', 'like', $prefix.'%')
             ->orderBy('invoice_number', 'desc')
             ->first();
 
@@ -57,6 +59,6 @@ class Sale extends Model
             $newNumber = 1;
         }
 
-        return $prefix . '-' . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
+        return $prefix.'-'.str_pad($newNumber, 4, '0', STR_PAD_LEFT);
     }
 }

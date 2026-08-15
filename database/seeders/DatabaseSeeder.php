@@ -107,8 +107,8 @@ class DatabaseSeeder extends Seeder
                 'user_id' => $user->id,
                 'nama' => $staff['name'],
                 'jabatan' => 'Staff Gudang',
-                'no_kontak' => '08123456789' . ($i + 3),
-                'tanggal_masuk' => '2024-0' . ($i + 2) . '-01',
+                'no_kontak' => '08123456789'.($i + 3),
+                'tanggal_masuk' => '2024-0'.($i + 2).'-01',
             ]);
             $staffUsers[] = ['user' => $user, 'employee' => $emp];
         }
@@ -186,7 +186,7 @@ class DatabaseSeeder extends Seeder
         $saleDate = Carbon::now()->subDays(2);
         for ($i = 0; $i < 5; $i++) {
             $sale = Sale::create([
-                'invoice_number' => 'INV-' . $saleDate->copy()->addDays($i)->format('Ymd') . '-' . str_pad($i + 1, 4, '0', STR_PAD_LEFT),
+                'invoice_number' => 'INV-'.$saleDate->copy()->addDays($i)->format('Ymd').'-'.str_pad($i + 1, 4, '0', STR_PAD_LEFT),
                 'user_id' => $i % 2 === 0 ? $kasir1->id : $kasir2->id,
                 'subtotal' => 0,
                 'diskon' => 0,
@@ -229,7 +229,7 @@ class DatabaseSeeder extends Seeder
                     'stok_sesudah' => $prod->stok - $qty,
                     'reference_type' => Sale::class,
                     'reference_id' => $sale->id,
-                    'keterangan' => 'Penjualan ' . $sale->invoice_number,
+                    'keterangan' => 'Penjualan '.$sale->invoice_number,
                     'user_id' => $sale->user_id,
                     'created_at' => $sale->created_at,
                 ]);
@@ -247,7 +247,9 @@ class DatabaseSeeder extends Seeder
         $allEmployees = Employee::all();
         for ($day = 5; $day >= 0; $day--) {
             $date = Carbon::now()->subDays($day);
-            if ($date->isWeekend()) continue;
+            if ($date->isWeekend()) {
+                continue;
+            }
 
             foreach ($allEmployees as $emp) {
                 Attendance::create([

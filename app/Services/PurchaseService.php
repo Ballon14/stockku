@@ -43,7 +43,7 @@ class PurchaseService
 
                 // Tambah stok
                 $product = Product::find($item['product_id']);
-                if (!empty($item['update_harga_beli'])) {
+                if (! empty($item['update_harga_beli'])) {
                     $product->update(['harga_beli' => $item['harga']]);
                 }
                 $this->stockService->recordMovement(
@@ -52,7 +52,7 @@ class PurchaseService
                     $item['qty'],
                     Purchase::class,
                     $purchase->id,
-                    'Pembelian ' . $purchase->invoice_number
+                    'Pembelian '.$purchase->invoice_number
                 );
             }
 

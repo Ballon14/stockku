@@ -34,7 +34,8 @@
     </div>
 
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-        <table class="w-full text-sm">
+        <div class="overflow-x-auto">
+    <table class="w-full text-sm">
             <thead class="bg-slate-50 border-b border-slate-100">
                 <tr>
                     <th class="text-left py-3 px-4 font-semibold text-slate-600">Tanggal</th>
@@ -64,6 +65,7 @@
                 @endforelse
             </tbody>
         </table>
+    </div>
     </div>
 </div>
 </x-app-layout>

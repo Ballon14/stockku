@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CategoryRequest;
 use App\Models\Category;
+use App\Services\ActivityLogger;
 use App\Services\CategoryService;
 
 class CategoryController extends Controller
@@ -15,6 +16,7 @@ class CategoryController extends Controller
     public function index()
     {
         $categories = $this->categoryService->getAll();
+
         return view('categories.index', compact('categories'));
     }
 
@@ -25,7 +27,9 @@ class CategoryController extends Controller
 
     public function store(CategoryRequest $request)
     {
-        $this->categoryService->store($request->validated());
+        $category = $this->categoryService->store($request->validated());
+        app(ActivityLogger::class)->log('category.create', 'Kategori "'.$category->name.'" ditambahkan.');
+
         return redirect()->route('categories.index')->with('success', 'Kategori berhasil ditambahkan.');
     }
 
@@ -37,12 +41,16 @@ class CategoryController extends Controller
     public function update(CategoryRequest $request, Category $category)
     {
         $this->categoryService->update($category, $request->validated());
+        app(ActivityLogger::class)->log('category.update', 'Kategori "'.$category->name.'" diperbarui.');
+
         return redirect()->route('categories.index')->with('success', 'Kategori berhasil diperbarui.');
     }
 
     public function destroy(Category $category)
     {
         $this->categoryService->delete($category);
+        app(ActivityLogger::class)->log('category.delete', 'Kategori "'.$category->name.'" dihapus.');
+
         return redirect()->route('categories.index')->with('success', 'Kategori berhasil dihapus.');
     }
 }

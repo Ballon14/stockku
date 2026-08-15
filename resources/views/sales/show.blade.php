@@ -27,6 +27,7 @@
                 @endforeach
             </tbody>
         </table>
+    </div>
         <div class="space-y-1 text-sm text-right">
             <div class="flex justify-end gap-8"><span class="text-slate-500">Subtotal</span><span class="font-medium w-32">Rp {{ number_format($sale->subtotal, 0, ',', '.') }}</span></div>
             <div class="flex justify-end gap-8"><span class="text-slate-500">Diskon</span><span class="font-medium w-32 text-red-600">- Rp {{ number_format($sale->diskon, 0, ',', '.') }}</span></div>

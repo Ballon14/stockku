@@ -15,8 +15,8 @@ class EmployeeService
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('nama', 'like', "%{$search}%")
-                  ->orWhere('jabatan', 'like', "%{$search}%")
-                  ->orWhere('no_kontak', 'like', "%{$search}%");
+                    ->orWhere('jabatan', 'like', "%{$search}%")
+                    ->orWhere('no_kontak', 'like', "%{$search}%");
             });
         }
 
@@ -44,12 +44,12 @@ class EmployeeService
 
         if ($userData && $employee->user) {
             $updateData = ['email' => $userData['email']];
-            if (!empty($userData['password'])) {
+            if (! empty($userData['password'])) {
                 $updateData['password'] = Hash::make($userData['password']);
             }
             $employee->user->update($updateData);
 
-            if (!empty($userData['role'])) {
+            if (! empty($userData['role'])) {
                 $employee->user->syncRoles([$userData['role']]);
             }
         }

@@ -1,7 +1,7 @@
 <x-app-layout>
 @section('title', 'Laporan Absensi')
 <x-slot name="header">
-    <div class="flex items-center justify-between">
+    <div class="flex flex-wrap items-center justify-between gap-3">
         <h2 class="text-2xl font-bold text-slate-800">Laporan Absensi Karyawan</h2>
         <form method="GET" action="{{ route('reports.attendance') }}" target="_blank">
             <input type="hidden" name="start_date" value="{{ $startDate }}">

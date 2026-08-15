@@ -1,7 +1,7 @@
 <x-app-layout>
 @section('title', 'Kategori Produk')
 <x-slot name="header">
-    <div class="flex items-center justify-between">
+    <div class="flex flex-wrap items-center justify-between gap-3">
         <h2 class="text-2xl font-bold text-slate-800">Kategori Produk</h2>
         <a href="{{ route('categories.create') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl text-sm font-semibold shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 transition-all">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
@@ -11,6 +11,7 @@
 </x-slot>
 
 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+    <div class="overflow-x-auto">
     <table class="w-full text-sm">
         <thead class="bg-slate-50 border-b border-slate-100">
             <tr>
@@ -51,6 +52,7 @@
             @endforelse
         </tbody>
     </table>
+    </div>
     <div class="px-4 py-3 border-t border-slate-100">{{ $categories->links() }}</div>
 </div>
 </x-app-layout>

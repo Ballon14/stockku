@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\SupplierRequest;
 use App\Models\Supplier;
+use App\Services\ActivityLogger;
 use App\Services\SupplierService;
 
 class SupplierController extends Controller
@@ -16,6 +17,7 @@ class SupplierController extends Controller
     {
         $search = request('search');
         $suppliers = $this->supplierService->getAll($search);
+
         return view('suppliers.index', compact('suppliers', 'search'));
     }
 
@@ -26,7 +28,9 @@ class SupplierController extends Controller
 
     public function store(SupplierRequest $request)
     {
-        $this->supplierService->store($request->validated());
+        $supplier = $this->supplierService->store($request->validated());
+        app(ActivityLogger::class)->log('supplier.create', 'Supplier "'.$supplier->name.'" ('.$supplier->code.') ditambahkan.');
+
         return redirect()->route('suppliers.index')->with('success', 'Supplier berhasil ditambahkan.');
     }
 
@@ -38,12 +42,16 @@ class SupplierController extends Controller
     public function update(SupplierRequest $request, Supplier $supplier)
     {
         $this->supplierService->update($supplier, $request->validated());
+        app(ActivityLogger::class)->log('supplier.update', 'Supplier "'.$supplier->name.'" diperbarui.');
+
         return redirect()->route('suppliers.index')->with('success', 'Supplier berhasil diperbarui.');
     }
 
     public function destroy(Supplier $supplier)
     {
         $this->supplierService->delete($supplier);
+        app(ActivityLogger::class)->log('supplier.delete', 'Supplier "'.$supplier->name.'" dihapus.');
+
         return redirect()->route('suppliers.index')->with('success', 'Supplier berhasil dihapus.');
     }
 }

@@ -4,16 +4,23 @@ namespace App\Livewire;
 
 use App\Models\Product;
 use App\Services\SaleService;
+use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 
 class PosTerminal extends Component
 {
     public string $search = '';
+
     public array $cart = [];
+
     public $diskon = 0;
+
     public $bayar = 0;
+
     public string $catatan = '';
+
     public bool $showCheckout = false;
+
     public ?int $lastSaleId = null;
 
     public function searchProducts()
@@ -24,9 +31,11 @@ class PosTerminal extends Component
     public function addToCart(int $productId)
     {
         $product = Product::find($productId);
-        if (!$product || $product->stok <= 0) return;
+        if (! $product || $product->stok <= 0) {
+            return;
+        }
 
-        $key = 'p_' . $productId;
+        $key = 'p_'.$productId;
 
         if (isset($this->cart[$key])) {
             if ($this->cart[$key]['qty'] < $product->stok) {
@@ -89,12 +98,12 @@ class PosTerminal extends Component
 
     public function getGrandTotalProperty(): float
     {
-        return max(0, $this->subtotal - (float)$this->diskon);
+        return max(0, $this->subtotal - (float) $this->diskon);
     }
 
     public function getKembalianProperty(): float
     {
-        return max(0, (float)$this->bayar - $this->grandTotal);
+        return max(0, (float) $this->bayar - $this->grandTotal);
     }
 
     public function openCheckout()
@@ -104,9 +113,12 @@ class PosTerminal extends Component
 
     public function processPayment()
     {
-        if (empty($this->cart)) return;
-        if ((float)$this->bayar < $this->grandTotal) {
+        if (empty($this->cart)) {
+            return;
+        }
+        if ((float) $this->bayar < $this->grandTotal) {
             session()->flash('pos-error', 'Jumlah bayar kurang dari total.');
+
             return;
         }
 
@@ -121,27 +133,30 @@ class PosTerminal extends Component
 
         try {
             $saleService = app(SaleService::class);
-            $sale = $saleService->createSale($items, (float)$this->diskon, (float)$this->bayar, $this->catatan);
+            $sale = $saleService->createSale($items, (float) $this->diskon, (float) $this->bayar, $this->catatan);
             $this->lastSaleId = $sale->id;
             $this->clearCart();
-            session()->flash('pos-success', 'Transaksi berhasil! Invoice: ' . $sale->invoice_number);
+            session()->flash('pos-success', 'Transaksi berhasil! Invoice: '.$sale->invoice_number);
+        } catch (ValidationException $e) {
+            $message = collect($e->errors())->flatten()->first() ?? 'Data transaksi tidak valid.';
+            session()->flash('pos-error', $message);
         } catch (\Exception $e) {
-            session()->flash('pos-error', 'Gagal memproses transaksi: ' . $e->getMessage());
+            session()->flash('pos-error', 'Gagal memproses transaksi: '.$e->getMessage());
         }
     }
 
     public function render()
     {
         $query = Product::where('is_active', true)->where('stok', '>', 0);
-        
+
         if (strlen($this->search) > 0) {
             $query->where(function ($q) {
-                $q->where('name', 'like', '%' . $this->search . '%')
-                  ->orWhere('sku', 'like', '%' . $this->search . '%')
-                  ->orWhere('barcode', $this->search);
+                $q->where('name', 'like', '%'.$this->search.'%')
+                    ->orWhere('sku', 'like', '%'.$this->search.'%')
+                    ->orWhere('barcode', $this->search);
             });
         }
-        
+
         $products = $query->limit(50)->get();
 
         return view('livewire.pos-terminal', [

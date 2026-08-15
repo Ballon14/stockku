@@ -15,10 +15,10 @@ StokCku adalah aplikasi web komprehensif yang dirancang untuk mengelola penjuala
 
 ## 🛠️ Teknologi yang Digunakan
 
-- **Backend**: Laravel 11.x (PHP 8.2)
+- **Backend**: Laravel 12.x (PHP 8.2+)
 - **Database**: MySQL
-- **Frontend & Styling**: Blade Templates, Tailwind CSS 4, AlpineJS
-- **Interaktivitas (POS)**: Livewire 3
+- **Frontend & Styling**: Blade Templates, Tailwind CSS 3 (via Vite & PostCSS), AlpineJS
+- **Interaktivitas (POS)**: Livewire 4
 - **Autentikasi & Otorisasi**: Laravel Breeze & Spatie Laravel Permission
 - **Ekspor Dokumen**: Barryvdh/Laravel-DomPDF (PDF) & OpenSpout (Excel)
 

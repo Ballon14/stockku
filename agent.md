@@ -15,11 +15,18 @@ StokCku is a modern, responsive Web-based Point of Sale (POS) and Inventory Mana
 ## 🛠️ Technology Stack
 - **Backend**: Laravel 12 (LTS) / PHP 8.2+
 - **Frontend**: Blade + Tailwind CSS (v4 via CDN)
-- **Interactivity**: Livewire 3 (No full page reloads for dynamic components)
+- **Interactivity**: Livewire 4 (No full page reloads for dynamic components)
 - **Database**: MySQL
 - **Authentication & Authorization**: Laravel Breeze + Spatie Laravel Permission
 - **PDF Generation**: `barryvdh/laravel-dompdf`
 - **Excel Export**: `openspout/openspout`
+
+## 🧱 Data Integrity Rules (MUST follow)
+- **Stock guards are server-side**: `SaleService::createSale()` re-fetches products with `lockForUpdate()` and validates `qty <= stok` inside `DB::transaction`. Never bypass with raw `decrement()`.
+- **`StockService::recordMovement()` throws** when `type = 'out'` would drive stock below zero, and throws `InvalidArgumentException` for unknown types.
+- **Returns are capped**: `sale_items.returned_qty` tracks cumulative returns; `SaleService::processReturn()` rejects over-return and sets sale status to `partial_return` / `returned`.
+- **Money validation**: header `diskon` is clamped to `[0, subtotal]`, item discount cannot make item subtotal negative, and `bayar >= grand_total` is enforced in the service (never trust client-side checks).
+- **Tests**: run `php artisan test` before finishing work on services. New behavior on sales/stock/returns must come with Feature tests under `tests/Feature/`.
 
 ## 🏗️ Architectural Guidelines
 Please adhere to the following conventions when making changes or adding features:

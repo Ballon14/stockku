@@ -33,7 +33,7 @@ class ReportService
                 if ($productId && $item->product_id != $productId) {
                     continue;
                 }
-                
+
                 $existing = $items->firstWhere('product_id', $item->product_id);
                 if ($existing) {
                     $existing->qty += $item->qty;
@@ -45,7 +45,7 @@ class ReportService
                         'name' => $item->product->name,
                         'category_name' => $item->product->category->name ?? '-',
                         'qty' => $item->qty,
-                        'subtotal' => $item->subtotal
+                        'subtotal' => $item->subtotal,
                     ];
                     $items->push($newItem);
                 }
@@ -54,7 +54,10 @@ class ReportService
 
         $totalRevenue = $items->sum('subtotal');
         $totalTransactions = $sales->filter(function ($sale) use ($productId) {
-            if (!$productId) return true;
+            if (! $productId) {
+                return true;
+            }
+
             return $sale->items->contains('product_id', $productId);
         })->count();
 
@@ -88,7 +91,7 @@ class ReportService
         // Retur
         $totalRetur = SaleReturn::whereHas('sale', function ($q) use ($startDate, $endDate) {
             $q->whereDate('created_at', '>=', $startDate)
-              ->whereDate('created_at', '<=', $endDate);
+                ->whereDate('created_at', '<=', $endDate);
         })->where('status', 'approved')->sum('total_refund');
 
         $gross_profit = $net_revenue - $cogs - $totalRetur;
@@ -119,23 +122,23 @@ class ReportService
     public function getAttendanceReport($startDate, $endDate, $employeeId = null)
     {
         $query = Employee::where('is_active', true);
-        
+
         if ($employeeId) {
             $query->where('id', $employeeId);
         }
-        
+
         $employees = $query->get();
-        
+
         $attendances = Attendance::whereBetween('tanggal', [$startDate, $endDate])
             ->whereIn('employee_id', $employees->pluck('id'))
             ->get();
-            
+
         $data = [];
         foreach ($employees as $employee) {
             $empAtt = $attendances->where('employee_id', $employee->id);
             $totalDays = $empAtt->count();
             $hadir = $empAtt->where('status', 'hadir')->count();
-            
+
             $data[] = [
                 'employee_name' => $employee->nama,
                 'employee_jabatan' => $employee->jabatan,
@@ -169,10 +172,10 @@ class ReportService
 
         // Grafik penjualan 7 hari terakhir
         $dailySales = Sale::select(
-                DB::raw('DATE(created_at) as date'),
-                DB::raw('SUM(grand_total) as total'),
-                DB::raw('COUNT(*) as count')
-            )
+            DB::raw('DATE(created_at) as date'),
+            DB::raw('SUM(grand_total) as total'),
+            DB::raw('COUNT(*) as count')
+        )
             ->where('status', '!=', 'returned')
             ->whereDate('created_at', '>=', $today->copy()->subDays(6))
             ->groupBy(DB::raw('DATE(created_at)'))
@@ -181,13 +184,13 @@ class ReportService
 
         // Produk terlaris bulan ini
         $topProducts = SaleItem::select(
-                'product_id',
-                DB::raw('SUM(qty) as total_qty'),
-                DB::raw('SUM(subtotal) as total_sales')
-            )
+            'product_id',
+            DB::raw('SUM(qty) as total_qty'),
+            DB::raw('SUM(subtotal) as total_sales')
+        )
             ->whereHas('sale', function ($q) use ($startOfMonth) {
                 $q->whereDate('created_at', '>=', $startOfMonth)
-                  ->where('status', '!=', 'returned');
+                    ->where('status', '!=', 'returned');
             })
             ->groupBy('product_id')
             ->orderByDesc('total_qty')

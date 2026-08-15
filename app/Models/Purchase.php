@@ -40,8 +40,8 @@ class Purchase extends Model
 
     public static function generateInvoiceNumber(): string
     {
-        $prefix = 'PUR-' . date('Ymd');
-        $last = static::where('invoice_number', 'like', $prefix . '%')
+        $prefix = 'PUR-'.date('Ymd');
+        $last = static::where('invoice_number', 'like', $prefix.'%')
             ->orderBy('invoice_number', 'desc')
             ->first();
 
@@ -52,6 +52,6 @@ class Purchase extends Model
             $newNumber = 1;
         }
 
-        return $prefix . '-' . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
+        return $prefix.'-'.str_pad($newNumber, 4, '0', STR_PAD_LEFT);
     }
 }

@@ -3,9 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Employee;
-use App\Models\LeaveRequest;
+use App\Services\ActivityLogger;
 use App\Services\AttendanceService;
-use Illuminate\Http\Request;
 
 class AttendanceController extends Controller
 {
@@ -18,7 +17,7 @@ class AttendanceController extends Controller
         $user = auth()->user();
         $employee = $user->employee;
 
-        if (!$employee) {
+        if (! $employee) {
             return redirect()->route('dashboard')->with('error', 'Data karyawan tidak ditemukan.');
         }
 
@@ -35,11 +34,12 @@ class AttendanceController extends Controller
         $user = auth()->user();
         $employee = $user->employee;
 
-        if (!$employee) {
+        if (! $employee) {
             return redirect()->route('dashboard')->with('error', 'Data karyawan tidak ditemukan.');
         }
 
         $todayAttendance = $this->attendanceService->getTodayAttendance($employee);
+
         return view('attendances.clock', compact('todayAttendance'));
     }
 
@@ -48,11 +48,13 @@ class AttendanceController extends Controller
         $user = auth()->user();
         $employee = $user->employee;
 
-        if (!$employee) {
+        if (! $employee) {
             return back()->with('error', 'Data karyawan tidak ditemukan.');
         }
 
         $this->attendanceService->clockIn($employee);
+        app(ActivityLogger::class)->log('attendance.clock_in', 'Clock-in ('.$employee->nama.').');
+
         return redirect()->route('attendance.clock')->with('success', 'Clock-in berhasil!');
     }
 
@@ -61,11 +63,13 @@ class AttendanceController extends Controller
         $user = auth()->user();
         $employee = $user->employee;
 
-        if (!$employee) {
+        if (! $employee) {
             return back()->with('error', 'Data karyawan tidak ditemukan.');
         }
 
         $this->attendanceService->clockOut($employee);
+        app(ActivityLogger::class)->log('attendance.clock_out', 'Clock-out ('.$employee->nama.').');
+
         return redirect()->route('attendance.clock')->with('success', 'Clock-out berhasil!');
     }
 

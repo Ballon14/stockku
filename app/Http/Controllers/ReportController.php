@@ -28,6 +28,7 @@ class ReportController extends Controller
 
         if ($request->input('export') === 'pdf') {
             $pdf = Pdf::loadView('reports.sales-pdf', compact('data', 'startDate', 'endDate'));
+
             return $pdf->download('laporan-penjualan.pdf');
         }
 
@@ -43,6 +44,7 @@ class ReportController extends Controller
 
         if ($request->input('export') === 'pdf') {
             $pdf = Pdf::loadView('reports.profit-loss-pdf', compact('data', 'startDate', 'endDate'));
+
             return $pdf->download('laporan-laba-rugi.pdf');
         }
 
@@ -72,6 +74,7 @@ class ReportController extends Controller
 
         if ($request->input('export') === 'pdf') {
             $pdf = Pdf::loadView('reports.attendance-pdf', compact('data', 'startDate', 'endDate'));
+
             return $pdf->download('laporan-absensi.pdf');
         }
 

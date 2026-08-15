@@ -13,8 +13,8 @@ class SupplierService
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('code', 'like', "%{$search}%")
-                  ->orWhere('phone', 'like', "%{$search}%");
+                    ->orWhere('code', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%");
             });
         }
 
@@ -29,6 +29,7 @@ class SupplierService
     public function update(Supplier $supplier, array $data): Supplier
     {
         $supplier->update($data);
+
         return $supplier;
     }
 

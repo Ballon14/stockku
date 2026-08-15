@@ -19,7 +19,7 @@ class AttendanceService
             ['clock_in' => $now, 'status' => 'hadir']
         );
 
-        if (!$attendance->wasRecentlyCreated && !$attendance->clock_in) {
+        if (! $attendance->wasRecentlyCreated && ! $attendance->clock_in) {
             $attendance->update(['clock_in' => $now, 'status' => 'hadir']);
         }
 
@@ -35,7 +35,7 @@ class AttendanceService
             ->where('tanggal', $today)
             ->first();
 
-        if ($attendance && $attendance->clock_in && !$attendance->clock_out) {
+        if ($attendance && $attendance->clock_in && ! $attendance->clock_out) {
             $attendance->update(['clock_out' => $now]);
         }
 

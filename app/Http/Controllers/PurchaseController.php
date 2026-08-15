@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PurchaseRequest;
+use App\Models\Product;
 use App\Models\Purchase;
+use App\Services\ActivityLogger;
 use App\Services\PurchaseService;
 use App\Services\SupplierService;
-use App\Models\Product;
 
 class PurchaseController extends Controller
 {
@@ -22,6 +23,7 @@ class PurchaseController extends Controller
         $supplierId = request('supplier_id');
         $purchases = $this->purchaseService->getPurchases($startDate, $endDate, $supplierId);
         $suppliers = $this->supplierService->getActive();
+
         return view('purchases.index', compact('purchases', 'suppliers', 'startDate', 'endDate', 'supplierId'));
     }
 
@@ -29,17 +31,20 @@ class PurchaseController extends Controller
     {
         $suppliers = $this->supplierService->getActive();
         $products = Product::where('is_active', true)->orderBy('name')->get();
+
         return view('purchases.create', compact('suppliers', 'products'));
     }
 
     public function store(PurchaseRequest $request)
     {
-        $this->purchaseService->createPurchase(
+        $purchase = $this->purchaseService->createPurchase(
             $request->input('supplier_id'),
             $request->input('tanggal'),
             $request->input('items'),
             $request->input('keterangan')
         );
+
+        app(ActivityLogger::class)->log('purchase.create', 'Pembelian '.$purchase->invoice_number.' dicatat (Total: Rp '.number_format($purchase->total, 0, ',', '.').').');
 
         return redirect()->route('purchases.index')->with('success', 'Pembelian berhasil dicatat.');
     }
@@ -47,6 +52,7 @@ class PurchaseController extends Controller
     public function show(Purchase $purchase)
     {
         $purchase->load(['supplier', 'user', 'items.product']);
+
         return view('purchases.show', compact('purchase'));
     }
 }

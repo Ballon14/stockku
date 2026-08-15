@@ -25,6 +25,7 @@ class SaleReturnController extends Controller
     public function create(Sale $sale)
     {
         $sale->load('items.product');
+
         return view('sale-returns.create', compact('sale'));
     }
 
@@ -45,6 +46,7 @@ class SaleReturnController extends Controller
     public function show(SaleReturn $saleReturn)
     {
         $saleReturn->load(['sale.items.product', 'items.product', 'processedBy']);
+
         return view('sale-returns.show', compact('saleReturn'));
     }
 }

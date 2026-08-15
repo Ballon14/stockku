@@ -34,7 +34,8 @@
 
         <h3 class="text-lg font-semibold text-slate-800 mb-3">Item Produk</h3>
         <div class="border rounded-xl border-slate-200 overflow-hidden mb-6">
-            <table class="w-full text-sm">
+            <div class="overflow-x-auto">
+    <table class="w-full text-sm">
                 <thead class="bg-slate-50 border-b border-slate-200">
                     <tr>
                         <th class="text-left py-3 px-4 font-medium text-slate-600">Produk</th>
@@ -63,6 +64,7 @@
                     </tr>
                 </tfoot>
             </table>
+    </div>
         </div>
 
         <div class="flex gap-3">

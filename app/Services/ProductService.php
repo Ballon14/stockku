@@ -15,8 +15,8 @@ class ProductService
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('sku', 'like', "%{$search}%")
-                  ->orWhere('barcode', 'like', "%{$search}%");
+                    ->orWhere('sku', 'like', "%{$search}%")
+                    ->orWhere('barcode', 'like', "%{$search}%");
             });
         }
 
@@ -47,6 +47,7 @@ class ProductService
         }
 
         $product->update($data);
+
         return $product;
     }
 
@@ -55,6 +56,7 @@ class ProductService
         if ($product->foto) {
             Storage::disk('public')->delete($product->foto);
         }
+
         return $product->delete();
     }
 
@@ -72,8 +74,8 @@ class ProductService
             ->where('stok', '>', 0)
             ->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('sku', 'like', "%{$search}%")
-                  ->orWhere('barcode', $search);
+                    ->orWhere('sku', 'like', "%{$search}%")
+                    ->orWhere('barcode', $search);
             })
             ->limit(10)
             ->get();

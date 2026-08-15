@@ -30,7 +30,8 @@
 
             <h3 class="text-lg font-semibold text-slate-800 mb-3">Pilih Item untuk Diretur</h3>
             <div class="border rounded-xl border-slate-200 overflow-hidden mb-6">
-                <table class="w-full text-sm">
+                <div class="overflow-x-auto">
+    <table class="w-full text-sm">
                     <thead class="bg-slate-50 border-b border-slate-200">
                         <tr>
                             <th class="w-10 px-4 text-center">
@@ -65,6 +66,7 @@
                         @endforeach
                     </tbody>
                 </table>
+    </div>
             </div>
             
             <template x-for="(item, index) in selectedItems" :key="index">

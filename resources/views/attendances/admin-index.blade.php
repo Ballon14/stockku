@@ -48,6 +48,7 @@
     <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
         <h3 class="font-semibold text-slate-700">Data Absensi: {{ \Carbon\Carbon::parse($date)->translatedFormat('l, d F Y') }}</h3>
     </div>
+    <div class="overflow-x-auto">
     <table class="w-full text-sm">
         <thead class="bg-white border-b border-slate-100">
             <tr>
@@ -87,6 +88,7 @@
             @endforeach
         </tbody>
     </table>
+    </div>
     @else
     <!-- Monthly Summary -->
     <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">

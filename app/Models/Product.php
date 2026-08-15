@@ -59,8 +59,9 @@ class Product extends Model
     public function getFotoUrlAttribute(): ?string
     {
         if ($this->foto) {
-            return asset('storage/' . $this->foto);
+            return asset('storage/'.$this->foto);
         }
+
         return null;
     }
 }

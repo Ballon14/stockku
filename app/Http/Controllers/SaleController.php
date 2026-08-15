@@ -37,12 +37,14 @@ class SaleController extends Controller
         }
 
         $sale->load(['items.product', 'user', 'returns.items']);
+
         return view('sales.show', compact('sale'));
     }
 
     public function receipt(Sale $sale)
     {
         $sale->load(['items.product', 'user']);
+
         return view('sales.receipt', compact('sale'));
     }
 

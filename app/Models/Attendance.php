@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -42,9 +43,11 @@ class Attendance extends Model
     public function getDurasiAttribute(): ?string
     {
         if ($this->clock_in && $this->clock_out) {
-            $diff = \Carbon\Carbon::parse($this->clock_in)->diff(\Carbon\Carbon::parse($this->clock_out));
+            $diff = Carbon::parse($this->clock_in)->diff(Carbon::parse($this->clock_out));
+
             return $diff->format('%H jam %I menit');
         }
+
         return null;
     }
 }

@@ -11,12 +11,15 @@ class SaleItem extends Model
         'sale_id',
         'product_id',
         'qty',
+        'returned_qty',
         'harga',
         'diskon',
         'subtotal',
     ];
 
     protected $casts = [
+        'qty' => 'integer',
+        'returned_qty' => 'integer',
         'harga' => 'decimal:2',
         'diskon' => 'decimal:2',
         'subtotal' => 'decimal:2',
