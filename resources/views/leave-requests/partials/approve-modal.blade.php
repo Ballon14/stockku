@@ -23,7 +23,7 @@
 
             <div class="flex gap-3">
                 <button type="button" @click="open = false" class="flex-1 px-4 py-2 bg-slate-100 text-slate-700 rounded-xl text-sm font-semibold hover:bg-slate-200 transition-colors">Batal</button>
-                <button type="submit" form="form-reject-{{ $req->id }}" onclick="return confirm('Yakin menolak pengajuan {{ $req->employee->nama }} ini? Tindakan ini tidak dapat dibatalkan.')" class="px-4 py-2 bg-red-50 text-red-600 rounded-xl text-sm font-semibold hover:bg-red-100 transition-colors">Tolak</button>
+                <button type="submit" form="form-reject-{{ $req->id }}" onclick="return confirmEvent(event, 'Yakin menolak pengajuan {{ $req->employee->nama }} ini? Tindakan ini tidak dapat dibatalkan.', { danger: true, title: 'Tolak Pengajuan', confirmText: 'Ya, Tolak' })" class="px-4 py-2 bg-red-50 text-red-600 rounded-xl text-sm font-semibold hover:bg-red-100 transition-colors">Tolak</button>
                 <button type="submit" form="form-approve-{{ $req->id }}" class="flex-1 px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-semibold shadow-lg shadow-emerald-500/30 hover:bg-emerald-700 transition-colors">Setujui</button>
             </div>
         </div>

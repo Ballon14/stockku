@@ -48,7 +48,7 @@ export async function refreshCatalog() {
 }
 
 export async function enqueueTransaction({ items, diskon, bayar, catatan, paymentMethod }) {
-    const offlineId = crypto.randomUUID();
+    const offlineId = crypto.randomUUID ? crypto.randomUUID() : 'off-' + Date.now() + '-' + Math.random().toString(36).slice(2, 10);
 
     const transaction = {
         offline_id: offlineId,

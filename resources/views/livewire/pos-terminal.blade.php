@@ -225,12 +225,29 @@
                     </p>
                     @endif
 
-                    <button wire:click="processPayment" wire:confirm="Apakah Anda yakin uang pelanggan sudah sesuai dan ingin memproses transaksi ini?" wire:loading.attr="disabled" wire:target="processPayment" class="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl font-semibold shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all text-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed" {{ $this->bayar < $this->grandTotal ? 'disabled' : '' }}>
+                    <div x-data="{ showConfirm: false }">
+                    <button @click="showConfirm = true" wire:loading.attr="disabled" wire:target="processPayment" class="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl font-semibold shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all text-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed" {{ $this->bayar < $this->grandTotal ? 'disabled' : '' }}>
                         <svg wire:loading.remove wire:target="processPayment" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                         <svg wire:loading wire:target="processPayment" class="w-6 h-6 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>
                         <span wire:loading.remove wire:target="processPayment">Proses Transaksi</span>
                         <span wire:loading wire:target="processPayment">Memproses...</span>
                     </button>
+
+                    <div x-show="showConfirm" x-cloak x-transition.opacity class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4" @keydown.escape.window="showConfirm = false">
+                            <div @click="showConfirm = false" class="absolute inset-0"></div>
+                            <div x-show="showConfirm" x-transition.scale.origin.bottom class="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center">
+                                <div class="mx-auto w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center mb-4">
+                                    <svg class="w-7 h-7 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                </div>
+                                <h3 class="text-lg font-bold text-slate-800 mb-2">Proses Transaksi</h3>
+                                <p class="text-sm text-slate-500 mb-6">Apakah Anda yakin uang pelanggan sudah sesuai dan ingin memproses transaksi ini?</p>
+                                <div class="flex gap-3">
+                                    <button type="button" @click="showConfirm = false" class="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-700 text-sm font-semibold hover:bg-slate-200 transition-colors">Batal</button>
+                                    <button type="button" wire:click="processPayment" @click="showConfirm = false" class="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold shadow-lg transition-colors">Ya, Proses</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 @endif
             </div>
@@ -399,10 +416,27 @@
                         <input type="text" x-model="catatan" class="w-full rounded-xl border border-slate-200 py-2 px-3 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-200" placeholder="Catatan transaksi (opsional)...">
                     </div>
 
-                    <button @click="checkout()" :disabled="!canCheckout" class="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl font-semibold shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all text-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                        Simpan Transaksi (Offline)
-                    </button>
+                    <div x-data="{ confirmOffline: false }">
+                        <button @click="confirmOffline = true" :disabled="!canCheckout" class="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl font-semibold shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all text-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                            Simpan Transaksi (Offline)
+                        </button>
+
+                    <div x-show="confirmOffline" x-cloak x-transition.opacity class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4" @keydown.escape.window="confirmOffline = false">
+                        <div @click="confirmOffline = false" class="absolute inset-0"></div>
+                        <div x-show="confirmOffline" x-transition.scale.origin.bottom class="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center">
+                            <div class="mx-auto w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center mb-4">
+                                <svg class="w-7 h-7 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            </div>
+                            <h3 class="text-lg font-bold text-slate-800 mb-2">Simpan Transaksi Offline</h3>
+                            <p class="text-sm text-slate-500 mb-6">Transaksi akan disimpan di perangkat ini dan disinkronkan otomatis saat koneksi kembali. Lanjutkan?</p>
+                            <div class="flex gap-3">
+                                <button type="button" @click="confirmOffline = false" class="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-700 text-sm font-semibold hover:bg-slate-200 transition-colors">Batal</button>
+                                <button type="button" @click="confirmOffline = false; checkout()" class="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold shadow-lg transition-colors">Ya, Simpan</button>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
                 </div>
             </div>
         </div>

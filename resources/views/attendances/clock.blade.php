@@ -49,7 +49,7 @@
                     </button>
                 </form>
                 @elseif(!$todayAttendance->clock_out)
-                <form method="POST" action="{{ route('attendance.clock-out') }}" onsubmit="return confirm('Anda yakin ingin Clock Out sekarang?')">
+                <form method="POST" action="{{ route('attendance.clock-out') }}" onsubmit="return confirmForm(this, 'Anda yakin ingin Clock Out sekarang?')">
                     @csrf
                     <button type="submit" class="w-full py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-2xl text-lg font-bold shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
