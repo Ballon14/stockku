@@ -1,6 +1,6 @@
-# StokCku - Web Aplikasi Penjualan & Absensi 🚀
+# StockKu - Web Aplikasi Penjualan & Absensi 🚀
 
-StokCku adalah aplikasi web komprehensif yang dirancang untuk mengelola penjualan toko ritel sekaligus melacak absensi karyawan. Dibangun menggunakan teknologi modern untuk menjamin performa cepat, antarmuka yang indah, dan pengalaman pengguna yang mulus.
+StockKu adalah aplikasi web komprehensif yang dirancang untuk mengelola penjualan toko ritel sekaligus melacak absensi karyawan. Dibangun menggunakan teknologi modern untuk menjamin performa cepat, antarmuka yang indah, dan pengalaman pengguna yang mulus.
 
 ## ✨ Fitur Utama
 

@@ -48,7 +48,38 @@
     <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
         <h3 class="font-semibold text-slate-700">Data Absensi: {{ \Carbon\Carbon::parse($date)->translatedFormat('l, d F Y') }}</h3>
     </div>
-    <div class="overflow-x-auto">
+    <!-- Mobile: card list -->
+    <div class="md:hidden divide-y divide-slate-100">
+        @foreach($employees as $emp)
+            @php
+                $att = $attendances->firstWhere('employee_id', $emp->id);
+            @endphp
+            <div class="p-4">
+                <div class="flex items-start justify-between gap-3 mb-2">
+                    <div class="min-w-0">
+                        <p class="font-medium text-slate-700 truncate">{{ $emp->nama }}</p>
+                        <p class="text-xs text-slate-400 mt-0.5">{{ $emp->jabatan }}</p>
+                    </div>
+                    @if($att)
+                    <span class="shrink-0 px-3 py-1 rounded-full text-xs font-semibold
+                        {{ $att->status === 'hadir' ? 'bg-emerald-100 text-emerald-700' :
+                           ($att->status === 'alpha' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700') }}">
+                        {{ $att->status_label }}
+                    </span>
+                    @else
+                    <span class="shrink-0 px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">Belum Ada Data</span>
+                    @endif
+                </div>
+                @if($att)
+                <div class="flex items-center gap-4 text-sm font-mono">
+                    <span class="text-slate-500">In: <span class="text-slate-700">{{ $att->clock_in ? \Carbon\Carbon::parse($att->clock_in)->format('H:i') : '-' }}</span></span>
+                    <span class="text-slate-500">Out: <span class="text-slate-700">{{ $att->clock_out ? \Carbon\Carbon::parse($att->clock_out)->format('H:i') : '-' }}</span></span>
+                </div>
+                @endif
+            </div>
+        @endforeach
+    </div>
+    <div class="hidden md:block overflow-x-auto">
     <table class="w-full text-sm">
         <thead class="bg-white border-b border-slate-100">
             <tr>
@@ -94,7 +125,33 @@
     <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
         <h3 class="font-semibold text-slate-700">Rekap Bulanan: {{ date('F', mktime(0, 0, 0, $month, 10)) }} {{ $year }}</h3>
     </div>
-    <div class="overflow-x-auto">
+    <!-- Mobile: card list -->
+    <div class="md:hidden divide-y divide-slate-100">
+        @foreach($employees as $emp)
+            @php
+                $empAtt = $attendances->where('employee_id', $emp->id);
+                $summary = [
+                    'hadir' => $empAtt->where('status', 'hadir')->count(),
+                    'sakit' => $empAtt->where('status', 'sakit')->count(),
+                    'izin' => $empAtt->where('status', 'izin')->count(),
+                    'cuti' => $empAtt->where('status', 'cuti')->count(),
+                    'alpha' => $empAtt->where('status', 'alpha')->count(),
+                ];
+            @endphp
+            <div class="p-4">
+                <p class="font-medium text-slate-700 truncate">{{ $emp->nama }}</p>
+                <p class="text-xs text-slate-400 mt-0.5 mb-2">{{ $emp->jabatan }}</p>
+                <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
+                    <span class="font-bold text-emerald-600">Hadir {{ $summary['hadir'] }}</span>
+                    <span class="font-semibold text-amber-500">Sakit {{ $summary['sakit'] }}</span>
+                    <span class="font-semibold text-blue-500">Izin {{ $summary['izin'] }}</span>
+                    <span class="font-semibold text-purple-500">Cuti {{ $summary['cuti'] }}</span>
+                    <span class="font-bold text-red-500">Alpha {{ $summary['alpha'] }}</span>
+                </div>
+            </div>
+        @endforeach
+    </div>
+    <div class="hidden md:block overflow-x-auto">
         <table class="w-full text-sm">
             <thead class="bg-white border-b border-slate-100">
                 <tr>

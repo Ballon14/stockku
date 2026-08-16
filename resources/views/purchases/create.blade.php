@@ -40,7 +40,45 @@
                 </div>
 
                 <div class="border rounded-xl border-slate-200 overflow-hidden">
-                    <div class="overflow-x-auto">
+                    <!-- Mobile: card list -->
+                    <div class="md:hidden divide-y divide-slate-200">
+                        <template x-for="(item, index) in items" :key="'m-' + index">
+                            <div class="p-3 space-y-3">
+                                <div class="flex items-start gap-2">
+                                    <select x-model="item.product_id" :name="`items[${index}][product_id]`" class="flex-1 min-w-0 rounded-lg border-slate-200 py-1.5 text-sm" required @change="updateHarga(index, $event)">
+                                        <option value="">Pilih Produk...</option>
+                                        @foreach($products as $prod)
+                                        <option value="{{ $prod->id }}" data-harga="{{ $prod->harga_beli }}">{{ $prod->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <button type="button" @click="removeItem(index)" x-show="items.length > 1" class="shrink-0 p-1.5 rounded-lg text-red-400 hover:bg-red-50 hover:text-red-600">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                    </button>
+                                </div>
+                                <div class="flex items-end gap-2">
+                                    <div class="w-20">
+                                        <label class="block text-xs text-slate-500 mb-1">Qty</label>
+                                        <input type="number" x-model="item.qty" :name="`items[${index}][qty]`" min="1" class="w-full text-center rounded-lg border-slate-200 py-1.5 text-sm" required @input="calculateSubtotal(index)">
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <label class="block text-xs text-slate-500 mb-1">Harga Beli Satuan</label>
+                                        <input type="number" x-model="item.harga" :name="`items[${index}][harga]`" min="0" class="w-full text-right rounded-lg border-slate-200 py-1.5 text-sm" required @input="calculateSubtotal(index)">
+                                    </div>
+                                    <div class="shrink-0 text-right">
+                                        <label class="block text-xs text-slate-500 mb-1">Subtotal</label>
+                                        <span class="font-semibold text-slate-700 text-sm" x-text="'Rp ' + formatRupiah(item.subtotal)"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                        <div class="p-3 bg-slate-50 flex items-center justify-between">
+                            <span class="text-sm font-semibold text-slate-600">Total Pembelian:</span>
+                            <span class="text-lg font-bold text-slate-800" x-text="'Rp ' + formatRupiah(total)"></span>
+                        </div>
+                    </div>
+
+                    <!-- Desktop: table -->
+                    <div class="hidden md:block overflow-x-auto">
     <table class="w-full text-sm">
                         <thead class="bg-slate-50 border-b border-slate-200">
                             <tr>

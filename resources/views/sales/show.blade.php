@@ -9,6 +9,7 @@
             <div><span class="text-slate-500 block">Kasir</span><span class="font-medium">{{ $sale->user->name }}</span></div>
             <div><span class="text-slate-500 block">Status</span><span class="px-2 py-0.5 rounded-full text-xs font-semibold {{ $sale->status === 'completed' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700' }}">{{ $sale->status === 'completed' ? 'Selesai' : 'Diretur' }}</span></div>
         </div>
+        <div class="overflow-x-auto">
         <table class="w-full text-sm mb-4">
             <thead class="bg-slate-50"><tr>
                 <th class="text-left py-2 px-3 font-medium text-slate-500">Produk</th>
@@ -28,6 +29,7 @@
             </tbody>
         </table>
     </div>
+    </div>
         <div class="space-y-1 text-sm text-right">
             <div class="flex justify-end gap-8"><span class="text-slate-500">Subtotal</span><span class="font-medium w-32">Rp {{ number_format($sale->subtotal, 0, ',', '.') }}</span></div>
             <div class="flex justify-end gap-8"><span class="text-slate-500">Diskon</span><span class="font-medium w-32 text-red-600">- Rp {{ number_format($sale->diskon, 0, ',', '.') }}</span></div>
@@ -38,7 +40,6 @@
     </div>
     <div class="flex gap-3">
         <a href="{{ route('sales.index') }}" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl text-sm font-medium">← Kembali</a>
-        <a href="{{ route('sales.receipt', $sale) }}" target="_blank" class="px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-semibold">🖨️ Cetak Struk</a>
+        <a href="{{ route('sales.receipt', $sale) }}" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-semibold"><i class="fa-solid fa-print"></i> Cetak Struk</a>
     </div>
-</div>
 </x-app-layout>

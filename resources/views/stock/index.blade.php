@@ -29,19 +29,49 @@
 </div>
 
 @if($product)
-<div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-6 mb-6 flex items-center justify-between">
-    <div>
-        <h3 class="text-xl font-bold text-indigo-900">{{ $product->name }}</h3>
+<div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-6 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div class="min-w-0">
+        <h3 class="text-xl font-bold text-indigo-900 truncate">{{ $product->name }}</h3>
         <p class="text-sm text-indigo-700 mt-1">SKU: {{ $product->sku }} | Kategori: {{ $product->category->name }}</p>
     </div>
-    <div class="text-right">
+    <div class="text-left sm:text-right shrink-0">
         <p class="text-sm font-medium text-indigo-700">Stok Saat Ini</p>
         <p class="text-4xl font-black text-indigo-600">{{ $product->stok }} <span class="text-lg font-bold text-indigo-400">{{ $product->satuan }}</span></p>
     </div>
 </div>
 
 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-    <div class="overflow-x-auto">
+    <!-- Mobile: card list -->
+    <div class="md:hidden divide-y divide-slate-100">
+        @forelse($movements as $mv)
+        <div class="p-4">
+            <div class="flex items-start justify-between gap-3 mb-2">
+                <div class="min-w-0">
+                    <p class="text-sm text-slate-600">{{ $mv->created_at->format('d/m/Y H:i') }}</p>
+                    <p class="text-xs text-slate-400 mt-0.5">{{ $mv->user->name }}</p>
+                </div>
+                <span class="shrink-0 px-2 py-0.5 rounded-full text-xs font-semibold
+                    {{ $mv->type === 'in' || $mv->type === 'return' ? 'bg-emerald-100 text-emerald-700' :
+                       ($mv->type === 'out' ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-700') }}">
+                    {{ $mv->type_label }}
+                </span>
+            </div>
+            <div class="flex items-center gap-6 text-sm">
+                <span class="font-semibold text-emerald-600">{{ $mv->type === 'in' || $mv->type === 'return' ? '+' . $mv->qty : '-' }}</span>
+                <span class="font-semibold text-red-600">{{ $mv->type === 'out' ? '-' . $mv->qty : '-' }}</span>
+                <span class="ml-auto text-slate-800">Sisa: <span class="font-bold">{{ $mv->stok_sesudah }}</span></span>
+            </div>
+            @if($mv->keterangan)
+            <p class="mt-2 text-xs text-slate-500">{{ $mv->keterangan }}</p>
+            @endif
+        </div>
+        @empty
+        <div class="py-8 text-center text-slate-400">Belum ada pergerakan stok untuk produk ini pada periode tersebut.</div>
+        @endforelse
+    </div>
+
+    <!-- Desktop: table -->
+    <div class="hidden md:block overflow-x-auto">
         <table class="w-full text-sm">
             <thead class="bg-slate-50 border-b border-slate-100">
                 <tr>

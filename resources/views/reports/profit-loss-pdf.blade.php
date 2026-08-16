@@ -22,7 +22,7 @@
 <body>
     <div class="header">
         <div class="title">LAPORAN LABA RUGI</div>
-        <div class="subtitle">StokCku - Toko Serba Ada</div>
+        <div class="subtitle">StockKu - Toko Serba Ada</div>
         <div class="subtitle">Periode: {{ \Carbon\Carbon::parse($startDate)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($endDate)->format('d/m/Y') }}</div>
     </div>
 

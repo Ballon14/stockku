@@ -22,7 +22,29 @@
     </div>
     <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
         <h3 class="text-lg font-semibold text-slate-800 mb-4">Riwayat Pergerakan Stok</h3>
-        <div class="overflow-x-auto">
+        <!-- Mobile: card list -->
+        <div class="md:hidden divide-y divide-slate-100">
+            @forelse($stockMovements as $mv)
+            <div class="py-3">
+                <div class="flex items-start justify-between gap-3 mb-1.5">
+                    <div>
+                        <p class="text-xs text-slate-500">{{ $mv->created_at->format('d/m/Y H:i') }}</p>
+                        <p class="text-xs text-slate-400 mt-0.5">{{ $mv->keterangan }}</p>
+                    </div>
+                    <div class="text-right shrink-0">
+                        <span class="px-2 py-0.5 rounded-full text-xs font-semibold {{ $mv->type === 'in' || $mv->type === 'return' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700' }}">{{ $mv->type_label }}</span>
+                        <p class="mt-1 text-sm font-bold {{ $mv->type === 'in' || $mv->type === 'return' ? 'text-emerald-600' : 'text-red-600' }}">{{ $mv->type === 'in' || $mv->type === 'return' ? '+' : '-' }}{{ $mv->qty }}</p>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-500">Stok: <span class="font-semibold text-slate-700">{{ $mv->stok_sebelum }} → {{ $mv->stok_sesudah }}</span></p>
+            </div>
+            @empty
+            <p class="py-6 text-center text-slate-400">Belum ada pergerakan stok</p>
+            @endforelse
+        </div>
+
+        <!-- Desktop: table -->
+        <div class="hidden md:block overflow-x-auto">
             <table class="w-full text-sm">
                 <thead class="bg-slate-50"><tr>
                     <th class="text-left py-2 px-3 font-medium text-slate-500">Tanggal</th>

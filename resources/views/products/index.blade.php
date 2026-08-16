@@ -32,7 +32,46 @@
 </div>
 
 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-    <div class="overflow-x-auto">
+    <!-- Mobile: card list -->
+    <div class="md:hidden divide-y divide-slate-100">
+        @forelse($products as $product)
+        <div class="p-4">
+            <div class="flex items-center gap-3 mb-3">
+                @if($product->foto)
+                <img src="{{ asset('storage/' . $product->foto) }}" class="w-11 h-11 rounded-lg object-cover shrink-0" alt="">
+                @else
+                <div class="w-11 h-11 rounded-lg bg-slate-100 flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                </div>
+                @endif
+                <div class="flex-1 min-w-0">
+                    <p class="font-medium text-slate-700 truncate">{{ $product->name }}</p>
+                    <p class="font-mono text-xs text-slate-400 mt-0.5">{{ $product->sku }} · {{ $product->category->name }}</p>
+                </div>
+                <span class="shrink-0 px-2 py-0.5 rounded-full text-xs font-bold {{ $product->isLowStock() ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700' }}">{{ $product->stok }}</span>
+            </div>
+            <div class="flex items-center justify-between">
+                <div class="text-xs text-slate-500">
+                    <p>Beli: <span class="font-semibold text-slate-700">Rp {{ number_format($product->harga_beli, 0, ',', '.') }}</span></p>
+                    <p>Jual: <span class="font-semibold text-slate-700">Rp {{ number_format($product->harga_jual, 0, ',', '.') }}</span></p>
+                </div>
+                <div class="flex items-center gap-1">
+                    <a href="{{ route('products.show', $product) }}" class="p-1.5 rounded-lg text-slate-400 hover:bg-blue-50 hover:text-blue-600" title="Detail"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></a>
+                    <a href="{{ route('products.edit', $product) }}" class="p-1.5 rounded-lg text-slate-400 hover:bg-indigo-50 hover:text-indigo-600"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></a>
+                    <form method="POST" action="{{ route('products.destroy', $product) }}" onsubmit="return confirm('Yakin hapus?')">
+                        @csrf @method('DELETE')
+                        <button class="p-1.5 rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-600"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        @empty
+        <div class="py-8 text-center text-slate-400">Belum ada produk.</div>
+        @endforelse
+    </div>
+
+    <!-- Desktop: table -->
+    <div class="hidden md:block overflow-x-auto">
         <table class="w-full text-sm">
             <thead class="bg-slate-50 border-b border-slate-100">
                 <tr>

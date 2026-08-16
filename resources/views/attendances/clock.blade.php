@@ -16,7 +16,7 @@
                 {{ now()->format('H:i:s') }}
             </div>
 
-            <div class="grid grid-cols-2 gap-4 mb-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
                 <div class="bg-slate-50 rounded-2xl p-4">
                     <p class="text-sm font-medium text-slate-500 mb-1">Status Masuk</p>
                     @if($todayAttendance && $todayAttendance->clock_in)
@@ -57,9 +57,9 @@
                     </button>
                 </form>
                 @else
-                <div class="py-4 bg-slate-100 text-slate-500 rounded-2xl text-lg font-bold border border-slate-200">
-                    Selesai untuk Hari Ini 🎉
-                </div>
+                <div class="py-4 bg-slate-100 text-slate-500 rounded-2xl text-lg font-bold border border-slate-200 w-full flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-circle-check text-emerald-500"></i> Selesai untuk Hari Ini
+                    </div>
                 @endif
             </div>
             

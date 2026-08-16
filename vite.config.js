@@ -13,8 +13,8 @@ export default defineConfig({
             injectRegister: 'auto',
             includeAssets: ['favicon.ico'],
             manifest: {
-                name: 'StokCku',
-                short_name: 'StokCku',
+                name: 'StockKu',
+                short_name: 'StockKu',
                 description: 'Manajemen Toko & Kasir',
                 lang: 'id',
                 start_url: '/',
@@ -36,7 +36,7 @@ export default defineConfig({
                         urlPattern: ({ request }) => request.mode === 'navigate',
                         handler: 'NetworkFirst',
                         options: {
-                            cacheName: 'stokcku-pages',
+                            cacheName: 'stockku-pages',
                             networkTimeoutSeconds: 5,
                         },
                     },
@@ -44,14 +44,14 @@ export default defineConfig({
                         urlPattern: ({ url, sameOrigin }) => sameOrigin && url.pathname.startsWith('/build/'),
                         handler: 'StaleWhileRevalidate',
                         options: {
-                            cacheName: 'stokcku-assets',
+                            cacheName: 'stockku-assets',
                         },
                     },
                     {
                         urlPattern: ({ url, sameOrigin }) => sameOrigin && url.pathname.startsWith('/icons/'),
                         handler: 'CacheFirst',
                         options: {
-                            cacheName: 'stokcku-icons',
+                            cacheName: 'stockku-icons',
                         },
                     },
                 ],

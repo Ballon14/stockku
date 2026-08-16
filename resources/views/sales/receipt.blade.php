@@ -3,9 +3,10 @@
 <head>
     <meta charset="utf-8">
     <title>Struk - {{ $sale->invoice_number }}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Courier New', monospace; font-size: 12px; width: 300px; margin: 0 auto; padding: 10px; }
+        body { font-family: 'Courier New', monospace; font-size: 12px; width: 100%; max-width: 300px; margin: 0 auto; padding: 10px; }
         .center { text-align: center; }
         .right { text-align: right; }
         .bold { font-weight: bold; }
@@ -19,7 +20,7 @@
 </head>
 <body>
     <div class="center">
-        <div class="logo">StokCku</div>
+        <div class="logo">StockKu</div>
         <div>Toko Serba Ada</div>
         <div style="font-size: 10px;">Jl. Contoh No. 123, Kota</div>
     </div>
@@ -58,7 +59,7 @@
         tidak dapat ditukar/dikembalikan
     </div>
     <div class="no-print center" style="margin-top: 20px;">
-        <button onclick="window.print()" style="padding: 10px 30px; font-size: 14px; background: #4f46e5; color: white; border: none; border-radius: 8px; cursor: pointer;">🖨️ Print Struk</button>
+        <button onclick="window.print()" style="padding: 10px 30px; font-size: 14px; background: #4f46e5; color: white; border: none; border-radius: 8px; cursor: pointer;"><i class="fa-solid fa-print"></i> Print Struk</button>
         <button onclick="window.close()" style="padding: 10px 30px; font-size: 14px; background: #6b7280; color: white; border: none; border-radius: 8px; cursor: pointer; margin-left: 10px;">Tutup</button>
     </div>
 </body>

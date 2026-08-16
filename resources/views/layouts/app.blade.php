@@ -9,16 +9,19 @@
         <meta name="mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-        <meta name="apple-mobile-web-app-title" content="StokCku">
+        <meta name="apple-mobile-web-app-title" content="StockKu">
         <link rel="manifest" href="{{ asset('build/manifest.webmanifest') }}">
         <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
         <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
 
-        <title>{{ config('app.name', 'StokCku') }} - @yield('title', 'Dashboard')</title>
+        <title>{{ config('app.name', 'StockKu') }} - @yield('title', 'Dashboard')</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=inter:300,400,500,600,700,800&display=swap" rel="stylesheet" />
+
+        <!-- Icons -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])

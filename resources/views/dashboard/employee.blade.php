@@ -13,9 +13,9 @@
         </div>
         <h3 class="text-xl font-bold text-slate-800 mb-2">
             @if($todayAttendance && $todayAttendance->clock_in && $todayAttendance->clock_out)
-                Anda sudah selesai hari ini ✅
+                Anda sudah selesai hari ini <i class="fa-solid fa-circle-check text-emerald-500 ms-1"></i>
             @elseif($todayAttendance && $todayAttendance->clock_in)
-                Anda sudah Clock-In 🕐
+                Anda sudah Clock-In <i class="fa-regular fa-clock text-indigo-500 ms-1"></i>
             @else
                 Belum Clock-In Hari Ini
             @endif

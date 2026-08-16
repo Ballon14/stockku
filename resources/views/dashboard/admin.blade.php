@@ -113,7 +113,22 @@
         <svg class="w-5 h-5 text-amber-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
         Stok Menipis
     </h3>
-    <div class="overflow-x-auto">
+        <!-- Mobile: card list -->
+    <div class="md:hidden divide-y divide-slate-100">
+        @foreach($data['low_stock'] as $prod)
+        <div class="py-3">
+            <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
+                    <p class="font-medium text-slate-700 truncate">{{ $prod->name }}</p>
+                    <p class="text-xs text-slate-400 mt-0.5">{{ $prod->category->name }}</p>
+                </div>
+                <span class="shrink-0 px-2 py-0.5 rounded-full text-xs font-bold {{ $prod->stok <= 0 ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700' }}">{{ $prod->stok }}</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-1">Min. stok: {{ $prod->min_stok }}</p>
+        </div>
+        @endforeach
+    </div>
+    <div class="hidden md:block overflow-x-auto">
         <table class="w-full text-sm">
             <thead>
                 <tr class="border-b border-slate-100">

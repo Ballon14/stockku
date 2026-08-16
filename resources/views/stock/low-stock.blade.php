@@ -15,7 +15,32 @@
 </div>
 
 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-    <div class="overflow-x-auto">
+    <!-- Mobile: card list -->
+    <div class="md:hidden divide-y divide-slate-100">
+        @forelse($products as $product)
+        <div class="p-4">
+            <div class="flex items-start justify-between gap-3 mb-2">
+                <div class="min-w-0">
+                    <p class="font-medium text-slate-700 truncate">{{ $product->name }}</p>
+                    <p class="font-mono text-xs text-slate-400 mt-0.5">{{ $product->sku }} · {{ $product->category->name }}</p>
+                </div>
+                <span class="shrink-0 px-3 py-1 rounded-full text-sm font-bold {{ $product->stok <= 0 ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700' }}">{{ $product->stok }} {{ $product->satuan }}</span>
+            </div>
+            <div class="flex items-center justify-between">
+                <span class="text-xs text-slate-500">Min. stok: {{ $product->min_stok }} {{ $product->satuan }}</span>
+                <a href="{{ route('purchases.create') }}" class="inline-flex px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-semibold hover:bg-indigo-700 transition-colors">Catat Pembelian</a>
+            </div>
+        </div>
+        @empty
+        <div class="py-12 text-center text-emerald-600 font-medium">
+            <svg class="w-12 h-12 mx-auto mb-3 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Semua stok produk dalam kondisi aman.
+        </div>
+        @endforelse
+    </div>
+
+    <!-- Desktop: table -->
+    <div class="hidden md:block overflow-x-auto">
         <table class="w-full text-sm">
             <thead class="bg-slate-50 border-b border-slate-100">
                 <tr>

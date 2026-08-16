@@ -1,8 +1,8 @@
 <x-app-layout>
 @section('title', 'Laporan Laba Rugi')
 <x-slot name="header">
-    <div class="flex items-center justify-between">
-        <h2 class="text-2xl font-bold text-slate-800">Laporan Laba Rugi</h2>
+    <div class="flex flex-wrap items-center justify-between gap-3">
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-800">Laporan Laba Rugi</h2>
         <form method="GET" action="{{ route('reports.profit-loss') }}" target="_blank">
             <input type="hidden" name="start_date" value="{{ $startDate }}">
             <input type="hidden" name="end_date" value="{{ $endDate }}">

@@ -41,7 +41,38 @@
 </div>
 
 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-    <div class="overflow-x-auto">
+    <!-- Mobile: card list -->
+    <div class="md:hidden divide-y divide-slate-100">
+        @forelse($data as $row)
+        <div class="p-4">
+            <div class="flex items-start justify-between gap-3 mb-3">
+                <div class="min-w-0">
+                    <p class="font-medium text-slate-700 truncate">{{ $row['employee_name'] }}</p>
+                    <p class="text-xs text-slate-400 mt-0.5">{{ $row['employee_jabatan'] }}</p>
+                </div>
+                <div class="text-right shrink-0">
+                    <p class="text-xs font-semibold {{ $row['attendance_percentage'] >= 80 ? 'text-emerald-700' : ($row['attendance_percentage'] >= 60 ? 'text-amber-700' : 'text-red-700') }}">{{ $row['attendance_percentage'] }}%</p>
+                    <div class="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden mt-1 ml-auto">
+                        <div class="h-full {{ $row['attendance_percentage'] >= 80 ? 'bg-emerald-500' : ($row['attendance_percentage'] >= 60 ? 'bg-amber-500' : 'bg-red-500') }}" style="width: {{ $row['attendance_percentage'] }}%"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
+                <span class="text-slate-500">Aktif: <span class="font-semibold text-slate-700">{{ $row['total_days'] }}</span></span>
+                <span class="font-bold text-emerald-600">Hadir {{ $row['hadir'] }}</span>
+                <span class="text-amber-500">Sakit {{ $row['sakit'] }}</span>
+                <span class="text-blue-500">Izin {{ $row['izin'] }}</span>
+                <span class="text-purple-500">Cuti {{ $row['cuti'] }}</span>
+                <span class="font-bold text-red-500">Alpha {{ $row['alpha'] }}</span>
+            </div>
+        </div>
+        @empty
+        <div class="py-8 text-center text-slate-400">Tidak ada data absensi.</div>
+        @endforelse
+    </div>
+
+    <!-- Desktop: table -->
+    <div class="hidden md:block overflow-x-auto">
         <table class="w-full text-sm">
             <thead class="bg-slate-50 border-b border-slate-100">
                 <tr>

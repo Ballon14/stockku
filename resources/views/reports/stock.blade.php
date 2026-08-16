@@ -30,7 +30,37 @@
 </div>
 
 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-    <div class="overflow-x-auto">
+    <!-- Mobile: card list -->
+    <div class="md:hidden divide-y divide-slate-100">
+        @forelse($movements as $mv)
+        <div class="p-4">
+            <div class="flex items-start justify-between gap-3 mb-2">
+                <div class="min-w-0">
+                    <p class="font-medium text-slate-700 truncate">{{ $mv->product->name }}</p>
+                    <p class="font-mono text-xs text-slate-400 mt-0.5">{{ $mv->product->sku }} · {{ $mv->created_at->format('d/m/Y H:i') }}</p>
+                </div>
+                <span class="shrink-0 px-2 py-0.5 rounded-full text-xs font-semibold
+                    {{ $mv->type === 'in' || $mv->type === 'return' ? 'bg-emerald-100 text-emerald-700' :
+                       ($mv->type === 'out' ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-700') }}">
+                    {{ $mv->type_label }}
+                </span>
+            </div>
+            <div class="flex items-center gap-6 text-sm">
+                <span class="font-bold {{ $mv->type === 'in' || $mv->type === 'return' ? 'text-emerald-600' : 'text-red-600' }}">{{ $mv->type === 'in' || $mv->type === 'return' ? '+' : '-' }}{{ $mv->qty }}</span>
+                <span class="text-slate-800">Stok akhir: <span class="font-bold">{{ $mv->stok_sesudah }}</span></span>
+                <span class="ml-auto text-xs text-slate-400">{{ $mv->user->name }}</span>
+            </div>
+            @if($mv->keterangan)
+            <p class="mt-2 text-xs text-slate-500">{{ $mv->keterangan }}</p>
+            @endif
+        </div>
+        @empty
+        <div class="py-8 text-center text-slate-400">Belum ada data mutasi stok.</div>
+        @endforelse
+    </div>
+
+    <!-- Desktop: table -->
+    <div class="hidden md:block overflow-x-auto">
         <table class="w-full text-sm">
             <thead class="bg-slate-50 border-b border-slate-100">
                 <tr>

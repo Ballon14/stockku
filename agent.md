@@ -1,9 +1,9 @@
-# StokCku - AI Agent Instructions (OpenCode)
+# StockKu - AI Agent Instructions (OpenCode)
 
-This file contains the core context, technology stack, and architectural guidelines for AI coding agents contributing to the **StokCku** repository.
+This file contains the core context, technology stack, and architectural guidelines for AI coding agents contributing to the **StockKu** repository.
 
 ## 🎯 Project Overview
-StokCku is a modern, responsive Web-based Point of Sale (POS) and Inventory Management System. It is designed to be visually premium, fast, and easy to use.
+StockKu is a modern, responsive Web-based Point of Sale (POS) and Inventory Management System. It is designed to be visually premium, fast, and easy to use.
 
 **Key Features:**
 - **POS / Kasir**: Real-time cart management using Livewire.

@@ -30,7 +30,34 @@
 
             <h3 class="text-lg font-semibold text-slate-800 mb-3">Pilih Item untuk Diretur</h3>
             <div class="border rounded-xl border-slate-200 overflow-hidden mb-6">
-                <div class="overflow-x-auto">
+                <!-- Mobile: card list -->
+                <div class="md:hidden divide-y divide-slate-200">
+                    @foreach($sale->items as $index => $item)
+                    <div class="p-4" x-data="{ selected: false, maxQty: {{ $item->qty }} }">
+                        <div class="flex items-start justify-between gap-3 mb-3">
+                            <div class="flex-1 min-w-0">
+                                <p class="font-medium text-slate-700">{{ $item->product->name }}</p>
+                                <p class="text-xs text-slate-400 mt-0.5">Qty beli: {{ $item->qty }}</p>
+                            </div>
+                            <label class="flex items-center gap-2 shrink-0 cursor-pointer select-none">
+                                <input type="checkbox" x-model="selected" @change="updateSelection({{ $item->product_id }}, selected, $refs.qtyInput.value)" class="item-checkbox rounded border-slate-300 text-indigo-600">
+                                <span class="text-sm text-slate-600">Retur</span>
+                            </label>
+                        </div>
+                        <input type="number"
+                            x-ref="qtyInput"
+                            x-bind:disabled="!selected"
+                            value="{{ $item->qty }}"
+                            min="1"
+                            max="{{ $item->qty }}"
+                            class="w-full text-center rounded-lg border-slate-200 py-1.5 text-sm disabled:bg-slate-100"
+                            @input="updateQty({{ $item->product_id }}, $event.target.value)">
+                    </div>
+                    @endforeach
+                </div>
+
+                <!-- Desktop: table -->
+                <div class="hidden md:block overflow-x-auto">
     <table class="w-full text-sm">
                     <thead class="bg-slate-50 border-b border-slate-200">
                         <tr>
