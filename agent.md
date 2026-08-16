@@ -65,5 +65,13 @@ Please adhere to the following conventions when making changes or adding feature
 
 ## 🚦 Important Notes for Agents
 - The application uses `created_at` timestamps based on `Asia/Jakarta` (WIB) timezone as defined in `config/app.php`.
-- Do not run commands like `npm run build` unless explicitly asked, since the project currently relies on Tailwind via CDN for simplicity during development.
+- Tailwind is compiled via Vite (`npm run build`); any change to `tailwind.config.js` or Blade class names requires rebuilding the assets before the UI updates.
 - When generating new features, ensure migrations and seeders are created to supply dummy data for easier testing.
+
+## 🔄 Development Workflow (MUST follow, point by point)
+1. **Understand the task** — read the relevant files first, then implement changes following the conventions above.
+2. **Verify changes** — run `php artisan test` for backend changes and `npm run build` for any Tailwind/Blade changes, then fix any errors found.
+3. **Check the diff** — run `git status` and `git diff`; make sure no secrets (tokens, passwords, `.env`) are staged.
+4. **Commit changes** — write a concise commit message in the repo's existing style (e.g., `git add -A && git commit -m "..."`).
+5. **Push to GitHub** — ALWAYS push the commit to the `main` branch after finishing work: `git push origin main`. If authentication fails, notify the user that a manual push is required.
+6. **Report back** — summarize what was changed point by point (file → what changed → why), and confirm the push status.
