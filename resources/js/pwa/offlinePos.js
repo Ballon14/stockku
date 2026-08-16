@@ -197,14 +197,34 @@ export function offlinePos() {
 export function connection() {
     return {
         online: navigator.onLine,
+        checking: false,
 
-        init() {
-            window.addEventListener('online', () => {
-                this.online = true;
-            });
-            window.addEventListener('offline', () => {
+        async init() {
+            this.checkConnection();
+
+            window.addEventListener('online', () => this.checkConnection());
+            window.addEventListener('offline', () => this.checkConnection());
+            setInterval(() => this.checkConnection(), 15000);
+        },
+
+        async checkConnection() {
+            if (this.checking) {
+                return;
+            }
+
+            this.checking = true;
+
+            try {
+                const response = await fetch('/offline/catalog', {
+                    cache: 'no-store',
+                    headers: { 'Accept': 'application/json' },
+                });
+                this.online = response.ok;
+            } catch (error) {
                 this.online = false;
-            });
+            } finally {
+                this.checking = false;
+            }
         },
     };
 }

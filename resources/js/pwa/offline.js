@@ -73,7 +73,7 @@ export async function getQueue() {
 }
 
 export async function processQueue() {
-    if (syncing || !isOnline()) {
+    if (syncing) {
         return { synced: [], failed: [] };
     }
 
