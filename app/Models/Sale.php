@@ -16,6 +16,7 @@ class Sale extends Model
         'grand_total',
         'bayar',
         'kembalian',
+        'payment_method',
         'status',
         'catatan',
         'sumber',

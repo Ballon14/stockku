@@ -51,6 +51,7 @@
         <tr class="bold"><td>TOTAL</td><td class="right">Rp {{ number_format($sale->grand_total, 0, ',', '.') }}</td></tr>
         <tr><td>Bayar</td><td class="right">Rp {{ number_format($sale->bayar, 0, ',', '.') }}</td></tr>
         <tr class="bold"><td>Kembalian</td><td class="right">Rp {{ number_format($sale->kembalian, 0, ',', '.') }}</td></tr>
+        <tr><td>Metode</td><td class="right">{{ $sale->payment_method === 'qris' ? 'QRIS' : 'Tunai' }}</td></tr>
     </table>
     <div class="double-line"></div>
     <div class="center" style="font-size: 10px; margin-top: 10px;">

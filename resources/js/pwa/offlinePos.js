@@ -17,6 +17,7 @@ export function offlinePos() {
         cart: {},
         diskon: 0,
         bayar: 0,
+        paymentMethod: 'cash',
         catatan: '',
         queueItems: [],
         syncing: false,
@@ -108,7 +109,20 @@ export function offlinePos() {
             this.cart = {};
             this.diskon = 0;
             this.bayar = 0;
+            this.paymentMethod = 'cash';
             this.catatan = '';
+        },
+
+        selectPayment(method) {
+            if (method !== 'cash' && method !== 'qris') {
+                return;
+            }
+
+            this.paymentMethod = method;
+
+            if (method === 'qris' && this.bayar < this.grandTotal) {
+                this.bayar = this.grandTotal;
+            }
         },
 
         get cartItems() {
@@ -146,6 +160,7 @@ export function offlinePos() {
                 diskon: Number(this.diskon || 0),
                 bayar: Number(this.bayar || 0),
                 catatan: this.catatan,
+                paymentMethod: this.paymentMethod,
             });
 
             this.clearCart();

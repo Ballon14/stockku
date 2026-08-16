@@ -169,7 +169,39 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4 pt-3 border-t border-slate-200">
+                    <div class="mb-4 pt-3 border-t border-slate-200">
+                        <label class="text-xs font-semibold text-slate-700 block mb-1">Metode Pembayaran</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button type="button" wire:click="setPaymentMethod('cash')" class="flex items-center justify-center gap-2 py-2.5 rounded-xl border text-sm font-semibold transition-all {{ $this->paymentMethod === 'cash' ? 'bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-500/30' : 'bg-white border-slate-200 text-slate-600 hover:border-indigo-300' }}">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                Tunai
+                            </button>
+                            <button type="button" wire:click="setPaymentMethod('qris')" class="flex items-center justify-center gap-2 py-2.5 rounded-xl border text-sm font-semibold transition-all {{ $this->paymentMethod === 'qris' ? 'bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-500/30' : 'bg-white border-slate-200 text-slate-600 hover:border-indigo-300' }}">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 10m-1 0a1 1 0 112 0 1 1 0 01-2 0zm12 0a1 1 0 112 0 1 1 0 01-2 0zm-12 6a1 1 0 112 0 1 1 0 01-2 0zm12 0a1 1 0 112 0 1 1 0 01-2 0z"/></svg>
+                                QRIS
+                            </button>
+                        </div>
+                    </div>
+
+                    @if($this->paymentMethod === 'qris')
+                    <div class="mb-4 rounded-xl border border-indigo-200 bg-indigo-50/60 p-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 10m-1 0a1 1 0 112 0 1 1 0 01-2 0zm12 0a1 1 0 112 0 1 1 0 01-2 0zm-12 6a1 1 0 112 0 1 1 0 01-2 0zm12 0a1 1 0 112 0 1 1 0 01-2 0z"/></svg>
+                            <p class="text-sm font-semibold text-indigo-800">Pembayaran QRIS</p>
+                        </div>
+                        <p class="text-xs text-indigo-600 mb-3">Minta pelanggan membayar ke kode QRIS di bawah melalui aplikasi m-banking, lalu konfirmasi setelah pembayaran diterima.</p>
+                        <div class="bg-white rounded-xl border border-indigo-100 p-4 text-center">
+                            @if($this->qrisCode)
+                            <p class="font-mono text-sm font-bold text-slate-800 break-all select-all">{{ $this->qrisCode }}</p>
+                            <p class="text-xs text-slate-500 mt-2">{{ config('stockku.qris_holder') }}</p>
+                            @else
+                            <p class="text-sm text-amber-600">Kode QRIS belum diatur. Tambahkan <code class="font-mono text-xs">QRIS_STATIC_CODE</code> di file <code class="font-mono text-xs">.env</code>.</p>
+                            @endif
+                        </div>
+                    </div>
+                    @endif
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                         <div>
                             <label class="text-xs font-semibold text-slate-700 block mb-1">Uang dari Pelanggan (Rp)</label>
                             <input type="number" wire:model.live="bayar" min="0" class="w-full rounded-xl border border-slate-300 py-2.5 px-3 text-base sm:text-lg font-bold text-slate-800 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200" placeholder="0">
@@ -322,7 +354,37 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4 pt-3 border-t border-slate-200">
+                    <div class="mb-4 pt-3 border-t border-slate-200">
+                        <label class="text-xs font-semibold text-slate-700 block mb-1">Metode Pembayaran</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button type="button" @click="selectPayment('cash')" class="flex items-center justify-center gap-2 py-2.5 rounded-xl border text-sm font-semibold transition-all" :class="paymentMethod === 'cash' ? 'bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-500/30' : 'bg-white border-slate-200 text-slate-600 hover:border-indigo-300'">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                Tunai
+                            </button>
+                            <button type="button" @click="selectPayment('qris')" class="flex items-center justify-center gap-2 py-2.5 rounded-xl border text-sm font-semibold transition-all" :class="paymentMethod === 'qris' ? 'bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-500/30' : 'bg-white border-slate-200 text-slate-600 hover:border-indigo-300'">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 10m-1 0a1 1 0 112 0 1 1 0 01-2 0zm12 0a1 1 0 112 0 1 1 0 01-2 0zm-12 6a1 1 0 112 0 1 1 0 01-2 0zm12 0a1 1 0 112 0 1 1 0 01-2 0z"/></svg>
+                                QRIS
+                            </button>
+                        </div>
+                    </div>
+
+                    <div x-show="paymentMethod === 'qris'" x-cloak class="mb-4 rounded-xl border border-indigo-200 bg-indigo-50/60 p-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 10m-1 0a1 1 0 112 0 1 1 0 01-2 0zm12 0a1 1 0 112 0 1 1 0 01-2 0zm-12 6a1 1 0 112 0 1 1 0 01-2 0zm12 0a1 1 0 112 0 1 1 0 01-2 0z"/></svg>
+                            <p class="text-sm font-semibold text-indigo-800">Pembayaran QRIS</p>
+                        </div>
+                        <p class="text-xs text-indigo-600 mb-3">Minta pelanggan membayar ke kode QRIS di bawah melalui aplikasi m-banking, lalu konfirmasi setelah pembayaran diterima.</p>
+                        <div class="bg-white rounded-xl border border-indigo-100 p-4 text-center">
+                            @if(config('stockku.qris_code'))
+                            <p class="font-mono text-sm font-bold text-slate-800 break-all select-all">{{ config('stockku.qris_code') }}</p>
+                            <p class="text-xs text-slate-500 mt-2">{{ config('stockku.qris_holder') }}</p>
+                            @else
+                            <p class="text-sm text-amber-600">Kode QRIS belum diatur. Tambahkan <code class="font-mono text-xs">QRIS_STATIC_CODE</code> di file <code class="font-mono text-xs">.env</code>.</p>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                         <div>
                             <label class="text-xs font-semibold text-slate-700 block mb-1">Uang dari Pelanggan (Rp)</label>
                             <input type="number" x-model.number="bayar" min="0" class="w-full rounded-xl border border-slate-300 py-2.5 px-3 text-base sm:text-lg font-bold text-slate-800 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200" placeholder="0">

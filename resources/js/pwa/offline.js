@@ -47,7 +47,7 @@ export async function refreshCatalog() {
     return catalog;
 }
 
-export async function enqueueTransaction({ items, diskon, bayar, catatan }) {
+export async function enqueueTransaction({ items, diskon, bayar, catatan, paymentMethod }) {
     const offlineId = crypto.randomUUID();
 
     const transaction = {
@@ -56,6 +56,7 @@ export async function enqueueTransaction({ items, diskon, bayar, catatan }) {
         diskon,
         bayar,
         catatan,
+        payment_method: paymentMethod === 'qris' ? 'qris' : 'cash',
         status: 'pending',
         created_at: new Date().toISOString(),
     };

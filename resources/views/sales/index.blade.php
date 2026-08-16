@@ -23,6 +23,10 @@
                 </div>
                 <span class="shrink-0 px-2 py-0.5 rounded-full text-xs font-semibold {{ $sale->status === 'completed' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700' }}">{{ $sale->status === 'completed' ? 'Selesai' : 'Diretur' }}</span>
             </div>
+            <div class="flex items-center justify-between mb-2">
+                <span class="px-2 py-0.5 rounded-full text-xs font-semibold {{ $sale->payment_method === 'qris' ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-slate-600' }}">{{ $sale->payment_method === 'qris' ? 'QRIS' : 'Tunai' }}</span>
+                <span class="text-xs text-slate-400">Rp {{ number_format($sale->bayar, 0, ',', '.') }}</span>
+            </div>
             <div class="flex items-center justify-between">
                 <p class="font-bold text-slate-800">Rp {{ number_format($sale->grand_total, 0, ',', '.') }}</p>
                 <div class="flex items-center gap-1">
@@ -47,6 +51,7 @@
                 <th class="text-left py-3 px-4 font-semibold text-slate-600">Tanggal</th>
                 <th class="text-left py-3 px-4 font-semibold text-slate-600">Kasir</th>
                 <th class="text-right py-3 px-4 font-semibold text-slate-600">Total</th>
+                <th class="text-center py-3 px-4 font-semibold text-slate-600">Metode</th>
                 <th class="text-center py-3 px-4 font-semibold text-slate-600">Status</th>
                 <th class="text-center py-3 px-4 font-semibold text-slate-600">Aksi</th>
             </tr></thead>
@@ -57,6 +62,7 @@
                     <td class="py-3 px-4 text-slate-600">{{ $sale->created_at->format('d/m/Y H:i') }}</td>
                     <td class="py-3 px-4 text-slate-600">{{ $sale->user->name }}</td>
                     <td class="py-3 px-4 text-right font-semibold text-slate-700">Rp {{ number_format($sale->grand_total, 0, ',', '.') }}</td>
+                    <td class="py-3 px-4 text-center"><span class="px-2 py-0.5 rounded-full text-xs font-semibold {{ $sale->payment_method === 'qris' ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-slate-600' }}">{{ $sale->payment_method === 'qris' ? 'QRIS' : 'Tunai' }}</span></td>
                     <td class="py-3 px-4 text-center"><span class="px-2 py-0.5 rounded-full text-xs font-semibold {{ $sale->status === 'completed' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700' }}">{{ $sale->status === 'completed' ? 'Selesai' : 'Diretur' }}</span></td>
                     <td class="py-3 px-4 text-center">
                         <div class="flex items-center justify-center gap-1">
@@ -69,7 +75,7 @@
                     </td>
                 </tr>
                 @empty
-                <tr><td colspan="6" class="py-8 text-center text-slate-400">Belum ada transaksi.</td></tr>
+                <tr><td colspan="7" class="py-8 text-center text-slate-400">Belum ada transaksi.</td></tr>
                 @endforelse
             </tbody>
         </table>

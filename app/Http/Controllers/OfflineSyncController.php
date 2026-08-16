@@ -36,6 +36,7 @@ class OfflineSyncController extends Controller
             'transactions.*.diskon' => ['nullable', 'numeric', 'min:0'],
             'transactions.*.bayar' => ['required', 'numeric', 'min:0'],
             'transactions.*.catatan' => ['nullable', 'string', 'max:255'],
+            'transactions.*.payment_method' => ['nullable', 'string', 'in:cash,qris'],
         ]);
 
         $results = [];
@@ -58,7 +59,8 @@ class OfflineSyncController extends Controller
                     $transaction['items'],
                     (float) ($transaction['diskon'] ?? 0),
                     (float) $transaction['bayar'],
-                    $transaction['catatan'] ?? null
+                    $transaction['catatan'] ?? null,
+                    $transaction['payment_method'] ?? 'cash'
                 );
 
                 $sale->update([

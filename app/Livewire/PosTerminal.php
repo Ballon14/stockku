@@ -17,6 +17,8 @@ class PosTerminal extends Component
 
     public $bayar = 0;
 
+    public string $paymentMethod = 'cash';
+
     public string $catatan = '';
 
     public bool $showCheckout = false;
@@ -87,8 +89,22 @@ class PosTerminal extends Component
         $this->cart = [];
         $this->diskon = 0;
         $this->bayar = 0;
+        $this->paymentMethod = 'cash';
         $this->catatan = '';
         $this->showCheckout = false;
+    }
+
+    public function setPaymentMethod(string $method)
+    {
+        if (! in_array($method, ['cash', 'qris'], true)) {
+            return;
+        }
+
+        $this->paymentMethod = $method;
+
+        if ($method === 'qris' && (float) $this->bayar < $this->grandTotal) {
+            $this->bayar = $this->grandTotal;
+        }
     }
 
     public function getSubtotalProperty(): float
@@ -104,6 +120,11 @@ class PosTerminal extends Component
     public function getKembalianProperty(): float
     {
         return max(0, (float) $this->bayar - $this->grandTotal);
+    }
+
+    public function getQrisCodeProperty(): string
+    {
+        return (string) config('stockku.qris_code', '');
     }
 
     public function openCheckout()
@@ -133,7 +154,7 @@ class PosTerminal extends Component
 
         try {
             $saleService = app(SaleService::class);
-            $sale = $saleService->createSale($items, (float) $this->diskon, (float) $this->bayar, $this->catatan);
+            $sale = $saleService->createSale($items, (float) $this->diskon, (float) $this->bayar, $this->catatan, $this->paymentMethod);
             $this->lastSaleId = $sale->id;
             $this->clearCart();
             session()->flash('pos-success', 'Transaksi berhasil! Invoice: '.$sale->invoice_number);

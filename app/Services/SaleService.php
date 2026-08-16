@@ -16,9 +16,13 @@ class SaleService
         protected StockService $stockService
     ) {}
 
-    public function createSale(array $items, float $diskon, float $bayar, ?string $catatan = null): Sale
+    public function createSale(array $items, float $diskon, float $bayar, ?string $catatan = null, string $paymentMethod = 'cash'): Sale
     {
-        $sale = DB::transaction(function () use ($items, $diskon, $bayar, $catatan) {
+        if (! in_array($paymentMethod, ['cash', 'qris'], true)) {
+            throw ValidationException::withMessages(['payment_method' => 'Metode pembayaran tidak valid.']);
+        }
+
+        $sale = DB::transaction(function () use ($items, $diskon, $bayar, $catatan, $paymentMethod) {
             if (empty($items)) {
                 throw ValidationException::withMessages(['items' => 'Keranjang belanja kosong.']);
             }
@@ -65,7 +69,7 @@ class SaleService
             }
 
             $kembalian = $bayar - $grandTotal;
-            $sale = $this->createSaleRecord($subtotal, $diskon, $grandTotal, $bayar, $kembalian, $catatan);
+            $sale = $this->createSaleRecord($subtotal, $diskon, $grandTotal, $bayar, $kembalian, $catatan, $paymentMethod);
 
             foreach ($preparedItems as $item) {
                 $sale->items()->create([
@@ -210,7 +214,8 @@ class SaleService
         float $grandTotal,
         float $bayar,
         float $kembalian,
-        ?string $catatan
+        ?string $catatan,
+        string $paymentMethod = 'cash'
     ): Sale {
         for ($attempt = 0; $attempt < 3; $attempt++) {
             try {
@@ -222,6 +227,7 @@ class SaleService
                     'grand_total' => $grandTotal,
                     'bayar' => $bayar,
                     'kembalian' => $kembalian,
+                    'payment_method' => $paymentMethod,
                     'status' => 'completed',
                     'catatan' => $catatan,
                 ]);
