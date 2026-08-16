@@ -186,9 +186,18 @@
                         <input type="text" wire:model="catatan" class="w-full rounded-xl border border-slate-200 py-2 px-3 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-200" placeholder="Catatan transaksi (opsional)...">
                     </div>
 
-                    <button wire:click="processPayment" wire:confirm="Apakah Anda yakin uang pelanggan sudah sesuai dan ingin memproses transaksi ini?" class="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl font-semibold shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all text-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed" {{ $this->bayar < $this->grandTotal ? 'disabled' : '' }}>
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                        Proses Transaksi
+                    @if($this->bayar < $this->grandTotal && $this->bayar > 0)
+                    <p class="mb-3 text-sm font-medium text-red-600 flex items-center gap-1.5">
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+                        Uang pelanggan kurang Rp {{ number_format($this->grandTotal - $this->bayar, 0, ',', '.') }} dari total belanja.
+                    </p>
+                    @endif
+
+                    <button wire:click="processPayment" wire:confirm="Apakah Anda yakin uang pelanggan sudah sesuai dan ingin memproses transaksi ini?" wire:loading.attr="disabled" wire:target="processPayment" class="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl font-semibold shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all text-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed" {{ $this->bayar < $this->grandTotal ? 'disabled' : '' }}>
+                        <svg wire:loading.remove wire:target="processPayment" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                        <svg wire:loading wire:target="processPayment" class="w-6 h-6 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>
+                        <span wire:loading.remove wire:target="processPayment">Proses Transaksi</span>
+                        <span wire:loading wire:target="processPayment">Memproses...</span>
                     </button>
                 </div>
                 @endif
