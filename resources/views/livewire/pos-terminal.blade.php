@@ -342,7 +342,7 @@
                 </div>
 
                 <!-- Offline checkout -->
-                <div x-show="cartItems.length > 0" x-cloak class="border-t border-slate-200 p-4 bg-slate-50/50">
+                <div x-show="cartItems.length > 0" x-cloak x-effect="saveCart()" class="border-t border-slate-200 p-4 bg-slate-50/50">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
                         <div>
                             <label class="text-xs text-slate-500">Diskon Total (Rp)</label>

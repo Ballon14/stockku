@@ -25,6 +25,18 @@ class PosTerminal extends Component
 
     public ?int $lastSaleId = null;
 
+    public function mount(): void
+    {
+        $this->restoreCartFromSession();
+    }
+
+    public function updated($name): void
+    {
+        if (in_array($name, ['cart', 'diskon', 'bayar', 'paymentMethod', 'catatan'], true)) {
+            $this->saveCartToSession();
+        }
+    }
+
     public function searchProducts()
     {
         // Triggered reactively
@@ -57,6 +69,7 @@ class PosTerminal extends Component
         }
 
         $this->search = '';
+        $this->saveCartToSession();
     }
 
     public function updateQty(string $key, int $qty)
@@ -69,6 +82,7 @@ class PosTerminal extends Component
                 $this->cart[$key]['subtotal'] = ($qty * $this->cart[$key]['harga']) - $this->cart[$key]['diskon'];
             }
         }
+        $this->saveCartToSession();
     }
 
     public function updateItemDiskon(string $key, float $diskon)
@@ -77,11 +91,13 @@ class PosTerminal extends Component
             $this->cart[$key]['diskon'] = max(0, $diskon);
             $this->cart[$key]['subtotal'] = ($this->cart[$key]['qty'] * $this->cart[$key]['harga']) - $this->cart[$key]['diskon'];
         }
+        $this->saveCartToSession();
     }
 
     public function removeItem(string $key)
     {
         unset($this->cart[$key]);
+        $this->saveCartToSession();
     }
 
     public function clearCart()
@@ -92,6 +108,7 @@ class PosTerminal extends Component
         $this->paymentMethod = 'cash';
         $this->catatan = '';
         $this->showCheckout = false;
+        $this->saveCartToSession();
     }
 
     public function setPaymentMethod(string $method)
@@ -105,6 +122,8 @@ class PosTerminal extends Component
         if ($method === 'qris' && (float) $this->bayar < $this->grandTotal) {
             $this->bayar = $this->grandTotal;
         }
+
+        $this->saveCartToSession();
     }
 
     public function getSubtotalProperty(): float
@@ -125,6 +144,67 @@ class PosTerminal extends Component
     public function getQrisCodeProperty(): string
     {
         return (string) config('stockku.qris_code', '');
+    }
+
+    private function saveCartToSession(): void
+    {
+        if (! auth()->check()) {
+            return;
+        }
+
+        session()->put('pos_cart_'.auth()->id(), [
+            'cart' => $this->cart,
+            'diskon' => $this->diskon,
+            'bayar' => $this->bayar,
+            'catatan' => $this->catatan,
+            'paymentMethod' => $this->paymentMethod,
+        ]);
+    }
+
+    private function restoreCartFromSession(): void
+    {
+        if (! auth()->check()) {
+            return;
+        }
+
+        $data = session()->get('pos_cart_'.auth()->id());
+
+        if (! is_array($data) || empty($data['cart'])) {
+            return;
+        }
+
+        $validated = [];
+
+        foreach ($data['cart'] as $key => $item) {
+            $product = Product::find($item['product_id'] ?? null);
+
+            if (! $product || ! $product->is_active || $product->stok <= 0) {
+                continue;
+            }
+
+            $itemDiskon = max(0, (float) ($item['diskon'] ?? 0));
+            $qty = min(max(1, (int) ($item['qty'] ?? 1)), $product->stok);
+
+            $validated[$key] = [
+                'product_id' => $product->id,
+                'name' => $product->name,
+                'harga' => (float) $product->harga_jual,
+                'qty' => $qty,
+                'stok' => $product->stok,
+                'diskon' => $itemDiskon,
+                'subtotal' => max(0, ($product->harga_jual * $qty) - $itemDiskon),
+            ];
+        }
+
+        $this->cart = $validated;
+        $this->diskon = max(0, (float) ($data['diskon'] ?? 0));
+        $this->bayar = max(0, (float) ($data['bayar'] ?? 0));
+        $this->catatan = (string) ($data['catatan'] ?? '');
+        $this->paymentMethod = in_array($data['paymentMethod'] ?? null, ['cash', 'qris'], true) ? $data['paymentMethod'] : 'cash';
+
+        if (! empty($this->cart)) {
+            $this->saveCartToSession();
+        }
     }
 
     public function openCheckout()

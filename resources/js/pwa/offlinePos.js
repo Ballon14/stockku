@@ -31,6 +31,61 @@ export function offlinePos() {
             await refreshCatalog();
             this.products = getCatalog();
             this.loaded = true;
+            this.restoreCart();
+        },
+
+        restoreCart() {
+            try {
+                const raw = localStorage.getItem('stokcku_offline_cart');
+
+                if (!raw) {
+                    return;
+                }
+
+                const data = JSON.parse(raw);
+                const cart = {};
+
+                for (const [key, item] of Object.entries(data.cart || {})) {
+                    const product = this.products.find((p) => p.id === item.product_id);
+
+                    if (!product || product.stok <= 0) {
+                        continue;
+                    }
+
+                    const qty = Math.min(Math.max(1, parseInt(item.qty, 10) || 1), product.stok);
+
+                    cart[key] = {
+                        product_id: product.id,
+                        name: product.name,
+                        harga: Number(product.harga_jual),
+                        qty,
+                        stok: product.stok,
+                        subtotal: Number(product.harga_jual) * qty,
+                    };
+                }
+
+                this.cart = cart;
+                this.diskon = Math.max(0, Number(data.diskon || 0));
+                this.bayar = Math.max(0, Number(data.bayar || 0));
+                this.paymentMethod = data.paymentMethod === 'qris' ? 'qris' : 'cash';
+                this.catatan = data.catatan || '';
+            } catch (error) {
+                localStorage.removeItem('stokcku_offline_cart');
+            }
+        },
+
+        saveCart() {
+            try {
+                localStorage.setItem('stokcku_offline_cart', JSON.stringify({
+                    cart: this.cart,
+                    diskon: this.diskon,
+                    bayar: this.bayar,
+                    paymentMethod: this.paymentMethod,
+                    catatan: this.catatan,
+                }));
+            } catch (error) {
+                // localStorage penuh atau tidak tersedia — abaikan
+            }
         },
 
         async updateQueue() {
