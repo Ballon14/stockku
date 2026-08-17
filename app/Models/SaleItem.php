@@ -13,6 +13,7 @@ class SaleItem extends Model
         'qty',
         'returned_qty',
         'harga',
+        'harga_beli',
         'diskon',
         'subtotal',
     ];
@@ -21,6 +22,7 @@ class SaleItem extends Model
         'qty' => 'integer',
         'returned_qty' => 'integer',
         'harga' => 'decimal:2',
+        'harga_beli' => 'decimal:2',
         'diskon' => 'decimal:2',
         'subtotal' => 'decimal:2',
     ];

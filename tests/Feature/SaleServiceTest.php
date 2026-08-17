@@ -177,4 +177,28 @@ class SaleServiceTest extends TestCase
         $this->assertSame(0.0, (float) $sale->grand_total);
         $this->assertDatabaseHas('sale_items', ['sale_id' => $sale->id, 'subtotal' => 0]);
     }
+
+    public function test_sale_item_snapshots_harga_beli_at_time_of_sale(): void
+    {
+        $this->actingAsUser();
+        $product = $this->makeProduct(stok: 10, hargaJual: 5000);
+
+        $sale = app(SaleService::class)->createSale(
+            [['product_id' => $product->id, 'qty' => 2, 'diskon' => 0]],
+            0,
+            20000
+        );
+
+        $this->assertDatabaseHas('sale_items', [
+            'sale_id' => $sale->id,
+            'harga_beli' => 3000,
+        ]);
+
+        $product->update(['harga_beli' => 9999]);
+
+        $this->assertDatabaseHas('sale_items', [
+            'sale_id' => $sale->id,
+            'harga_beli' => 3000,
+        ]);
+    }
 }

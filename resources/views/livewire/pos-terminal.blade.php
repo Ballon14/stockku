@@ -39,6 +39,16 @@
                         <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                         <input wire:model.live.debounce.300ms="search" type="text" placeholder="Nama produk / SKU / barcode..." class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-sm transition-all" autofocus>
                     </div>
+                    <div class="mt-2 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7V5a1 1 0 011-1h2m10 0h2a1 1 0 011 1v2m0 10v2a1 1 0 01-1 1h-2m-10 0H5a1 1 0 01-1-1v-2M9 9h.01M15 9h.01M9 15h6"/></svg>
+                        <input wire:model="barcode" wire:keydown.enter="addByBarcode" type="text" placeholder="Scan barcode / SKU lalu Enter" class="w-full pl-3 pr-4 py-2 rounded-lg border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 text-sm transition-all">
+                    </div>
+                    @if($barcodeError)
+                    <p class="mt-2 text-xs font-medium text-red-600 flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        {{ $barcodeError }}
+                    </p>
+                    @endif
                 </div>
 
                 <div class="flex-1 overflow-y-auto p-4 space-y-2 max-h-[45vh] lg:max-h-none">
@@ -293,6 +303,11 @@
                         <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                         <input x-model="search" type="text" placeholder="Nama produk / SKU..." class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-sm transition-all">
                     </div>
+                    <div class="mt-2 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7V5a1 1 0 011-1h2m10 0h2a1 1 0 011 1v2m0 10v2a1 1 0 01-1 1h-2m-10 0H5a1 1 0 01-1-1v-2M9 9h.01M15 9h.01M9 15h6"/></svg>
+                        <input x-model="barcode" @keydown.enter="addByBarcode()" type="text" placeholder="Scan barcode / SKU lalu Enter" class="w-full pl-3 pr-4 py-2 rounded-lg border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 text-sm transition-all">
+                    </div>
+                    <p x-show="barcodeError" x-cloak x-text="barcodeError" class="mt-2 text-xs font-medium text-red-600"></p>
                 </div>
 
                 <div class="flex-1 overflow-y-auto p-4 space-y-2 max-h-[45vh] lg:max-h-none">

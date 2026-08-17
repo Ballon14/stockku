@@ -76,6 +76,7 @@ class SaleService
                     'product_id' => $item['product']->id,
                     'qty' => $item['qty'],
                     'harga' => $item['harga'],
+                    'harga_beli' => (float) $item['product']->harga_beli,
                     'diskon' => $item['diskon'],
                     'subtotal' => $item['subtotal'],
                 ]);

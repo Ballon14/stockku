@@ -25,6 +25,10 @@ class PosTerminal extends Component
 
     public ?int $lastSaleId = null;
 
+    public string $barcode = '';
+
+    public ?string $barcodeError = null;
+
     public function mount(): void
     {
         $this->restoreCartFromSession();
@@ -40,6 +44,31 @@ class PosTerminal extends Component
     public function searchProducts()
     {
         // Triggered reactively
+    }
+
+    public function addByBarcode(): void
+    {
+        $code = trim((string) $this->barcode);
+        $this->barcode = '';
+
+        if ($code === '') {
+            return;
+        }
+
+        $product = Product::where('is_active', true)
+            ->where(function ($query) use ($code) {
+                $query->where('barcode', $code)->orWhere('sku', $code);
+            })
+            ->first();
+
+        if (! $product) {
+            $this->barcodeError = "Barcode/SKU \"{$code}\" tidak ditemukan.";
+
+            return;
+        }
+
+        $this->barcodeError = null;
+        $this->addToCart($product->id);
     }
 
     public function addToCart(int $productId)

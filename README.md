@@ -153,6 +153,29 @@ routes/web.php           # Definisi route
 - **Keamanan**: pendaftaran publik dinonaktifkan (akun dibuat oleh Admin), login & lupa-password dibatasi `throttle` untuk mencegah brute-force, dan saat produksi pastikan `APP_DEBUG=false` di `.env`.
 - **Email**: `MAIL_MAILER=log` (default) hanya menulis email ke file log — set konfigurasi SMTP asli agar *reset password* benar-benar terkirim.
 
+### Mengelola Server via Systemd
+
+File unit systemd sudah disediakan di `deploy/`:
+
+```bash
+sudo cp deploy/stockku.service deploy/stockku-backup.service deploy/stockku-backup.timer /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now stockku.service stockku-backup.timer
+```
+
+- `stockku.service` — menjalankan server (`php artisan serve --host=0.0.0.0 --port=8000`), restart otomatis jika crash, aktif saat boot.
+- `stockku-backup.timer` + `stockku-backup.service` — backup database otomatis tiap pukul 02:30.
+
+### Backup Database
+
+Jalankan manual kapan saja:
+
+```bash
+./scripts/backup.sh
+```
+
+Dump disimpan di `storage/backups/stock-<timestamp>.sql.gz` dan file lebih dari 14 hari dihapus otomatis. Kredensial DB dibaca dari `.env` (tidak di-hardcode).
+
 ---
 
 <div align="center">

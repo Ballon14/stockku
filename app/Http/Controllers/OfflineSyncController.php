@@ -20,7 +20,7 @@ class OfflineSyncController extends Controller
     {
         $products = Product::where('is_active', true)
             ->orderBy('name')
-            ->get(['id', 'name', 'sku', 'harga_jual', 'stok', 'satuan']);
+            ->get(['id', 'name', 'sku', 'barcode', 'harga_jual', 'stok', 'satuan']);
 
         return response()->json($products);
     }

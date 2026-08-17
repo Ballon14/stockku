@@ -84,7 +84,9 @@ class ReportService
 
         $cogs = $sales->sum(function ($sale) {
             return $sale->items->sum(function ($item) {
-                return $item->product->harga_beli * $item->qty;
+                $hargaBeli = $item->harga_beli ?? $item->product?->harga_beli ?? 0;
+
+                return $hargaBeli * $item->qty;
             });
         });
 

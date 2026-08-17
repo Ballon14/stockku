@@ -1,0 +1,7 @@
+[Unit]
+Description=StockKu Database Backup
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/root/stockku/scripts/backup.sh

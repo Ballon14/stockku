@@ -13,6 +13,8 @@ const rupiah = (value) => 'Rp ' + Number(value || 0).toLocaleString('id-ID');
 export function offlinePos() {
     return {
         search: '',
+        barcode: '',
+        barcodeError: '',
         products: [],
         cart: {},
         diskon: 0,
@@ -139,6 +141,28 @@ export function offlinePos() {
             }
 
             this.search = '';
+        },
+
+        addByBarcode() {
+            const code = String(this.barcode || '').trim();
+            this.barcode = '';
+
+            if (!code) {
+                return;
+            }
+
+            const product = this.products.find((item) =>
+                (item.barcode && String(item.barcode) === code) ||
+                (item.sku && String(item.sku).toLowerCase() === code.toLowerCase())
+            );
+
+            if (!product) {
+                this.barcodeError = 'Barcode/SKU "' + code + '" tidak ditemukan.';
+                return;
+            }
+
+            this.barcodeError = '';
+            this.addToCart(product.id);
         },
 
         updateQty(key, qty) {
