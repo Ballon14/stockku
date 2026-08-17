@@ -42,7 +42,14 @@ class PurchaseService
                 ]);
 
                 // Tambah stok
-                $product = Product::find($item['product_id']);
+                $product = Product::query()->lockForUpdate()->find($item['product_id']);
+
+                if (! $product) {
+                    throw new \RuntimeException(
+                        "Produk tidak ditemukan (ID: {$item['product_id']})."
+                    );
+                }
+
                 if (! empty($item['update_harga_beli'])) {
                     $product->update(['harga_beli' => $item['harga']]);
                 }

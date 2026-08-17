@@ -64,7 +64,6 @@
 
     <!-- Footer -->
     <p class="mt-6 text-center text-sm text-gray-500">
-        Belum punya akun?
-        <a href="{{ route('register') }}" class="font-semibold text-indigo-600 hover:text-indigo-500">Daftar sekarang</a>
+        Akun karyawan dibuat oleh Admin.
     </p>
 </x-guest-layout>

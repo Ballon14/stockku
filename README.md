@@ -150,6 +150,8 @@ routes/web.php           # Definisi route
 
 - **Production**: gunakan web server (Nginx/Apache) dengan PHP-FPM, arahkan document root ke `public/`.
 - **PWA / Service Worker**: fitur *installable app* dan *offline cache* hanya aktif pada koneksi **HTTPS** (atau `localhost`). Di jaringan HTTP LAN, aplikasi tetap berjalan normal — POS offline tetap berfungsi via LocalStorage/IndexedDB.
+- **Keamanan**: pendaftaran publik dinonaktifkan (akun dibuat oleh Admin), login & lupa-password dibatasi `throttle` untuk mencegah brute-force, dan saat produksi pastikan `APP_DEBUG=false` di `.env`.
+- **Email**: `MAIL_MAILER=log` (default) hanya menulis email ke file log — set konfigurasi SMTP asli agar *reset password* benar-benar terkirim.
 
 ---
 
