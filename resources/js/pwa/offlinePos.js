@@ -18,6 +18,7 @@ export function offlinePos() {
         products: [],
         cart: {},
         diskon: 0,
+        diskonPersen: 0,
         bayar: 0,
         paymentMethod: 'cash',
         catatan: '',
@@ -141,6 +142,7 @@ export function offlinePos() {
             }
 
             this.search = '';
+            this.syncDiskonFromPersen();
         },
 
         addByBarcode() {
@@ -165,6 +167,16 @@ export function offlinePos() {
             this.addToCart(product.id);
         },
 
+        setDiskonPersen() {
+            this.diskon = Math.round((this.subtotal || 0) * Math.max(0, Number(this.diskonPersen || 0)) / 100);
+        },
+
+        syncDiskonFromPersen() {
+            if (Number(this.diskonPersen || 0) > 0) {
+                this.diskon = Math.round((this.subtotal || 0) * Number(this.diskonPersen) / 100);
+            }
+        },
+
         updateQty(key, qty) {
             qty = parseInt(qty, 10);
 
@@ -178,15 +190,19 @@ export function offlinePos() {
                 this.cart[key].qty = qty;
                 this.cart[key].subtotal = qty * this.cart[key].harga;
             }
+
+            this.syncDiskonFromPersen();
         },
 
         removeItem(key) {
             delete this.cart[key];
+            this.syncDiskonFromPersen();
         },
 
         clearCart() {
             this.cart = {};
             this.diskon = 0;
+            this.diskonPersen = 0;
             this.bayar = 0;
             this.paymentMethod = 'cash';
             this.catatan = '';

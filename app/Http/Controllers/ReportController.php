@@ -27,6 +27,7 @@ class ReportController extends Controller
         $products = Product::where('is_active', true)->orderBy('name')->get();
 
         if ($request->input('export') === 'pdf') {
+            $data = $this->reportService->getSalesReport($startDate, $endDate, $userId, $productId, false);
             $pdf = Pdf::loadView('reports.sales-pdf', compact('data', 'startDate', 'endDate'));
 
             return $pdf->download('laporan-penjualan.pdf');

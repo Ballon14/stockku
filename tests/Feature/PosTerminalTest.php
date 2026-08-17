@@ -81,4 +81,28 @@ class PosTerminalTest extends TestCase
             ->assertSet('barcodeError', 'Barcode/SKU "9999999999999" tidak ditemukan.')
             ->assertCount('cart', 0);
     }
+
+    public function test_diskon_persen_converts_to_rupiah(): void
+    {
+        $user = User::create(['name' => 'Kasir', 'email' => 'kasir-pos4@stockku.com', 'password' => 'password']);
+        $this->actingAs($user);
+        $product = $this->makeProduct();
+
+        Livewire::test(PosTerminal::class)
+            ->call('addToCart', $product->id)
+            ->set('diskonPersen', 10)
+            ->assertSet('diskon', 500);
+    }
+
+    public function test_diskon_rupiah_syncs_persen(): void
+    {
+        $user = User::create(['name' => 'Kasir', 'email' => 'kasir-pos5@stockku.com', 'password' => 'password']);
+        $this->actingAs($user);
+        $product = $this->makeProduct();
+
+        Livewire::test(PosTerminal::class)
+            ->call('addToCart', $product->id)
+            ->set('diskon', 1000)
+            ->assertSet('diskonPersen', 20);
+    }
 }

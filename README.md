@@ -166,6 +166,37 @@ sudo systemctl enable --now stockku.service stockku-backup.timer
 - `stockku.service` — menjalankan server (`php artisan serve --host=0.0.0.0 --port=8000`), restart otomatis jika crash, aktif saat boot.
 - `stockku-backup.timer` + `stockku-backup.service` — backup database otomatis tiap pukul 02:30.
 
+### HTTPS di Jaringan LAN
+
+Aplikasi dijalankan di belakang **nginx** sebagai reverse proxy dengan sertifikat **self-signed** (CA internal) — port 8000 tidak lagi terbuka ke publik, hanya `443`.
+
+Setup (sudah diterapkan di server):
+
+```bash
+# 1. Sertifikat & CA (CN = IP server, mis. 10.10.10.21)
+mkdir -p /etc/ssl/stockku
+openssl genrsa -out /etc/ssl/stockku/ca.key 2048
+openssl req -x509 -new -nodes -key ca.key -sha256 -days 3650 \
+  -subj "/CN=StockKu CA/O=StockKu/C=ID" -out /etc/ssl/stockku/stockku-ca.crt
+# buat server.key + server.crt dengan SAN berisi IP server (lihat deploy/stockku-nginx.conf)
+
+# 2. Konfigurasi nginx (lihat deploy/stockku-nginx.conf)
+cp deploy/stockku-nginx.conf /etc/nginx/sites-available/stockku
+ln -sf /etc/nginx/sites-available/stockku /etc/nginx/sites-enabled/stockku
+nginx -t && systemctl restart nginx
+
+# 3. HTTP -> HTTPS otomatis (sudah ada di konfigurasi nginx)
+```
+
+**Mempercayai CA di perangkat klien** (PC kasir, HP):
+
+1. Salin `stockku-ca.crt` ke perangkat.
+2. **Windows**: buka `stockku-ca.crt` → *Install Certificate* → *Local Machine* → *Trusted Root Certification Authorities*.
+3. **Android**: Pengaturan → Keamanan → Instal sertifikat CA → pilih `stockku-ca.crt`.
+4. **iOS**: instal profil `stockku-ca.crt`, lalu aktifkan *Certificate Trust Settings* → *Enable Full Trust*.
+
+Tanpa mempercayai CA, browser tetap bisa dipaksa lanjut (peringatan "Not Secure"), tetapi **PWA / service worker tidak aktif**. Catatan: sertifikat berlaku 825 hari; regenerasi dengan langkah yang sama.
+
 ### Backup Database
 
 Jalankan manual kapan saja:

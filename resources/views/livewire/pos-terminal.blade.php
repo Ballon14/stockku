@@ -170,8 +170,17 @@
                 <div class="border-t border-slate-200 p-4 bg-slate-50/50">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
                         <div>
-                            <label class="text-xs text-slate-500">Diskon Total (Rp)</label>
-                            <input type="number" wire:model.live="diskon" min="0" class="w-32 rounded-lg border border-slate-200 py-1.5 px-3 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-200">
+                            <label class="text-xs text-slate-500">Diskon Total</label>
+                            <div class="flex items-center gap-2">
+                                <div class="relative">
+                                    <input type="number" wire:model.live="diskon" min="0" class="w-32 rounded-lg border border-slate-200 py-1.5 pl-6 pr-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-200">
+                                    <span class="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-slate-400">Rp</span>
+                                </div>
+                                <div class="relative">
+                                    <input type="number" wire:model.live="diskonPersen" min="0" max="100" class="w-20 rounded-lg border border-slate-200 py-1.5 pl-6 pr-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-200">
+                                    <span class="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-slate-400">%</span>
+                                </div>
+                            </div>
                         </div>
                         <div class="text-right">
                             <p class="text-sm text-slate-500">Subtotal: Rp {{ number_format($this->subtotal, 0, ',', '.') }}</p>
@@ -377,8 +386,17 @@
                 <div x-show="cartItems.length > 0" x-cloak x-effect="saveCart()" class="border-t border-slate-200 p-4 bg-slate-50/50">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
                         <div>
-                            <label class="text-xs text-slate-500">Diskon Total (Rp)</label>
-                            <input type="number" x-model.number="diskon" min="0" class="w-32 rounded-lg border border-slate-200 py-1.5 px-3 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-200">
+                            <label class="text-xs text-slate-500">Diskon Total</label>
+                            <div class="flex items-center gap-2">
+                                <div class="relative">
+                                    <input type="number" x-model.number="diskon" min="0" @input="diskonPersen = subtotal > 0 ? Math.round((diskon||0)/subtotal*100) : 0" class="w-32 rounded-lg border border-slate-200 py-1.5 pl-6 pr-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-200">
+                                    <span class="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-slate-400">Rp</span>
+                                </div>
+                                <div class="relative">
+                                    <input type="number" x-model.number="diskonPersen" min="0" max="100" @input="setDiskonPersen()" class="w-20 rounded-lg border border-slate-200 py-1.5 pl-6 pr-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-200">
+                                    <span class="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-slate-400">%</span>
+                                </div>
+                            </div>
                         </div>
                         <div class="text-right">
                             <p class="text-sm text-slate-500" x-text="'Subtotal: ' + rupiah(subtotal)"></p>

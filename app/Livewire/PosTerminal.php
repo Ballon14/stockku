@@ -15,6 +15,8 @@ class PosTerminal extends Component
 
     public $diskon = 0;
 
+    public $diskonPersen = 0;
+
     public $bayar = 0;
 
     public string $paymentMethod = 'cash';
@@ -36,9 +38,21 @@ class PosTerminal extends Component
 
     public function updated($name): void
     {
-        if (in_array($name, ['cart', 'diskon', 'bayar', 'paymentMethod', 'catatan'], true)) {
+        if (in_array($name, ['cart', 'diskon', 'diskonPersen', 'bayar', 'paymentMethod', 'catatan'], true)) {
             $this->saveCartToSession();
         }
+    }
+
+    public function updatedDiskon($value): void
+    {
+        $this->diskonPersen = $this->subtotal > 0
+            ? round(max(0, (float) $value) / $this->subtotal * 100)
+            : 0;
+    }
+
+    public function updatedDiskonPersen($value): void
+    {
+        $this->diskon = round($this->subtotal * max(0, (float) $value) / 100);
     }
 
     public function searchProducts()
@@ -98,6 +112,7 @@ class PosTerminal extends Component
         }
 
         $this->search = '';
+        $this->syncDiskonFromPersen();
         $this->saveCartToSession();
     }
 
@@ -111,6 +126,7 @@ class PosTerminal extends Component
                 $this->cart[$key]['subtotal'] = ($qty * $this->cart[$key]['harga']) - $this->cart[$key]['diskon'];
             }
         }
+        $this->syncDiskonFromPersen();
         $this->saveCartToSession();
     }
 
@@ -120,12 +136,14 @@ class PosTerminal extends Component
             $this->cart[$key]['diskon'] = max(0, $diskon);
             $this->cart[$key]['subtotal'] = ($this->cart[$key]['qty'] * $this->cart[$key]['harga']) - $this->cart[$key]['diskon'];
         }
+        $this->syncDiskonFromPersen();
         $this->saveCartToSession();
     }
 
     public function removeItem(string $key)
     {
         unset($this->cart[$key]);
+        $this->syncDiskonFromPersen();
         $this->saveCartToSession();
     }
 
@@ -133,6 +151,7 @@ class PosTerminal extends Component
     {
         $this->cart = [];
         $this->diskon = 0;
+        $this->diskonPersen = 0;
         $this->bayar = 0;
         $this->paymentMethod = 'cash';
         $this->catatan = '';
@@ -173,6 +192,13 @@ class PosTerminal extends Component
     public function getQrisCodeProperty(): string
     {
         return (string) config('stockku.qris_code', '');
+    }
+
+    private function syncDiskonFromPersen(): void
+    {
+        if ((float) $this->diskonPersen > 0) {
+            $this->diskon = round($this->subtotal * (float) $this->diskonPersen / 100);
+        }
     }
 
     private function saveCartToSession(): void

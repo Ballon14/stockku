@@ -1,9 +1,15 @@
 <x-app-layout>
 @section('title', 'Dashboard')
+@push('scripts')
+@vite(['resources/js/dashboard.js'])
+@endpush
 
 <x-slot name="header">
     <h2 class="text-2xl font-bold text-slate-800">Dashboard</h2>
 </x-slot>
+
+<script type="application/json" id="daily-sales-data">{{ json_encode($data['daily_sales']) }}</script>
+<script type="application/json" id="top-products-data">{{ json_encode($data['top_products']->map(fn ($item) => ['name' => $item->product->name, 'total_qty' => (int) $item->total_qty, 'total_sales' => (float) $item->total_sales])) }}</script>
 
 <!-- Stats Cards -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
@@ -63,36 +69,21 @@
     <!-- Sales Chart -->
     <div class="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
         <h3 class="text-lg font-semibold text-slate-800 mb-4">Penjualan 7 Hari Terakhir</h3>
-        <div class="space-y-3">
-            @php
-                $maxSale = $data['daily_sales']->max('total') ?: 1;
-            @endphp
-            @forelse($data['daily_sales'] as $day)
-            <div class="flex items-center gap-3">
-                <span class="text-xs text-slate-500 w-20 shrink-0">{{ \Carbon\Carbon::parse($day->date)->translatedFormat('d M') }}</span>
-                <div class="flex-1 bg-slate-100 rounded-full h-6 relative overflow-hidden">
-                    <div class="absolute inset-y-0 left-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full transition-all duration-500"
-                         style="width: {{ ($day->total / $maxSale) * 100 }}%">
-                    </div>
-                    <span class="absolute inset-0 flex items-center justify-center text-xs font-medium {{ ($day->total / $maxSale) > 0.5 ? 'text-white' : 'text-slate-600' }}">
-                        Rp {{ number_format($day->total, 0, ',', '.') }}
-                    </span>
-                </div>
-                <span class="text-xs text-slate-400 w-12 text-right">{{ $day->count }}x</span>
-            </div>
-            @empty
-            <p class="text-sm text-slate-400 text-center py-8">Belum ada data penjualan</p>
-            @endforelse
+        <div class="h-72 relative">
+            <canvas id="daily-sales-chart"></canvas>
         </div>
     </div>
 
     <!-- Top Products -->
     <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
         <h3 class="text-lg font-semibold text-slate-800 mb-4">Produk Terlaris</h3>
-        <div class="space-y-4">
+        <div class="h-52 relative mb-4">
+            <canvas id="top-products-chart"></canvas>
+        </div>
+        <div class="space-y-3">
             @forelse($data['top_products'] as $i => $item)
             <div class="flex items-center gap-3">
-                <span class="w-7 h-7 rounded-lg bg-gradient-to-br {{ $i === 0 ? 'from-amber-400 to-orange-500' : ($i === 1 ? 'from-slate-300 to-slate-400' : 'from-amber-600 to-amber-700') }} flex items-center justify-center text-white text-xs font-bold">{{ $i + 1 }}</span>
+                <span class="w-7 h-7 rounded-lg bg-gradient-to-br {{ $i === 0 ? 'from-indigo-500 to-purple-600' : ($i === 1 ? 'from-slate-300 to-slate-400' : 'from-amber-600 to-amber-700') }} flex items-center justify-center text-white text-xs font-bold">{{ $i + 1 }}</span>
                 <div class="flex-1 min-w-0">
                     <p class="text-sm font-medium text-slate-700 truncate">{{ $item->product->name }}</p>
                     <p class="text-xs text-slate-400">{{ $item->total_qty }} terjual</p>

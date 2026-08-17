@@ -10,11 +10,12 @@ use App\Models\SaleItem;
 use App\Models\SaleReturn;
 use App\Models\StockMovement;
 use Carbon\Carbon;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
 class ReportService
 {
-    public function getSalesReport($startDate, $endDate, $userId = null, $productId = null)
+    public function getSalesReport($startDate, $endDate, $userId = null, $productId = null, $paginate = true)
     {
         $query = Sale::with(['user', 'items.product.category'])
             ->whereDate('created_at', '>=', $startDate)
@@ -61,12 +62,35 @@ class ReportService
             return $sale->items->contains('product_id', $productId);
         })->count();
 
+        $items = $items->sortByDesc('qty')->values();
+
+        if (! $paginate) {
+            return [
+                'summary' => [
+                    'total_transactions' => $totalTransactions,
+                    'total_revenue' => $totalRevenue,
+                ],
+                'items' => $items,
+            ];
+        }
+
+        $perPage = 25;
+        $page = (int) request('page', 1);
+
+        $paginated = new LengthAwarePaginator(
+            $items->forPage($page, $perPage)->values(),
+            $items->count(),
+            $perPage,
+            $page,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
+
         return [
             'summary' => [
                 'total_transactions' => $totalTransactions,
                 'total_revenue' => $totalRevenue,
             ],
-            'items' => $items->sortByDesc('qty')->values(),
+            'items' => $paginated,
         ];
     }
 
