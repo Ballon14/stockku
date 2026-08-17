@@ -1,68 +1,160 @@
-# StockKu - Web Aplikasi Penjualan & Absensi 🚀
+<div align="center">
 
-StockKu adalah aplikasi web komprehensif yang dirancang untuk mengelola penjualan toko ritel sekaligus melacak absensi karyawan. Dibangun menggunakan teknologi modern untuk menjamin performa cepat, antarmuka yang indah, dan pengalaman pengguna yang mulus.
+# 🛒 StockKu
+
+### Web Aplikasi Penjualan (POS) & Absensi Karyawan
+
+Aplikasi kasir modern untuk toko ritel: transaksi cepat tanpa reload, pembayaran **Tunai & QRIS**, mode **offline** yang tersinkron otomatis, plus manajemen inventaris, absensi karyawan, dan laporan lengkap.
+
+[![PHP](https://img.shields.io/badge/PHP-%5E8.2-777BB4?logo=php&logoColor=white)](https://www.php.net)
+[![Laravel](https://img.shields.io/badge/Laravel-12-FF2D20?logo=laravel&logoColor=white)](https://laravel.com)
+[![Livewire](https://img.shields.io/badge/Livewire-4.4-FB70A9?logo=livewire&logoColor=white)](https://livewire.laravel.com)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-3-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+[![MySQL](https://img.shields.io/badge/MySQL-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com)
+[![Alpine.js](https://img.shields.io/badge/Alpine.js-3.4-8BC0D0?logo=alpine.js&logoColor=white)](https://alpinejs.dev)
+
+</div>
+
+---
+
+## 📑 Daftar Isi
+
+- [✨ Fitur Utama](#-fitur-utama)
+- [🛠️ Teknologi](#️-teknologi)
+- [👤 Akun Demo](#-akun-demo)
+- [🚀 Instalasi](#-instalasi)
+- [📦 Struktur Direktori](#-struktur-direktori)
+- [🌐 Catatan Deploy](#-catatan-deploy)
+
+---
 
 ## ✨ Fitur Utama
 
-- **Multi-Role Authentication**: Akses berbasis role (Admin, Manager, Kasir, Karyawan) menggunakan Spatie Permission.
-- **Point of Sale (POS) Super Cepat**: Menggunakan Livewire untuk pengalaman kasir tanpa reload halaman.
-- **Manajemen Inventaris**: Pengelolaan Kategori, Produk, Supplier, dan riwayat mutasi stok (Stok Masuk, Keluar, Retur).
-- **Peringatan Stok Menipis**: Notifikasi otomatis ketika stok produk mencapai batas minimum.
-- **Manajemen Karyawan & Absensi**: Fitur Clock-In/Clock-Out harian dan pengajuan Izin/Sakit/Cuti terintegrasi.
-- **Retur Penjualan**: Sistem pengembalian barang dari pelanggan yang secara otomatis mengembalikan stok.
-- **Laporan Lengkap**: Laporan Penjualan, Laba Rugi, Mutasi Stok, dan Rekap Absensi yang dapat diekspor ke PDF/Excel.
-- **Struk Kasir Thermal**: Format cetak struk penjualan yang dioptimalkan untuk printer thermal (58mm/80mm).
+### 🧾 Point of Sale (Kasir)
+- **Kasir super cepat** berbasis Livewire — tambah barang, ubah qty, diskon, dan selesaikan transaksi tanpa reload halaman
+- **Pembayaran Tunai & QRIS** (kode QRIS statis, tanpa perlu payment gateway)
+- **Mode offline**: transaksi tersimpan di perangkat saat internet mati dan **sinkron otomatis** saat koneksi kembali
+- **Keranjang persisten** — isi keranjang tidak hilang walau halaman di-refresh
+- **Struk thermal 58mm/80mm** yang dioptimalkan untuk printer kasir
+- Konfirmasi transaksi dengan **modal kustom** yang konsisten (bukan dialog bawaan browser)
 
-## 🛠️ Teknologi yang Digunakan
+### 📦 Manajemen Inventaris
+- Kategori, Produk, dan Supplier dengan mutasi stok lengkap (Stok Masuk, Keluar, Retur)
+- **Peringatan stok menipis** otomatis saat mencapai batas minimum
+- Retur penjualan yang mengembalikan stok secara otomatis
 
-- **Backend**: Laravel 12.x (PHP 8.2+)
-- **Database**: MySQL
-- **Frontend & Styling**: Blade Templates, Tailwind CSS 3 (via Vite & PostCSS), AlpineJS
-- **Interaktivitas (POS)**: Livewire 4
-- **Autentikasi & Otorisasi**: Laravel Breeze & Spatie Laravel Permission
-- **Ekspor Dokumen**: Barryvdh/Laravel-DomPDF (PDF) & OpenSpout (Excel)
+### 👥 Karyawan & Absensi
+- **Multi-role**: Admin, Manager, Kasir, Karyawan (Spatie Permission)
+- Clock-In / Clock-Out harian, pengajuan **Izin / Sakit / Cuti** dengan alur persetujuan
+- Rekap absensi bulanan
 
-## 👤 Role Pengguna & Akses Default
+### 📊 Laporan
+- Penjualan, Laba Rugi, Mutasi Stok, dan Rekap Absensi
+- Ekspor ke **PDF** (DomPDF) & **Excel** (OpenSpout)
 
-Aplikasi sudah dilengkapi dengan *Seeder* untuk data awal (termasuk dummy transaksi). Berikut adalah akun yang dapat digunakan:
+---
+
+## 🛠️ Teknologi
+
+| Lapisan | Teknologi |
+|---|---|
+| **Backend** | Laravel 12 · PHP 8.2+ · Livewire 4.4 |
+| **Database** | MySQL |
+| **Frontend** | Blade · Tailwind CSS 3 · Alpine.js · Vite |
+| **Autentikasi & Otorisasi** | Laravel Breeze · Spatie Laravel Permission |
+| **Ekspor Dokumen** | Barryvdh/Laravel-DomPDF · OpenSpout |
+| **Offline & PWA** | IndexedDB · LocalStorage · Workbox (Service Worker) |
+
+---
+
+## 👤 Akun Demo
+
+Seeder tersedia dengan data awal lengkap (termasuk riwayat transaksi 1 bulan). Akun yang dapat digunakan:
 
 | Role | Email | Password | Hak Akses Utama |
 |------|-------|----------|-----------------|
-| **Admin** | admin@stokcku.com | `password` | Akses penuh ke semua modul, master data, laporan, dan setting. |
-| **Manager** | manager@stokcku.com | `password` | Laporan, dashboard analitik, read-only data (tanpa POS). |
-| **Kasir** | kasir@stokcku.com | `password` | Modul POS (Penjualan), absensi pribadi. |
-| **Karyawan** | karyawan@stokcku.com | `password` | Hanya absensi harian dan pengajuan izin/cuti. |
-
-## 🚀 Cara Menjalankan Aplikasi
-
-Aplikasi telah dikonfigurasi. Berikut adalah panduan singkat jika Anda ingin menjalankannya ulang dari awal:
-
-1. **Jalankan Migration & Seeder**
-   ```bash
-   php artisan migrate:fresh --seed
-   ```
-   *(Catatan: Seeder akan memakan waktu beberapa saat karena menghasilkan riwayat transaksi & mutasi stok yang lengkap selama 1 bulan terakhir).*
-
-2. **Kompilasi Asset Frontend (Tailwind)**
-   ```bash
-   npm run build
-   # atau untuk mode development: npm run dev
-   ```
-
-3. **Jalankan Server Laravel**
-   ```bash
-   php artisan serve
-   ```
-
-4. Buka aplikasi di browser pada alamat: `http://localhost:8000`
-
-## 📦 Struktur Direktori Utama
-
-- `app/Http/Controllers/`: Menyimpan semua Controller (dipisahkan per modul).
-- `app/Services/`: Berisi logika bisnis aplikasi (Business Logic Layer) agar controller tetap ramping.
-- `app/Http/Requests/`: Berisi form request validation untuk memvalidasi input.
-- `app/Livewire/`: Menyimpan komponen Livewire, khususnya `PosTerminal` untuk fitur kasir.
-- `resources/views/`: Layout dan halaman frontend menggunakan kombinasi Blade + Tailwind + AlpineJS.
+| 🛡️ **Admin** | `admin@stokcku.com` | `password` | Akses penuh ke semua modul, master data, laporan, dan pengaturan |
+| 📊 **Manager** | `manager@stokcku.com` | `password` | Laporan & dashboard analitik (read-only, tanpa POS) |
+| 💵 **Kasir** | `kasir1@stokcku.com` | `password` | Modul POS (Penjualan) & absensi pribadi |
+| 🕒 **Karyawan** | `karyawan@stokcku.com` | `password` | Absensi harian & pengajuan izin/cuti |
 
 ---
-*Dibangun dengan ❤️ untuk efisiensi bisnis Anda.*
+
+## 🚀 Instalasi
+
+### Prasyarat
+
+- **PHP** ≥ 8.2 (dengan ekstensi `pdo_mysql`, `mbstring`, `xml`, `zip`, `gd`)
+- **Composer**
+- **Node.js** ≥ 18 & **npm**
+- **MySQL** server
+
+### Langkah
+
+```bash
+# 1. Install dependency
+composer install
+npm install
+
+# 2. Siapkan environment
+cp .env.example .env
+php artisan key:generate
+
+# 3. Atur koneksi database di .env, lalu jalankan migration + seeder
+php artisan migrate:fresh --seed
+# (Seeder butuh beberapa saat karena menghasilkan riwayat transaksi & mutasi stok 1 bulan)
+
+# 4. Konfigurasi QRIS (opsional — untuk pembayaran QRIS statis)
+# Isi di .env:
+QRIS_STATIC_CODE=00020101021126620012ID.CO.QRIS.WWW-0111TESTQRIS00001
+QRIS_HOLDER="Nama Toko Anda"
+
+# 5. Kompilasi asset frontend
+npm run build
+# atau untuk development: npm run dev
+
+# 6. Jalankan server
+php artisan serve
+```
+
+Buka aplikasi di browser: **http://localhost:8000**
+
+> 💡 Untuk menjalankan di jaringan LAN (akses dari perangkat kasir lain), gunakan:
+> `php artisan serve --host=0.0.0.0 --port=8000`
+
+---
+
+## 📦 Struktur Direktori
+
+```
+app/
+├── Http/
+│   ├── Controllers/     # Controller per modul (Penjualan, Absensi, Laporan, ...)
+│   ├── Middleware/      # Termasuk PreventStaleCache (anti-cache halaman web)
+│   └── Requests/        # Form Request Validation
+├── Livewire/
+│   └── PosTerminal.php  # Komponen kasir (online + offline)
+├── Services/            # Business logic layer agar controller ramping
+└── Models/              # Eloquent Models
+resources/
+├── views/               # Blade + Tailwind + Alpine
+└── js/
+    ├── pwa/             # offlinePos.js (POS offline) & offline.js (antrian sinkron)
+    └── confirm.js       # Modal konfirmasi kustom global
+routes/web.php           # Definisi route
+```
+
+---
+
+## 🌐 Catatan Deploy
+
+- **Production**: gunakan web server (Nginx/Apache) dengan PHP-FPM, arahkan document root ke `public/`.
+- **PWA / Service Worker**: fitur *installable app* dan *offline cache* hanya aktif pada koneksi **HTTPS** (atau `localhost`). Di jaringan HTTP LAN, aplikasi tetap berjalan normal — POS offline tetap berfungsi via LocalStorage/IndexedDB.
+
+---
+
+<div align="center">
+
+Dibangun dengan ❤️ untuk efisiensi bisnis Anda.
+
+</div>
