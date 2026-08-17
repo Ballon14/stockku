@@ -8,8 +8,8 @@
     <h2 class="text-2xl font-bold text-slate-800">Dashboard</h2>
 </x-slot>
 
-<script type="application/json" id="daily-sales-data">{{ json_encode($data['daily_sales']) }}</script>
-<script type="application/json" id="top-products-data">{{ json_encode($data['top_products']->map(fn ($item) => ['name' => $item->product->name, 'total_qty' => (int) $item->total_qty, 'total_sales' => (float) $item->total_sales])) }}</script>
+<script type="application/json" id="daily-sales-data">@json($data['daily_sales'])</script>
+<script type="application/json" id="top-products-data">@json($data['top_products']->map(fn ($item) => ['name' => $item->product->name, 'total_qty' => (int) $item->total_qty, 'total_sales' => (float) $item->total_sales]))</script>
 
 <!-- Stats Cards -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
