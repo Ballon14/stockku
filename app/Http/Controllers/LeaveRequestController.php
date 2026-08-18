@@ -17,7 +17,7 @@ class LeaveRequestController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->hasRole('admin')) {
+        if ($user->hasRole(['admin', 'manager'])) {
             $leaveRequests = LeaveRequest::with('employee')
                 ->latest()
                 ->paginate(15);

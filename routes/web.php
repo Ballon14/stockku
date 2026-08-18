@@ -64,10 +64,6 @@ Route::middleware('auth')->group(function () {
         // Attendance Admin
         Route::get('/attendance/admin', [AttendanceController::class, 'adminIndex'])->name('attendance.admin');
 
-        // Leave Request Approval
-        Route::post('/leave-requests/{leaveRequest}/approve', [LeaveRequestController::class, 'approve'])->name('leave-requests.approve');
-        Route::post('/leave-requests/{leaveRequest}/reject', [LeaveRequestController::class, 'reject'])->name('leave-requests.reject');
-
         // Activity Logs
         Route::get('/activity-logs', [ActivityLogController::class, 'index'])->name('activity-logs.index');
     });
@@ -95,6 +91,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/leave-requests/create', [LeaveRequestController::class, 'create'])->name('leave-requests.create');
     Route::post('/leave-requests', [LeaveRequestController::class, 'store'])->name('leave-requests.store');
     Route::post('/leave-requests/{leaveRequest}/cancel', [LeaveRequestController::class, 'cancel'])->name('leave-requests.cancel');
+    Route::post('/leave-requests/{leaveRequest}/approve', [LeaveRequestController::class, 'approve'])->name('leave-requests.approve')->middleware('role:admin|manager');
+    Route::post('/leave-requests/{leaveRequest}/reject', [LeaveRequestController::class, 'reject'])->name('leave-requests.reject')->middleware('role:admin|manager');
 
     // Reports - Admin & Manager
     Route::middleware('role:admin|manager')->prefix('reports')->group(function () {
