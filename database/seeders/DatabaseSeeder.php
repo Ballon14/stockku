@@ -217,6 +217,7 @@ class DatabaseSeeder extends Seeder
                     'product_id' => $prod->id,
                     'qty' => $qty,
                     'harga' => $prod->harga_jual,
+                    'harga_beli' => $prod->harga_beli,
                     'diskon' => 0,
                     'subtotal' => $itemSub,
                 ]);
