@@ -40,6 +40,7 @@
         </div>
     </div>
 
+    @if(auth()->user()->hasRole(['admin', 'manager']))
     <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
         <div class="flex items-center justify-between">
             <div>
@@ -52,6 +53,7 @@
             </div>
         </div>
     </div>
+    @endif
 
     <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
         <div class="flex items-center justify-between">
