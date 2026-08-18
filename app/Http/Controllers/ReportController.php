@@ -70,7 +70,7 @@ class ReportController extends Controller
         $endDate = $request->input('end_date', now()->toDateString());
         $employeeId = $request->input('employee_id');
 
-        $data = $this->reportService->getAttendanceReport($startDate, $endDate, $employeeId);
+        $data = $this->reportService->getAttendanceReport($startDate, $endDate, $employeeId, $request->input('export') !== 'pdf');
         $employees = Employee::where('is_active', true)->orderBy('nama')->get();
 
         if ($request->input('export') === 'pdf') {

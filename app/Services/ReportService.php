@@ -145,27 +145,27 @@ class ReportService
         return $query->orderBy('created_at', 'desc')->paginate(20);
     }
 
-    public function getAttendanceReport($startDate, $endDate, $employeeId = null)
+    public function getAttendanceReport($startDate, $endDate, $employeeId = null, $paginate = true)
     {
-        $query = Employee::where('is_active', true);
+        $query = Employee::where('is_active', true)->orderBy('nama');
 
         if ($employeeId) {
             $query->where('id', $employeeId);
         }
 
-        $employees = $query->get();
+        $employees = $paginate ? $query->paginate(15) : $query->get();
 
         $attendances = Attendance::whereBetween('tanggal', [$startDate, $endDate])
             ->whereIn('employee_id', $employees->pluck('id'))
             ->get();
 
-        $data = [];
+        $rows = [];
         foreach ($employees as $employee) {
             $empAtt = $attendances->where('employee_id', $employee->id);
             $totalDays = $empAtt->count();
             $hadir = $empAtt->where('status', 'hadir')->count();
 
-            $data[] = [
+            $rows[] = [
                 'employee_name' => $employee->nama,
                 'employee_jabatan' => $employee->jabatan,
                 'total_days' => $totalDays,
@@ -178,7 +178,12 @@ class ReportService
             ];
         }
 
-        return collect($data)->sortByDesc('attendance_percentage')->values()->all();
+        usort($rows, fn ($a, $b) => $b['attendance_percentage'] <=> $a['attendance_percentage']);
+
+        return [
+            'rows' => $rows,
+            'employees' => $employees,
+        ];
     }
 
     public function getDashboardData()

@@ -71,7 +71,7 @@ class AttendanceService
             $query->whereMonth('tanggal', $month)->whereYear('tanggal', $year);
         }
 
-        return $query->paginate(20);
+        return $query->get();
     }
 
     public function getTodaySummary(): array

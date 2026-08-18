@@ -86,7 +86,7 @@ class AttendanceController extends Controller
             $attendances = $this->attendanceService->getAllAttendances(null, $month, $year);
         }
 
-        $employees = Employee::where('is_active', true)->get();
+        $employees = Employee::where('is_active', true)->orderBy('nama')->paginate(15)->withQueryString();
 
         return view('attendances.admin-index', compact('attendances', 'employees', 'date', 'month', 'year', 'viewType'));
     }

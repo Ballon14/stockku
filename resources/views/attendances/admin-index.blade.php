@@ -191,5 +191,6 @@
         </table>
     </div>
     @endif
+    <div class="px-4 py-3 border-t border-slate-100">{{ $employees->appends(request()->query())->links() }}</div>
 </div>
 </x-app-layout>

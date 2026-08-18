@@ -43,7 +43,7 @@
 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
     <!-- Mobile: card list -->
     <div class="md:hidden divide-y divide-slate-100">
-        @forelse($data as $row)
+        @forelse($data['rows'] as $row)
         <div class="p-4">
             <div class="flex items-start justify-between gap-3 mb-3">
                 <div class="min-w-0">
@@ -88,7 +88,7 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse($data as $row)
+                @forelse($data['rows'] as $row)
                 <tr class="border-b border-slate-50 hover:bg-slate-50/50">
                     <td class="py-3 px-4 font-medium text-slate-700">{{ $row['employee_name'] }}</td>
                     <td class="py-3 px-4 text-slate-500">{{ $row['employee_jabatan'] }}</td>
@@ -113,5 +113,6 @@
             </tbody>
         </table>
     </div>
+    <div class="px-4 py-3 border-t border-slate-100">{{ $data['employees']->appends(request()->query())->links() }}</div>
 </div>
 </x-app-layout>

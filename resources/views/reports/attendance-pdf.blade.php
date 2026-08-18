@@ -38,7 +38,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($data as $row)
+            @foreach($data['rows'] as $row)
             <tr>
                 <td class="text-left">{{ $row['employee_name'] }}</td>
                 <td class="text-left">{{ $row['employee_jabatan'] }}</td>
