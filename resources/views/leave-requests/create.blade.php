@@ -6,7 +6,7 @@
 
 <div class="max-w-xl">
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-        <form method="POST" action="{{ route('leave-requests.store') }}">
+        <form method="POST" action="{{ route('leave-requests.store') }}" onsubmit="return confirmForm(this, leaveRequestSummary(this), { title: 'Konfirmasi Pengajuan', confirmText: 'Ya, Kirim Pengajuan' })">
             @csrf
             <div class="space-y-5">
                 <div>
@@ -55,4 +55,15 @@
         </form>
     </div>
 </div>
+
+<script>
+    function leaveRequestSummary(form) {
+        const f = new FormData(form);
+        const jenis = { izin: 'Izin', sakit: 'Sakit', cuti: 'Cuti' }[f.get('jenis')] || '-';
+        const mulai = f.get('tanggal_mulai') || '-';
+        const selesai = f.get('tanggal_selesai') || '-';
+        const ket = f.get('keterangan') || '-';
+        return 'Pastikan data sudah benar:\n\nJenis\t\t: ' + jenis + '\nTanggal\t\t: ' + mulai + ' s/d ' + selesai + '\nKeterangan\t: ' + ket;
+    }
+</script>
 </x-app-layout>

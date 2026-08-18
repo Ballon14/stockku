@@ -87,4 +87,23 @@ class LeaveRequestController extends Controller
 
         return back()->with('success', 'Pengajuan ditolak.');
     }
+
+    public function cancel(LeaveRequest $leaveRequest)
+    {
+        $employee = auth()->user()->employee;
+
+        if (! $employee || $leaveRequest->employee_id !== $employee->id) {
+            abort(403, 'Anda tidak berhak membatalkan pengajuan ini.');
+        }
+
+        if ($leaveRequest->status !== 'pending') {
+            return back()->with('error', 'Pengajuan yang sudah diproses tidak dapat dibatalkan.');
+        }
+
+        $this->attendanceService->cancelLeaveRequest($leaveRequest, auth()->id());
+
+        app(ActivityLogger::class)->log('leave.cancel', 'Pengajuan '.$leaveRequest->jenis.' ('.$leaveRequest->tanggal_mulai.' s/d '.$leaveRequest->tanggal_selesai.') dibatalkan oleh pengaju.');
+
+        return back()->with('success', 'Pengajuan dibatalkan.');
+    }
 }

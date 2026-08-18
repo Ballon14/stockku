@@ -131,4 +131,19 @@ class AttendanceService
 
         return $leaveRequest;
     }
+
+    public function cancelLeaveRequest(LeaveRequest $leaveRequest, int $cancelledBy): LeaveRequest
+    {
+        if ($leaveRequest->status !== 'pending') {
+            throw new \RuntimeException('Pengajuan yang sudah diproses tidak dapat dibatalkan.');
+        }
+
+        $leaveRequest->update([
+            'status' => 'cancelled',
+            'approved_by' => $cancelledBy,
+            'catatan_approval' => 'Dibatalkan oleh pengaju',
+        ]);
+
+        return $leaveRequest;
+    }
 }

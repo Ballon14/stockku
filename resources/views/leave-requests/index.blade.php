@@ -37,6 +37,16 @@
             <div class="mt-3 flex justify-end">
                 @include('leave-requests.partials.approve-modal', ['req' => $req])
             </div>
+            @elseif($req->status === 'pending')
+            <div class="mt-3 flex justify-end">
+                <form method="POST" action="{{ route('leave-requests.cancel', $req) }}" onsubmit="return confirmForm(this, 'Yakin ingin membatalkan pengajuan {{ strtolower($req->jenis_label) }} ini?', { title: 'Batalkan Pengajuan', confirmText: 'Ya, Batalkan', danger: true })">
+                    @csrf
+                    <button type="submit" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold text-red-600 border border-red-200 hover:bg-red-50 transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                        Batalkan
+                    </button>
+                </form>
+            </div>
             @endif
         </div>
         @empty
@@ -59,6 +69,8 @@
                     <th class="text-center py-3 px-4 font-semibold text-slate-600">Status</th>
                     @if(auth()->user()->hasRole('admin'))
                     <th class="text-center py-3 px-4 font-semibold text-slate-600">Aksi (Admin)</th>
+                    @else
+                    <th class="text-center py-3 px-4 font-semibold text-slate-600">Aksi</th>
                     @endif
                 </tr>
             </thead>
@@ -87,11 +99,23 @@
                     <td class="py-3 px-4 text-center">
                         @include('leave-requests.partials.approve-modal', ['req' => $req])
                     </td>
+                    @elseif($req->status === 'pending')
+                    <td class="py-3 px-4 text-center">
+                        <form method="POST" action="{{ route('leave-requests.cancel', $req) }}" onsubmit="return confirmForm(this, 'Yakin ingin membatalkan pengajuan {{ strtolower($req->jenis_label) }} ini?', { title: 'Batalkan Pengajuan', confirmText: 'Ya, Batalkan', danger: true })">
+                            @csrf
+                            <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-red-600 border border-red-200 hover:bg-red-50 transition-colors">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                                Batalkan
+                            </button>
+                        </form>
+                    </td>
+                    @else
+                    <td class="py-3 px-4 text-center text-slate-300">—</td>
                     @endif
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="{{ auth()->user()->hasRole('admin') ? 7 : 5 }}" class="py-8 text-center text-slate-400">Belum ada data pengajuan.</td>
+                    <td colspan="{{ auth()->user()->hasRole('admin') ? 7 : 6 }}" class="py-8 text-center text-slate-400">Belum ada data pengajuan.</td>
                 </tr>
                 @endforelse
             </tbody>

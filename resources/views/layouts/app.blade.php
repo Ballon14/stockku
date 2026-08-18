@@ -66,7 +66,7 @@
                         <svg x-show="!danger" class="w-7 h-7 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     </div>
                     <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 mb-2" x-text="title"></h3>
-                    <p class="text-sm text-slate-500 dark:text-slate-400 mb-6" x-text="message"></p>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mb-6 whitespace-pre-line" x-text="message"></p>
                     <div class="flex gap-3">
                         <button type="button" @click="close()" class="flex-1 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm font-semibold hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors">Batal</button>
                         <button type="button" @click="confirm()" :class="danger ? 'bg-red-600 hover:bg-red-700' : 'bg-indigo-600 hover:bg-indigo-700'" class="flex-1 py-2.5 rounded-xl text-white text-sm font-semibold shadow-lg transition-colors" x-text="confirmText"></button>

@@ -49,6 +49,7 @@ class LeaveRequest extends Model
             'pending' => 'Menunggu',
             'approved' => 'Disetujui',
             'rejected' => 'Ditolak',
+            'cancelled' => 'Dibatalkan',
             default => $this->status,
         };
     }
