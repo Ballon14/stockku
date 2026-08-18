@@ -80,6 +80,7 @@ Aplikasi kasir lengkap untuk toko ritel: transaksi **super cepat tanpa reload**,
 
 - **Multi-role** dengan Spatie Permission: Admin, Manager, Kasir, Karyawan
 - **Clock-In / Clock-Out** harian, rekapan harian & bulanan untuk admin
+- **Absensi wajib**: seluruh aktivitas (POS, dashboard, laporan, dll.) terkunci sampai clock-in; setelah clock-out, akses tertutup sampai hari berikutnya — kecuali sedang izin/sakit/cuti yang disetujui
 - Pengajuan **Izin / Sakit / Cuti** dengan alur **persetujuan** (approve/reject)
 - Perhitungan **persentase kehadiran** otomatis per karyawan
 

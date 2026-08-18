@@ -5,6 +5,27 @@
 </x-slot>
 
 <div class="max-w-xl mx-auto mt-8">
+    @if(!$todayAttendance || !$todayAttendance->clock_in)
+    <div class="mb-4 flex items-start gap-3 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 p-4">
+        <span class="shrink-0 w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center">
+            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+        </span>
+        <div>
+            <p class="font-semibold text-sm">Anda belum clock-in hari ini</p>
+            <p class="text-xs mt-0.5">Clock-in bersifat wajib sebelum Anda dapat menggunakan fitur lain di aplikasi.</p>
+        </div>
+    </div>
+    @elseif($todayAttendance->clock_out)
+    <div class="mb-4 flex items-start gap-3 rounded-2xl bg-slate-100 border border-slate-200 text-slate-700 p-4">
+        <span class="shrink-0 w-8 h-8 rounded-full bg-slate-400 flex items-center justify-center">
+            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        </span>
+        <div>
+            <p class="font-semibold text-sm">Anda sudah clock-out hari ini</p>
+            <p class="text-xs mt-0.5">Anda tidak dapat melakukan aktivitas lain sampai clock-in kembali besok.</p>
+        </div>
+    </div>
+    @endif
     <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8 text-center relative overflow-hidden">
         <!-- Decorative bg -->
         <div class="absolute -top-24 -right-24 w-48 h-48 bg-indigo-50 rounded-full blur-3xl opacity-50"></div>
