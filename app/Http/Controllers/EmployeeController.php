@@ -73,6 +73,30 @@ class EmployeeController extends Controller
         return redirect()->route('employees.index')->with('success', 'Data karyawan berhasil diperbarui.');
     }
 
+    public function toggleActive(Employee $employee)
+    {
+        if ($employee->user && $employee->user->hasRole('admin')) {
+            return back()->with('error', 'Akun admin (owner) tidak dapat dinonaktifkan.');
+        }
+
+        $newStatus = ! $employee->is_active;
+
+        $employee->update(['is_active' => $newStatus]);
+
+        if ($employee->user) {
+            $employee->user->update(['is_active' => $newStatus]);
+
+            if (! $newStatus) {
+                \DB::table('sessions')->where('user_id', $employee->user->id)->delete();
+            }
+        }
+
+        $status = $newStatus ? 'diaktifkan' : 'dinonaktifkan';
+        app(ActivityLogger::class)->log('employee.toggle_active', 'Karyawan "'.$employee->nama.'" '.$status.'.');
+
+        return back()->with('success', 'Karyawan "'.$employee->nama.'" berhasil '.$status.'.');
+    }
+
     public function destroy(Employee $employee)
     {
         $this->employeeService->delete($employee);

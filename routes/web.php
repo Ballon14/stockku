@@ -47,6 +47,7 @@ Route::middleware(['auth', 'ensure-attended'])->group(function () {
         Route::resource('products', ProductController::class);
         Route::resource('suppliers', SupplierController::class)->except('show');
         Route::resource('employees', EmployeeController::class)->except('show');
+        Route::post('/employees/{employee}/toggle-active', [EmployeeController::class, 'toggleActive'])->name('employees.toggle-active');
 
         // Purchases
         Route::resource('purchases', PurchaseController::class)->only(['index', 'create', 'store', 'show']);
