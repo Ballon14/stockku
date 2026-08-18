@@ -20,7 +20,7 @@ class RbacTest extends TestCase
 
         $user = User::create([
             'name' => ucfirst($role).' Tes',
-            'email' => $role.'-tes-'.uniqid().'@stokcku.com',
+            'email' => $role.'-tes-'.uniqid().'@stockku.com',
             'password' => 'password',
             'email_verified_at' => now(),
         ]);

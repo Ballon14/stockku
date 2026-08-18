@@ -36,7 +36,7 @@ class SaleReturnTest extends TestCase
     {
         $user = User::create([
             'name' => 'Kasir Tes',
-            'email' => 'kasir-tes-'.uniqid().'@stokcku.com',
+            'email' => 'kasir-tes-'.uniqid().'@stockku.com',
             'password' => 'password',
         ]);
 

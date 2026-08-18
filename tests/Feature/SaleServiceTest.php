@@ -36,7 +36,7 @@ class SaleServiceTest extends TestCase
     {
         $user = User::create([
             'name' => 'Kasir Tes',
-            'email' => 'kasir-tes@stokcku.com',
+            'email' => 'kasir-tes@stockku.com',
             'password' => 'password',
         ]);
 

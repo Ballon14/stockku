@@ -34,7 +34,7 @@ class StockServiceTest extends TestCase
     {
         $user = User::create([
             'name' => 'Karyawan Tes',
-            'email' => 'karyawan-tes-'.uniqid().'@stokcku.com',
+            'email' => 'karyawan-tes-'.uniqid().'@stockku.com',
             'password' => 'password',
         ]);
 

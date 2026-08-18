@@ -130,10 +130,10 @@ Seeder menyediakan data awal lengkap (kategori, produk, supplier, karyawan, dan 
 
 | Role | Email | Password | Hak Akses Utama |
 |------|-------|----------|-----------------|
-| 🛡️ **Admin** | `admin@stokcku.com` | `password` | Akses penuh: semua modul, master data, laporan, pengaturan |
-| 📊 **Manager** | `manager@stokcku.com` | `password` | Laporan & dashboard analitik (read-only, tanpa POS) |
-| 💵 **Kasir** | `kasir1@stokcku.com` | `password` | Modul POS (penjualan) & absensi pribadi |
-| 🕒 **Karyawan** | `karyawan@stokcku.com` | `password` | Absensi harian & pengajuan izin/cuti |
+| 🛡️ **Admin** | `admin@stockku.com` | `password` | Akses penuh: semua modul, master data, laporan, pengaturan |
+| 📊 **Manager** | `manager@stockku.com` | `password` | Laporan & dashboard analitik (read-only, tanpa POS) |
+| 💵 **Kasir** | `kasir1@stockku.com` | `password` | Modul POS (penjualan) & absensi pribadi |
+| 🕒 **Karyawan** | `karyawan@stockku.com` | `password` | Absensi harian & pengajuan izin/cuti |
 
 ---
 

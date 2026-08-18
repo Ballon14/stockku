@@ -22,7 +22,7 @@ class ActivityLogTest extends TestCase
 
         $user = User::create([
             'name' => ucfirst($role).' Log',
-            'email' => $role.'-log-'.uniqid().'@stokcku.com',
+            'email' => $role.'-log-'.uniqid().'@stockku.com',
             'password' => 'password',
         ]);
         $user->assignRole($role);

@@ -35,7 +35,7 @@ class OfflineSyncTest extends TestCase
         $role = Role::findOrCreate('kasir');
         $user = User::create([
             'name' => 'Kasir Offline',
-            'email' => 'kasir-offline-'.uniqid().'@stokcku.com',
+            'email' => 'kasir-offline-'.uniqid().'@stockku.com',
             'password' => 'password',
         ]);
         $user->assignRole($role);
@@ -71,7 +71,7 @@ class OfflineSyncTest extends TestCase
         $role = Role::findOrCreate('karyawan');
         $user = User::create([
             'name' => 'Karyawan',
-            'email' => 'karyawan-offline-'.uniqid().'@stokcku.com',
+            'email' => 'karyawan-offline-'.uniqid().'@stockku.com',
             'password' => 'password',
         ]);
         $user->assignRole($role);

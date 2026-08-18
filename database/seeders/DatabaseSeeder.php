@@ -49,7 +49,7 @@ class DatabaseSeeder extends Seeder
         // Create Users & Employees
         $admin = User::create([
             'name' => 'Administrator',
-            'email' => 'admin@stokcku.com',
+            'email' => 'admin@stockku.com',
             'password' => Hash::make('password'),
         ]);
         $admin->assignRole('admin');
@@ -63,7 +63,7 @@ class DatabaseSeeder extends Seeder
 
         $kasir1 = User::create([
             'name' => 'Siti Kasir',
-            'email' => 'kasir1@stokcku.com',
+            'email' => 'kasir1@stockku.com',
             'password' => Hash::make('password'),
         ]);
         $kasir1->assignRole('kasir');
@@ -77,7 +77,7 @@ class DatabaseSeeder extends Seeder
 
         $kasir2 = User::create([
             'name' => 'Budi Kasir',
-            'email' => 'kasir2@stokcku.com',
+            'email' => 'kasir2@stockku.com',
             'password' => Hash::make('password'),
         ]);
         $kasir2->assignRole('kasir');
@@ -91,9 +91,9 @@ class DatabaseSeeder extends Seeder
 
         $staffUsers = [];
         $staffNames = [
-            ['name' => 'Andi Staff', 'email' => 'staff1@stokcku.com'],
-            ['name' => 'Dewi Staff', 'email' => 'staff2@stokcku.com'],
-            ['name' => 'Rudi Staff', 'email' => 'staff3@stokcku.com'],
+            ['name' => 'Andi Staff', 'email' => 'staff1@stockku.com'],
+            ['name' => 'Dewi Staff', 'email' => 'staff2@stockku.com'],
+            ['name' => 'Rudi Staff', 'email' => 'staff3@stockku.com'],
         ];
 
         foreach ($staffNames as $i => $staff) {
@@ -115,7 +115,7 @@ class DatabaseSeeder extends Seeder
 
         $manager = User::create([
             'name' => 'Pak Manager',
-            'email' => 'manager@stokcku.com',
+            'email' => 'manager@stockku.com',
             'password' => Hash::make('password'),
         ]);
         $manager->assignRole('manager');
