@@ -45,6 +45,7 @@ Aplikasi kasir lengkap untuk toko ritel: transaksi **super cepat tanpa reload**,
 | 🔔 **Peringatan Stok Menipis** | Notifikasi otomatis saat stok mencapai batas minimum — di dashboard, sidebar, dan halaman khusus. |
 | 🔒 **HTTPS di Jaringan LAN** | Reverse proxy nginx + sertifikat self-signed (CA internal) — PWA & offline cache aktif penuh. |
 | 💾 **Backup Otomatis** | Dump database terjadwal tiap pukul 02.30 dengan retensi 14 hari. |
+| 📱 **Aplikasi Android** | APK tersedia untuk diunduh langsung dari website (login & dashboard) — CA internal sudah tertanam, tanpa instal manual. |
 
 ---
 
@@ -273,6 +274,19 @@ nginx -t && systemctl restart nginx
 ```
 
 Dump disimpan di `storage/backups/stock-<timestamp>.sql.gz` dan file lebih dari 14 hari dihapus otomatis. Kredensial DB dibaca dari `.env` (tidak di-hardcode).
+
+### 4. Aplikasi Android (APK)
+
+Aplikasi web dibungkus menjadi APK dengan **Capacitor** (WebView native). APK bisa diunduh langsung dari website — kartu unduhan muncul di halaman login dan dashboard — sehingga tidak perlu menyalin file secara manual.
+
+- **CA internal sudah tertanam** di dalam APK (networkSecurityConfig) — WebView langsung mempercayai sertifikat self-signed tanpa instal CA di perangkat.
+- **Build ulang** setelah ada perubahan kode web:
+
+```bash
+./scripts/build-apk.sh   # membangun APK & menyalin ke public/downloads/stockku.apk
+```
+
+- Konfigurasi: `capacitor.config.json` (appId `com.stockku.app`, server `https://10.10.10.21`).
 
 ---
 

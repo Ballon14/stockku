@@ -13,6 +13,7 @@
 <script type="application/json" id="top-products-data">@json($data['top_products']->map(fn ($item) => ['name' => $item->product->name, 'total_qty' => (int) $item->total_qty, 'total_sales' => (float) $item->total_sales]))</script>
 
 <!-- Stats Cards -->
+<x-download-apk-banner />
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
     <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
         <div class="flex items-center justify-between">

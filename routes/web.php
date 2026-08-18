@@ -21,6 +21,16 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
+Route::get('/download-apk', function () {
+    $apk = public_path('downloads/stockku.apk');
+
+    if (! file_exists($apk)) {
+        return back()->with('error', 'File aplikasi belum tersedia. Hubungi administrator.');
+    }
+
+    return response()->download($apk, 'StockKu.apk');
+})->name('downloads.apk');
+
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
