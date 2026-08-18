@@ -90,6 +90,7 @@ Aplikasi kasir lengkap untuk toko ritel: transaksi **super cepat tanpa reload**,
 - Ekspor **PDF** (DomPDF) untuk semua laporan
 - **Pagination** pada semua halaman berdata banyak (15–31 baris/halaman)
 - **Audit log** aktivitas lengkap: login, logout, login gagal, clock-in/out, dan aktivitas penting lainnya
+- **Status akun aktif/nonaktif**: akun nonaktif tidak bisa login (sesi diputus), dikelola Admin di halaman Data Karyawan; akun Admin tidak dapat dinonaktifkan
 
 ### 🔐 Keamanan & Operasional
 
