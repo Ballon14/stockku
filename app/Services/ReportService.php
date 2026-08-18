@@ -208,6 +208,16 @@ class ReportService
             ->orderBy('date')
             ->get();
 
+        // Jendela 7 hari (zona waktu lokal server) agar label grafik selalu sinkron
+        $chartWindow = collect(range(6, 0))->map(function ($offset) use ($today) {
+            $date = $today->copy()->subDays($offset);
+
+            return [
+                'date' => $date->toDateString(),
+                'label' => $date->translatedFormat('d M'),
+            ];
+        });
+
         // Produk terlaris bulan ini
         $topProducts = SaleItem::select(
             'product_id',
@@ -244,6 +254,7 @@ class ReportService
             'sales_count_today' => $salesCountToday,
             'sales_this_month' => $salesThisMonth,
             'daily_sales' => $dailySales,
+            'chart_window' => $chartWindow,
             'top_products' => $topProducts,
             'low_stock' => $lowStock,
             'attendance_summary' => $attendanceSummary,

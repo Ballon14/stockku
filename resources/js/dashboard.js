@@ -24,20 +24,14 @@ function fillLast7Days(raw) {
         map[day.date] = day;
     });
 
-    const days = [];
-    for (let i = 6; i >= 0; i--) {
-        const d = new Date();
-        d.setDate(d.getDate() - i);
-        const key = d.toISOString().slice(0, 10);
-        days.push({
-            date: key,
-            label: d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }),
-            total: map[key] ? Number(map[key].total) : 0,
-            count: map[key] ? Number(map[key].count) : 0,
-        });
-    }
+    const windowDays = parseJson(document.getElementById('daily-chart-window'));
 
-    return days;
+    return windowDays.map((d) => ({
+        date: d.date,
+        label: d.label,
+        total: map[d.date] ? Number(map[d.date].total) : 0,
+        count: map[d.date] ? Number(map[d.date].count) : 0,
+    }));
 }
 
 function renderDailyChart() {

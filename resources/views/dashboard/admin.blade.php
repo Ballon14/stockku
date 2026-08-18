@@ -9,6 +9,7 @@
 </x-slot>
 
 <script type="application/json" id="daily-sales-data">@json($data['daily_sales'])</script>
+<script type="application/json" id="daily-chart-window">@json($data['chart_window'])</script>
 <script type="application/json" id="top-products-data">@json($data['top_products']->map(fn ($item) => ['name' => $item->product->name, 'total_qty' => (int) $item->total_qty, 'total_sales' => (float) $item->total_sales]))</script>
 
 <!-- Stats Cards -->
