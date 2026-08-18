@@ -8,7 +8,7 @@
 @endphp
 
 @if($flashes->isNotEmpty())
-<div class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/50">
+<div class="flash-overlay fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/50">
     <div class="w-full max-w-sm space-y-3 max-h-[85vh] overflow-y-auto">
         @foreach($flashes as $flash)
         <div class="flash-modal pointer-events-auto bg-white rounded-3xl shadow-2xl shadow-slate-900/30 overflow-hidden">
@@ -28,7 +28,7 @@
                 <p class="text-sm text-slate-500 leading-relaxed">{{ $flash['message'] }}</p>
             </div>
             <div class="px-6 pb-6">
-                <button type="button" class="w-full py-2.5 rounded-xl font-semibold text-white shadow-lg transition-all hover:brightness-110 active:scale-[0.98] {{ $flash['type'] === 'success' ? 'bg-emerald-600 shadow-emerald-500/30' : ($flash['type'] === 'warning' ? 'bg-amber-500 shadow-amber-500/30' : 'bg-red-500 shadow-red-500/30') }}" onclick="this.closest('.flash-modal').remove()">
+                <button type="button" class="w-full py-2.5 rounded-xl font-semibold text-white shadow-lg transition-all hover:brightness-110 active:scale-[0.98] {{ $flash['type'] === 'success' ? 'bg-emerald-600 shadow-emerald-500/30' : ($flash['type'] === 'warning' ? 'bg-amber-500 shadow-amber-500/30' : 'bg-red-500 shadow-red-500/30') }}" onclick="this.closest('.flash-modal').remove(); if (!document.querySelector('.flash-modal')) document.querySelector('.flash-overlay')?.remove()">
                     {{ $flash['type'] === 'warning' ? 'Mengerti' : 'OK' }}
                 </button>
             </div>
@@ -48,6 +48,7 @@
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') {
             document.querySelectorAll('.flash-modal').forEach(function (m) { m.remove(); });
+            if (!document.querySelector('.flash-modal')) document.querySelector('.flash-overlay')?.remove();
         }
     });
 </script>
