@@ -16,7 +16,7 @@
             <form method="POST" action="{{ route('leave-requests.reject', $req) }}" id="form-reject-{{ $req->id }}">@csrf</form>
 
             <div class="mb-4">
-                <label class="block text-sm font-medium text-slate-700 mb-1">Catatan Admin (Opsional)</label>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Catatan Approval (Opsional)</label>
                 <input type="text" name="catatan_approval" form="form-approve-{{ $req->id }}" class="w-full rounded-xl border-slate-200 text-sm focus:border-indigo-500" placeholder="Catatan approval..." onchange="document.getElementById('reject-note-{{ $req->id }}').value = this.value">
                 <input type="hidden" name="catatan_approval" id="reject-note-{{ $req->id }}" form="form-reject-{{ $req->id }}">
             </div>
