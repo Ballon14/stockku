@@ -61,20 +61,16 @@ class PosTerminal extends Component
         // Triggered reactively
     }
 
-    public function addByBarcode(): void
+    public function addByBarcode(?string $code = null): void
     {
-        $code = trim((string) $this->barcode);
+        $code = trim((string) ($code ?? $this->barcode));
         $this->barcode = '';
 
         if ($code === '') {
             return;
         }
 
-        $product = Product::where('is_active', true)
-            ->where(function ($query) use ($code) {
-                $query->where('barcode', $code)->orWhere('sku', $code);
-            })
-            ->first();
+        $product = $this->findByCode($code);
 
         if (! $product) {
             $this->barcodeError = "Barcode/SKU \"{$code}\" tidak ditemukan.";
@@ -84,6 +80,35 @@ class PosTerminal extends Component
 
         $this->barcodeError = null;
         $this->addToCart($product->id);
+    }
+
+    public function addBySearchEnter(): void
+    {
+        $code = trim((string) $this->search);
+
+        if ($code === '') {
+            return;
+        }
+
+        $product = $this->findByCode($code);
+
+        if (! $product) {
+            return;
+        }
+
+        $this->search = '';
+        $this->addToCart($product->id);
+    }
+
+    private function findByCode(string $code): ?Product
+    {
+        return Product::where('is_active', true)
+            ->where(function ($query) use ($code) {
+                $query->where('barcode', $code)
+                    ->orWhere('sku', $code)
+                    ->orWhereRaw('LOWER(sku) = ?', [mb_strtolower($code)]);
+            })
+            ->first();
     }
 
     public function addToCart(int $productId)

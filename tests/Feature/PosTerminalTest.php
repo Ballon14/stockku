@@ -82,6 +82,56 @@ class PosTerminalTest extends TestCase
             ->assertCount('cart', 0);
     }
 
+    public function test_add_by_barcode_with_direct_code_argument(): void
+    {
+        $user = User::create(['name' => 'Kasir', 'email' => 'kasir-pos6@stockku.com', 'password' => 'password']);
+        $this->actingAs($user);
+        $product = $this->makeProduct(barcode: '8991234567890');
+
+        Livewire::test(PosTerminal::class)
+            ->call('addByBarcode', '8991234567890')
+            ->assertSet('barcodeError', null)
+            ->assertCount('cart', 1)
+            ->assertSet('cart.p_'.$product->id.'.qty', 1);
+    }
+
+    public function test_add_by_barcode_sku_case_insensitive(): void
+    {
+        $user = User::create(['name' => 'Kasir', 'email' => 'kasir-pos7@stockku.com', 'password' => 'password']);
+        $this->actingAs($user);
+        $product = $this->makeProduct();
+
+        Livewire::test(PosTerminal::class)
+            ->call('addByBarcode', mb_strtolower($product->sku))
+            ->assertSet('barcodeError', null)
+            ->assertCount('cart', 1);
+    }
+
+    public function test_add_by_search_enter_exact_code_adds_to_cart(): void
+    {
+        $user = User::create(['name' => 'Kasir', 'email' => 'kasir-pos8@stockku.com', 'password' => 'password']);
+        $this->actingAs($user);
+        $product = $this->makeProduct(barcode: '8990001112223');
+
+        Livewire::test(PosTerminal::class)
+            ->set('search', '8990001112223')
+            ->call('addBySearchEnter')
+            ->assertSet('search', '')
+            ->assertCount('cart', 1)
+            ->assertSet('cart.p_'.$product->id.'.qty', 1);
+    }
+
+    public function test_add_by_search_enter_unknown_code_does_nothing(): void
+    {
+        $user = User::create(['name' => 'Kasir', 'email' => 'kasir-pos9@stockku.com', 'password' => 'password']);
+        $this->actingAs($user);
+
+        Livewire::test(PosTerminal::class)
+            ->set('search', '9998887776665')
+            ->call('addBySearchEnter')
+            ->assertCount('cart', 0);
+    }
+
     public function test_diskon_persen_converts_to_rupiah(): void
     {
         $user = User::create(['name' => 'Kasir', 'email' => 'kasir-pos4@stockku.com', 'password' => 'password']);
