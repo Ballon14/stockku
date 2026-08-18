@@ -1,0 +1,13 @@
+{
+  "appId": "com.stockku.app",
+  "appName": "StockKu",
+  "webDir": "public",
+  "server": {
+    "url": "https://10.10.10.21",
+    "cleartext": false
+  },
+  "allowNavigation": ["10.10.10.21"],
+  "android": {
+    "allowMixedContent": false
+  }
+}

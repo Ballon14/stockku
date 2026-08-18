@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">StockKu</string>
+    <string name="title_activity_main">StockKu</string>
+    <string name="package_name">com.stockku.app</string>
+    <string name="custom_url_scheme">com.stockku.app</string>
+</resources>
