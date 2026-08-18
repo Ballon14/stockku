@@ -40,6 +40,21 @@
                 <!-- Flash Messages -->
                 <x-flash-notifications />
 
+                <!-- Read-only mode banner -->
+                @if(view()->shared('attendanceReadOnly', false))
+                <div class="flex items-center gap-3 px-4 sm:px-6 py-3 bg-amber-400 text-amber-950 border-b border-amber-500">
+                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-bold">Mode Baca</p>
+                        <p class="text-xs font-medium">Anda belum clock-in hari ini. Clock-in untuk mengaktifkan seluruh fitur (transaksi, perubahan data).</p>
+                    </div>
+                    <a href="{{ route('attendance.clock') }}" class="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-950 text-amber-100 text-xs font-bold hover:bg-amber-900 transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+                        Clock-In Sekarang
+                    </a>
+                </div>
+                @endif
+
                 <!-- Page Content -->
                 <main class="p-4 sm:p-6 lg:p-8">
                     @isset($header)
