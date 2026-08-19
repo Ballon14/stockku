@@ -69,7 +69,9 @@ class PurchaseService
 
     public function getPurchases($startDate = null, $endDate = null, $supplierId = null)
     {
-        $query = Purchase::with(['supplier', 'user', 'items.product'])->latest();
+        $query = Purchase::with(['supplier', 'user', 'items.product'])
+            ->orderBy('tanggal', 'desc')
+            ->orderBy('created_at', 'desc');
 
         if ($startDate) {
             $query->whereDate('tanggal', '>=', $startDate);
