@@ -1,13 +1,21 @@
 <div>
     @if(session()->has('pos-success'))
-    <div class="mb-4 rounded-xl bg-emerald-50 border border-emerald-200 p-4 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-            <svg class="w-5 h-5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-            <span class="text-sm font-medium text-emerald-800">{{ session('pos-success') }}</span>
+    <div x-data="{ open: true }" x-init="setTimeout(() => open = false, 3000)" @keydown.escape.window="open = false" x-show="open" x-cloak class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/50">
+        <div class="w-full max-w-sm bg-white rounded-3xl shadow-2xl shadow-slate-900/30 overflow-hidden">
+            <div class="p-6 text-center">
+                <div class="mx-auto w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center mb-4">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+                </div>
+                <h3 class="text-lg font-bold text-slate-800 mb-1">Transaksi Berhasil</h3>
+                <p class="text-sm text-slate-500 leading-relaxed">{{ session('pos-success') }}</p>
+                @if($lastSaleId)
+                <a href="{{ route('sales.receipt', $lastSaleId) }}" target="_blank" class="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-700 hover:text-emerald-900 underline">Cetak Struk →</a>
+                @endif
+            </div>
+            <div class="px-6 pb-6">
+                <button type="button" @click="open = false" class="w-full py-2.5 rounded-xl font-semibold text-white shadow-lg bg-emerald-600 shadow-emerald-500/30 transition-all hover:brightness-110 active:scale-[0.98]">OK</button>
+            </div>
         </div>
-        @if($lastSaleId)
-        <a href="{{ route('sales.receipt', $lastSaleId) }}" target="_blank" class="text-sm font-semibold text-emerald-700 hover:text-emerald-900 underline">Cetak Struk →</a>
-        @endif
     </div>
     @endif
 
