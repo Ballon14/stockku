@@ -15,7 +15,7 @@ class PurchaseServiceTest extends TestCase
 
     private function makePurchase(string $invoice, string $tanggal, int $total): Purchase
     {
-        $supplier = Supplier::create(['name' => 'Supplier Tes', 'phone' => '081234567890']);
+        $supplier = Supplier::create(['name' => 'Supplier Tes', 'code' => 'SUP-'.uniqid(), 'phone' => '081234567890']);
         $user = User::create(['name' => 'Admin', 'email' => 'admin-'.uniqid().'@stockku.com', 'password' => 'password']);
 
         return Purchase::create([
@@ -43,6 +43,9 @@ class PurchaseServiceTest extends TestCase
     {
         $first = $this->makePurchase('INV-SAME-1', '2026-08-20 00:00:00', 10000);
         $second = $this->makePurchase('INV-SAME-2', '2026-08-20 00:00:00', 20000);
+
+        Purchase::query()->where('id', $first->id)->update(['created_at' => '2026-08-20 10:00:00']);
+        Purchase::query()->where('id', $second->id)->update(['created_at' => '2026-08-20 10:00:01']);
 
         $purchases = app(PurchaseService::class)->getPurchases();
 
