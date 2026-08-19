@@ -15,7 +15,7 @@ class PurchaseServiceTest extends TestCase
 
     private function makePurchase(string $invoice, string $tanggal, int $total): Purchase
     {
-        $supplier = Supplier::create(['nama' => 'Supplier Tes', 'telepon' => '081234567890']);
+        $supplier = Supplier::create(['name' => 'Supplier Tes', 'phone' => '081234567890']);
         $user = User::create(['name' => 'Admin', 'email' => 'admin-'.uniqid().'@stockku.com', 'password' => 'password']);
 
         return Purchase::create([
