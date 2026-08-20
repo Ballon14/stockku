@@ -202,16 +202,6 @@ function renderTopProductsChart() {
             maintainAspectRatio: false,
             cutout: '62%',
             plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        boxWidth: 10,
-                        boxHeight: 10,
-                        borderRadius: 3,
-                        font: { size: 11 },
-                        color: '#475569',
-                    },
-                },
                 tooltip: {
                     backgroundColor: 'rgba(15, 23, 42, 0.95)',
                     titleColor: '#cbd5e1',
