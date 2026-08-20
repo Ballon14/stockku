@@ -97,6 +97,11 @@
                 sidebar.classList.toggle('-translate-x-full');
                 overlay.classList.toggle('hidden');
             }
+
+            window.addEventListener('pageshow', function () {
+                const nav = document.querySelector('#sidebar nav');
+                if (nav) nav.scrollTop = 0;
+            });
         </script>
 
         @livewireScripts
