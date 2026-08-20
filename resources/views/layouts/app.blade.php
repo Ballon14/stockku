@@ -98,10 +98,24 @@
                 overlay.classList.toggle('hidden');
             }
 
-            window.addEventListener('pageshow', function () {
+            function resetSidebarScroll() {
                 const nav = document.querySelector('#sidebar nav');
                 if (nav) nav.scrollTop = 0;
-            });
+            }
+
+            function scrollSidebarToActive() {
+                const active = document.querySelector('#sidebar nav .sidebar-active');
+                if (active) active.scrollIntoView({ block: 'center' });
+            }
+
+            function syncSidebarPosition() {
+                resetSidebarScroll();
+                scrollSidebarToActive();
+            }
+
+            window.addEventListener('pageshow', syncSidebarPosition);
+            window.addEventListener('load', syncSidebarPosition);
+            window.setTimeout(syncSidebarPosition, 150);
         </script>
 
         @livewireScripts
