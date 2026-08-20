@@ -116,7 +116,7 @@
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <!-- Sales Chart -->
-    <div class="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+    <div class="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col lg:h-[630px]">
         <div class="flex flex-wrap items-center justify-between gap-3 mb-2">
             <h3 class="text-lg font-semibold text-slate-800">Grafik Penjualan</h3>
             <div class="flex items-center gap-1 bg-slate-100 rounded-xl p-1" id="sales-chart-tabs">
@@ -126,18 +126,18 @@
             </div>
         </div>
         <p class="text-sm text-slate-500 mb-4">Total: <span id="sales-chart-total" class="font-bold text-slate-800">-</span> &middot; Rata-rata: <span id="sales-chart-average" class="font-bold text-slate-800">-</span></p>
-        <div class="h-72 relative">
+        <div class="relative flex-1 min-h-72">
             <canvas id="daily-sales-chart"></canvas>
         </div>
     </div>
 
-    <!-- Top Products -->
-    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+<!-- Top Products -->
+    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col lg:h-[630px]">
         <h3 class="text-lg font-semibold text-slate-800 mb-4">Produk Terlaris</h3>
-        <div class="h-52 relative mb-4">
+        <div class="relative flex-1 min-h-72">
             <canvas id="top-products-chart"></canvas>
         </div>
-        <div class="space-y-3">
+        <div class="space-y-3 mt-4">
             @forelse($data['top_products'] as $i => $item)
             <div class="flex items-center gap-3">
                 <span class="w-7 h-7 rounded-lg bg-gradient-to-br {{ $i === 0 ? 'from-indigo-500 to-purple-600' : ($i === 1 ? 'from-slate-300 to-slate-400' : 'from-amber-600 to-amber-700') }} flex items-center justify-center text-white text-xs font-bold">{{ $i + 1 }}</span>

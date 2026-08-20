@@ -174,6 +174,11 @@ function initSalesChart() {
     });
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+    initSalesChart();
+    renderTopProductsChart();
+});
+
 function renderTopProductsChart() {
     if (!topCanvas) {
         return;
