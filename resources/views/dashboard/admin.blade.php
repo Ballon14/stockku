@@ -116,7 +116,7 @@
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <!-- Sales Chart -->
-    <div class="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col lg:h-[630px]">
+    <div class="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col lg:h-[440px]">
         <div class="flex flex-wrap items-center justify-between gap-3 mb-2">
             <h3 class="text-lg font-semibold text-slate-800">Grafik Penjualan</h3>
             <div class="flex items-center gap-1 bg-slate-100 rounded-xl p-1" id="sales-chart-tabs">
@@ -132,24 +132,26 @@
     </div>
 
 <!-- Top Products -->
-    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col lg:h-[630px]">
+    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col lg:h-[440px]">
         <h3 class="text-lg font-semibold text-slate-800 mb-4">Produk Terlaris</h3>
-        <div class="relative flex-1 min-h-72">
-            <canvas id="top-products-chart"></canvas>
-        </div>
-        <div class="space-y-3 mt-4">
-            @forelse($data['top_products'] as $i => $item)
-            <div class="flex items-center gap-3">
-                <span class="w-7 h-7 rounded-lg bg-gradient-to-br {{ $i === 0 ? 'from-indigo-500 to-purple-600' : ($i === 1 ? 'from-slate-300 to-slate-400' : 'from-amber-600 to-amber-700') }} flex items-center justify-center text-white text-xs font-bold">{{ $i + 1 }}</span>
-                <div class="flex-1 min-w-0">
-                    <p class="text-sm font-medium text-slate-700 truncate">{{ $item->product->name }}</p>
-                    <p class="text-xs text-slate-400">{{ $item->total_qty }} terjual</p>
-                </div>
-                <p class="text-sm font-semibold text-slate-700">Rp {{ number_format($item->total_sales, 0, ',', '.') }}</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 flex-1 min-h-0">
+            <div class="relative min-h-52">
+                <canvas id="top-products-chart"></canvas>
             </div>
-            @empty
-            <p class="text-sm text-slate-400 text-center py-4">Belum ada data</p>
-            @endforelse
+            <div class="space-y-3 overflow-y-auto">
+                @forelse($data['top_products'] as $i => $item)
+                <div class="flex items-center gap-3">
+                    <span class="w-7 h-7 rounded-lg bg-gradient-to-br {{ $i === 0 ? 'from-indigo-500 to-purple-600' : ($i === 1 ? 'from-slate-300 to-slate-400' : 'from-amber-600 to-amber-700') }} flex items-center justify-center text-white text-xs font-bold">{{ $i + 1 }}</span>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-slate-700 truncate">{{ $item->product?->name ?? 'Produk dihapus' }}</p>
+                        <p class="text-xs text-slate-400">{{ $item->total_qty }} terjual</p>
+                    </div>
+                    <p class="text-sm font-semibold text-slate-700">Rp {{ number_format($item->total_sales, 0, ',', '.') }}</p>
+                </div>
+                @empty
+                <p class="text-sm text-slate-400 text-center py-4">Belum ada data</p>
+                @endforelse
+            </div>
         </div>
     </div>
 </div>
