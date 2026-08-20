@@ -195,11 +195,8 @@ class ReportService
         // Penjualan hari ini
         $salesToday = Sale::whereDate('created_at', $today)
             ->where('status', '!=', 'returned')
-            ->sum('grand_total');
-
-        $salesCountToday = Sale::whereDate('created_at', $today)
-            ->where('status', '!=', 'returned')
-            ->count();
+            ->selectRaw('COALESCE(SUM(grand_total), 0) as total, COUNT(*) as jumlah')
+            ->first();
 
         // Grafik penjualan 7 hari terakhir
         $dailySales = Sale::select(
@@ -239,15 +236,16 @@ class ReportService
             ->with('product')
             ->get();
 
-        // Produk stok menipis
+        // Produk stok menipis (daftar dibatasi 10, hitung penuh untuk kartu)
         $lowStock = Product::whereColumn('stok', '<=', 'min_stok')
             ->where('is_active', true)
             ->with('category')
             ->limit(10)
             ->get();
 
-        // Kehadiran hari ini
-        $attendanceSummary = app(AttendanceService::class)->getTodaySummary();
+        $lowStockCount = Product::whereColumn('stok', '<=', 'min_stok')
+            ->where('is_active', true)
+            ->count();
 
         // Penjualan bulan ini
         $salesThisMonth = Sale::whereDate('created_at', '>=', $startOfMonth)
@@ -255,14 +253,14 @@ class ReportService
             ->sum('grand_total');
 
         return [
-            'sales_today' => $salesToday,
-            'sales_count_today' => $salesCountToday,
+            'sales_today' => (float) $salesToday->total,
+            'sales_count_today' => (int) $salesToday->jumlah,
             'sales_this_month' => $salesThisMonth,
             'daily_sales' => $dailySales,
             'chart_window' => $chartWindow,
             'top_products' => $topProducts,
             'low_stock' => $lowStock,
-            'attendance_summary' => $attendanceSummary,
+            'low_stock_count' => $lowStockCount,
         ];
     }
 }

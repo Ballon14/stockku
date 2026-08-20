@@ -74,7 +74,11 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
-        $this->productService->delete($product);
+        try {
+            $this->productService->delete($product);
+        } catch (\RuntimeException $e) {
+            return redirect()->route('products.index')->with('error', $e->getMessage());
+        }
         app(ActivityLogger::class)->log('product.delete', 'Produk "'.$product->name.'" (SKU: '.$product->sku.') dihapus.');
 
         return redirect()->route('products.index')->with('success', 'Produk berhasil dihapus.');

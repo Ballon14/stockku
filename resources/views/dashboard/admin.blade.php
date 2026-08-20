@@ -10,7 +10,7 @@
 
 <script type="application/json" id="daily-sales-data">@json($data['daily_sales'])</script>
 <script type="application/json" id="daily-chart-window">@json($data['chart_window'])</script>
-<script type="application/json" id="top-products-data">@json($data['top_products']->map(fn ($item) => ['name' => $item->product->name, 'total_qty' => (int) $item->total_qty, 'total_sales' => (float) $item->total_sales]))</script>
+<script type="application/json" id="top-products-data">@json($data['top_products']->map(fn ($item) => ['name' => $item->product?->name ?? 'Produk dihapus', 'total_qty' => (int) $item->total_qty, 'total_sales' => (float) $item->total_sales]))</script>
 
 <!-- Stats Cards -->
 <x-download-apk-banner />
@@ -34,8 +34,8 @@
                 <p class="text-sm font-medium text-slate-500">Penjualan Bulan Ini</p>
                 <p class="text-2xl font-bold text-slate-800 mt-1">Rp {{ number_format($data['sales_this_month'], 0, ',', '.') }}</p>
             </div>
-            <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+            <div class="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center">
+                <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
             </div>
         </div>
     </div>
@@ -59,7 +59,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-sm font-medium text-slate-500">Stok Menipis</p>
-                <p class="text-2xl font-bold text-slate-800 mt-1">{{ $data['low_stock']->count() }}</p>
+                <p class="text-2xl font-bold text-slate-800 mt-1">{{ $data['low_stock_count'] }}</p>
                 <p class="text-xs text-red-600 mt-1">produk perlu restock</p>
             </div>
             <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">

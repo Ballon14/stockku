@@ -16,6 +16,61 @@ class ReportServiceTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_dashboard_low_stock_count_not_capped_by_list_limit(): void
+    {
+        $category = Category::create(['name' => 'Kategori Dashboard', 'slug' => 'kategori-dashboard']);
+
+        for ($i = 0; $i < 15; $i++) {
+            Product::create([
+                'category_id' => $category->id,
+                'name' => 'Produk Menipis '.$i,
+                'sku' => 'LOW-'.$i,
+                'barcode' => null,
+                'harga_beli' => 1000,
+                'harga_jual' => 2000,
+                'stok' => 1,
+                'min_stok' => 5,
+                'satuan' => 'pcs',
+                'is_active' => true,
+            ]);
+        }
+
+        $data = app(ReportService::class)->getDashboardData();
+
+        $this->assertCount(10, $data['low_stock']);
+        $this->assertSame(15, $data['low_stock_count']);
+    }
+
+    public function test_dashboard_returns_sales_today_data(): void
+    {
+        $category = Category::create(['name' => 'Kategori Sales', 'slug' => 'kategori-sales']);
+        $product = Product::create([
+            'category_id' => $category->id,
+            'name' => 'Produk Sales',
+            'sku' => 'SLS-1',
+            'barcode' => null,
+            'harga_beli' => 1000,
+            'harga_jual' => 5000,
+            'stok' => 10,
+            'min_stok' => 2,
+            'satuan' => 'pcs',
+            'is_active' => true,
+        ]);
+        $user = User::create(['name' => 'Kasir', 'email' => 'kasir-dash@stockku.com', 'password' => 'password']);
+        $this->actingAs($user);
+
+        app(SaleService::class)->createSale(
+            [['product_id' => $product->id, 'qty' => 2, 'diskon' => 0]],
+            0,
+            10000
+        );
+
+        $data = app(ReportService::class)->getDashboardData();
+
+        $this->assertSame(10000.0, $data['sales_today']);
+        $this->assertSame(1, $data['sales_count_today']);
+    }
+
     public function test_sales_report_items_are_paginated(): void
     {
         $user = User::create(['name' => 'Kasir', 'email' => 'kasir-rpt@stockku.com', 'password' => 'password']);

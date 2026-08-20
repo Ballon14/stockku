@@ -53,6 +53,10 @@ class ProductService
 
     public function delete(Product $product): bool
     {
+        if ($product->saleItems()->exists() || $product->purchaseItems()->exists() || $product->stockMovements()->exists()) {
+            throw new \RuntimeException('Produk tidak dapat dihapus karena memiliki riwayat transaksi.');
+        }
+
         if ($product->foto) {
             Storage::disk('public')->delete($product->foto);
         }

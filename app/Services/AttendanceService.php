@@ -76,9 +76,8 @@ class AttendanceService
 
     public function getTodaySummary(): array
     {
-        $today = Carbon::today()->toDateString();
         $totalEmployees = Employee::where('is_active', true)->count();
-        $present = Attendance::where('tanggal', $today)->where('status', 'hadir')->count();
+        $present = Attendance::whereDate('tanggal', Carbon::today())->where('status', 'hadir')->count();
 
         return [
             'total' => $totalEmployees,
