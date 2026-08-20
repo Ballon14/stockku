@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\User;
 use App\Services\ReportService;
 use App\Services\SaleService;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -69,6 +70,59 @@ class ReportServiceTest extends TestCase
 
         $this->assertSame(10000.0, $data['sales_today']);
         $this->assertSame(1, $data['sales_count_today']);
+    }
+
+    public function test_dashboard_sales_chart_has_three_periods_with_monthly_aggregation(): void
+    {
+        $category = Category::create(['name' => 'Kategori Grafik', 'slug' => 'kategori-grafik']);
+        $product = Product::create([
+            'category_id' => $category->id,
+            'name' => 'Produk Grafik',
+            'sku' => 'GRF-1',
+            'barcode' => null,
+            'harga_beli' => 1000,
+            'harga_jual' => 5000,
+            'stok' => 100,
+            'min_stok' => 2,
+            'satuan' => 'pcs',
+            'is_active' => true,
+        ]);
+        $user = User::create(['name' => 'Kasir', 'email' => 'kasir-grf@stockku.com', 'password' => 'password']);
+        $this->actingAs($user);
+
+        $this->travelTo(Carbon::parse('2026-01-05 10:00:00'));
+        app(SaleService::class)->createSale([['product_id' => $product->id, 'qty' => 1, 'diskon' => 0]], 0, 5000);
+
+        $this->travelTo(Carbon::parse('2026-02-10 10:00:00'));
+        app(SaleService::class)->createSale([['product_id' => $product->id, 'qty' => 2, 'diskon' => 0]], 0, 10000);
+        app(SaleService::class)->createSale([['product_id' => $product->id, 'qty' => 1, 'diskon' => 0]], 0, 5000);
+
+        $this->travelTo(Carbon::parse('2026-03-15 10:00:00'));
+        app(SaleService::class)->createSale([['product_id' => $product->id, 'qty' => 1, 'diskon' => 0]], 0, 7000);
+
+        $data = app(ReportService::class)->getDashboardData();
+
+        $chart = $data['sales_chart'];
+        $this->assertCount(7, $chart['7d']['labels']);
+        $this->assertCount(30, $chart['30d']['labels']);
+        $this->assertCount(12, $chart['12m']['labels']);
+
+        $this->assertContains('Jan', $chart['12m']['labels']);
+        $this->assertContains('Feb', $chart['12m']['labels']);
+
+        $janIndex = array_search('Jan', $chart['12m']['labels'], true);
+        $febIndex = array_search('Feb', $chart['12m']['labels'], true);
+        $this->assertSame(5000.0, $chart['12m']['data'][$janIndex]);
+        $this->assertSame(15000.0, $chart['12m']['data'][$febIndex]);
+        $this->assertSame(1, $chart['12m']['counts'][$janIndex]);
+        $this->assertSame(2, $chart['12m']['counts'][$febIndex]);
+
+        $this->assertSame(5000.0, $chart['12m']['data'][11]);
+        $this->assertSame(1, $chart['12m']['counts'][11]);
+
+        $this->assertSame(25000.0, $chart['12m']['total']);
+        $this->assertSame(5000.0, $chart['7d']['total']);
+        $this->assertSame(1, $chart['7d']['counts'][array_key_last($chart['7d']['counts'])]);
     }
 
     public function test_sales_report_items_are_paginated(): void

@@ -8,8 +8,7 @@
     <h2 class="text-2xl font-bold text-slate-800">Dashboard</h2>
 </x-slot>
 
-<script type="application/json" id="daily-sales-data">@json($data['daily_sales'])</script>
-<script type="application/json" id="daily-chart-window">@json($data['chart_window'])</script>
+<script type="application/json" id="daily-sales-data">@json($data['sales_chart'])</script>
 <script type="application/json" id="top-products-data">@json($data['top_products']->map(fn ($item) => ['name' => $item->product?->name ?? 'Produk dihapus', 'total_qty' => (int) $item->total_qty, 'total_sales' => (float) $item->total_sales]))</script>
 
 <!-- Stats Cards -->
@@ -118,7 +117,15 @@
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <!-- Sales Chart -->
     <div class="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-        <h3 class="text-lg font-semibold text-slate-800 mb-4">Penjualan 7 Hari Terakhir</h3>
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-2">
+            <h3 class="text-lg font-semibold text-slate-800">Grafik Penjualan</h3>
+            <div class="flex items-center gap-1 bg-slate-100 rounded-xl p-1" id="sales-chart-tabs">
+                <button type="button" data-period="7d" class="sales-tab px-4 py-1.5 rounded-lg text-sm font-semibold bg-white text-indigo-600 shadow-sm transition-colors">7 Hari</button>
+                <button type="button" data-period="30d" class="sales-tab px-4 py-1.5 rounded-lg text-sm font-semibold text-slate-500 hover:text-slate-700 transition-colors">30 Hari</button>
+                <button type="button" data-period="12m" class="sales-tab px-4 py-1.5 rounded-lg text-sm font-semibold text-slate-500 hover:text-slate-700 transition-colors">Bulanan</button>
+            </div>
+        </div>
+        <p class="text-sm text-slate-500 mb-4">Total: <span id="sales-chart-total" class="font-bold text-slate-800">-</span> &middot; Rata-rata: <span id="sales-chart-average" class="font-bold text-slate-800">-</span></p>
         <div class="h-72 relative">
             <canvas id="daily-sales-chart"></canvas>
         </div>

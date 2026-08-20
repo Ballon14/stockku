@@ -208,17 +208,34 @@ class ReportService
             ->whereDate('created_at', '>=', $today->copy()->subDays(6))
             ->groupBy(DB::raw('DATE(created_at)'))
             ->orderBy('date')
-            ->get();
+            ->get()
+            ->keyBy('date');
 
-        // Jendela 7 hari (zona waktu lokal server) agar label grafik selalu sinkron
-        $chartWindow = collect(range(6, 0))->map(function ($offset) use ($today) {
-            $date = $today->copy()->subDays($offset);
+        // Grafik penjualan 30 hari terakhir
+        $dailySales30 = Sale::select(
+            DB::raw('DATE(created_at) as date'),
+            DB::raw('SUM(grand_total) as total'),
+            DB::raw('COUNT(*) as count')
+        )
+            ->where('status', '!=', 'returned')
+            ->whereDate('created_at', '>=', $today->copy()->subDays(29))
+            ->groupBy(DB::raw('DATE(created_at)'))
+            ->orderBy('date')
+            ->get()
+            ->keyBy('date');
 
-            return [
-                'date' => $date->toDateString(),
-                'label' => $date->translatedFormat('d M'),
-            ];
-        });
+        // Grafik penjualan 12 bulan terakhir (agregasi di PHP agar kompatibel semua driver)
+        $monthlySales = Sale::where('status', '!=', 'returned')
+            ->whereDate('created_at', '>=', $today->copy()->subMonths(11)->startOfMonth())
+            ->get(['created_at', 'grand_total'])
+            ->groupBy(fn ($sale) => $sale->created_at->format('Y-m'))
+            ->map(fn ($items) => ['total' => (float) $items->sum('grand_total'), 'count' => $items->count()]);
+
+        $salesChart = [
+            '7d' => $this->buildChartSeries($today->copy()->subDays(6), $today, 'day', $dailySales),
+            '30d' => $this->buildChartSeries($today->copy()->subDays(29), $today, 'day', $dailySales30),
+            '12m' => $this->buildChartSeries($today->copy()->subMonths(11)->startOfMonth(), $today, 'month', $monthlySales),
+        ];
 
         // Produk terlaris bulan ini
         $topProducts = SaleItem::select(
@@ -256,11 +273,51 @@ class ReportService
             'sales_today' => (float) $salesToday->total,
             'sales_count_today' => (int) $salesToday->jumlah,
             'sales_this_month' => $salesThisMonth,
-            'daily_sales' => $dailySales,
-            'chart_window' => $chartWindow,
+            'sales_chart' => $salesChart,
             'top_products' => $topProducts,
             'low_stock' => $lowStock,
             'low_stock_count' => $lowStockCount,
+        ];
+    }
+
+    /**
+     * Bangun deret grafik (labels + data + total + rata-rata) dari jendela waktu.
+     * $raw: Collection berisi data agregat per hari (key 'date'/'total') atau
+     * Collection berisi total per bulan (key 'Y-m' => total).
+     */
+    private function buildChartSeries(Carbon $start, Carbon $end, string $unit, $raw): array
+    {
+        $labels = [];
+        $data = [];
+        $counts = [];
+        $cursor = $start->copy();
+
+        while ($cursor->lte($end)) {
+            if ($unit === 'month') {
+                $key = $cursor->format('Y-m');
+                $label = $cursor->translatedFormat('M');
+                $cursor->addMonth();
+            } else {
+                $key = $cursor->toDateString();
+                $label = $cursor->translatedFormat('d M');
+                $cursor->addDay();
+            }
+
+            $bucket = $raw[$key] ?? null;
+            $labels[] = $label;
+            $data[] = (float) ($unit === 'month' ? ($bucket['total'] ?? 0) : ($bucket->total ?? 0));
+            $counts[] = (int) ($unit === 'month' ? ($bucket['count'] ?? 0) : ($bucket->count ?? 0));
+        }
+
+        $total = array_sum($data);
+        $count = count($data);
+
+        return [
+            'labels' => $labels,
+            'data' => $data,
+            'counts' => $counts,
+            'total' => $total,
+            'average' => $count > 0 ? $total / $count : 0,
         ];
     }
 }
