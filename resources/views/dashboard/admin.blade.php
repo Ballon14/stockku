@@ -141,11 +141,8 @@
             <div class="space-y-3 overflow-y-auto">
                 @forelse($data['top_products'] as $i => $item)
                 <div class="flex items-center gap-3">
-                    <span class="w-7 h-7 rounded-lg bg-gradient-to-br {{ $i === 0 ? 'from-indigo-500 to-purple-600' : ($i === 1 ? 'from-slate-300 to-slate-400' : 'from-amber-600 to-amber-700') }} flex items-center justify-center text-white text-xs font-bold">{{ $i + 1 }}</span>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-sm font-medium text-slate-700 truncate">{{ $item->product?->name ?? 'Produk dihapus' }}</p>
-                        <p class="text-xs text-slate-400">{{ $item->total_qty }} terjual</p>
-                    </div>
+                    <span class="w-7 h-7 rounded-lg flex items-center justify-center text-white text-xs font-bold {{ $i === 0 ? 'bg-indigo-500' : ($i === 1 ? 'bg-purple-500' : ($i === 2 ? 'bg-amber-500' : ($i === 3 ? 'bg-emerald-500' : 'bg-sky-500'))) }}">{{ $i + 1 }}</span>
+                    <p class="flex-1 min-w-0 text-sm font-medium text-slate-700 truncate">{{ $item->product?->name ?? 'Produk dihapus' }}</p>
                     <p class="text-sm font-semibold text-slate-700">Rp {{ number_format($item->total_sales, 0, ',', '.') }}</p>
                 </div>
                 @empty
