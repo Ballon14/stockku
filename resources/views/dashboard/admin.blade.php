@@ -14,6 +14,52 @@
 
 <!-- Stats Cards -->
 <x-download-apk-banner />
+
+@if($data['low_stock_count'] > 0 || ($data['attendance_summary']['tidak_hadir'] ?? 0) > 0)
+<div class="mb-8 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-300 shadow-lg shadow-amber-500/20 overflow-hidden">
+    <div class="p-5">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-11 h-11 rounded-xl bg-amber-500 flex items-center justify-center shadow-lg shadow-amber-500/40 animate-pulse">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+            </div>
+            <div>
+                <h3 class="text-base font-bold text-slate-800">Perhatian!</h3>
+                <p class="text-sm text-slate-500">Ada beberapa hal yang perlu ditindaklanjuti hari ini.</p>
+            </div>
+        </div>
+        <div class="space-y-3">
+            @if($data['low_stock_count'] > 0)
+            <div class="flex flex-wrap items-center gap-3 bg-white/80 rounded-xl border border-amber-200 p-4">
+                <span class="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+                </span>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-bold text-slate-800">{{ $data['low_stock_count'] }} produk stok menipis</p>
+                    <p class="text-xs text-slate-500">Segera catat pembelian agar stok tidak habis.</p>
+                </div>
+                <a href="{{ route('stock.low') }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-xl shadow-lg shadow-red-500/30 hover:bg-red-700 transition-colors shrink-0">
+                    Lihat Stok Menipis →
+                </a>
+            </div>
+            @endif
+            @if(($data['attendance_summary']['tidak_hadir'] ?? 0) > 0)
+            <div class="flex flex-wrap items-center gap-3 bg-white/80 rounded-xl border border-amber-200 p-4">
+                <span class="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </span>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-bold text-slate-800">{{ $data['attendance_summary']['tidak_hadir'] }} karyawan belum hadir</p>
+                    <p class="text-xs text-slate-500">Belum clock-in: {{ $data['attendance_summary']['hadir'] }}/{{ $data['attendance_summary']['total'] }} sudah masuk.</p>
+                </div>
+                <a href="{{ route('attendance.admin') }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-amber-500 text-white text-sm font-semibold rounded-xl shadow-lg shadow-amber-500/30 hover:bg-amber-600 transition-colors shrink-0">
+                    Lihat Rekap Absensi →
+                </a>
+            </div>
+            @endif
+        </div>
+    </div>
+</div>
+@endif
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
     <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
         <div class="flex items-center justify-between">
@@ -41,29 +87,29 @@
     </div>
 
     @if(auth()->user()->hasRole(['admin', 'manager']))
-    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition-shadow {{ $data['attendance_summary']['tidak_hadir'] > 0 ? 'border-amber-300 shadow-lg shadow-amber-500/20' : '' }}">
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-sm font-medium text-slate-500">Kehadiran Hari Ini</p>
                 <p class="text-2xl font-bold text-slate-800 mt-1">{{ $data['attendance_summary']['hadir'] }}/{{ $data['attendance_summary']['total'] }}</p>
-                <p class="text-xs text-amber-600 mt-1">{{ $data['attendance_summary']['tidak_hadir'] }} belum hadir</p>
+                <p class="text-xs font-semibold mt-1 {{ $data['attendance_summary']['tidak_hadir'] > 0 ? 'text-amber-600' : 'text-emerald-600' }}">{{ $data['attendance_summary']['tidak_hadir'] > 0 ? $data['attendance_summary']['tidak_hadir'].' belum hadir' : 'semua sudah hadir' }}</p>
             </div>
-            <div class="w-12 h-12 bg-violet-100 rounded-xl flex items-center justify-center">
-                <svg class="w-6 h-6 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center {{ $data['attendance_summary']['tidak_hadir'] > 0 ? 'bg-amber-100 text-amber-600 animate-pulse' : 'bg-violet-100 text-violet-600' }}">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
             </div>
         </div>
     </div>
     @endif
 
-    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition-shadow {{ $data['low_stock_count'] > 0 ? 'border-red-300 shadow-lg shadow-red-500/20' : '' }}">
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-sm font-medium text-slate-500">Stok Menipis</p>
                 <p class="text-2xl font-bold text-slate-800 mt-1">{{ $data['low_stock_count'] }}</p>
-                <p class="text-xs text-red-600 mt-1">produk perlu restock</p>
+                <p class="text-xs font-semibold mt-1 {{ $data['low_stock_count'] > 0 ? 'text-red-600' : 'text-emerald-600' }}">{{ $data['low_stock_count'] > 0 ? 'produk perlu segera restock' : 'stok aman' }}</p>
             </div>
-            <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
-                <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center {{ $data['low_stock_count'] > 0 ? 'bg-red-100 text-red-600 animate-pulse' : 'bg-red-50 text-red-400' }}">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
             </div>
         </div>
     </div>
@@ -103,11 +149,18 @@
 
 <!-- Low Stock Alert -->
 @if($data['low_stock']->count() > 0)
-<div class="mt-6 bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-    <h3 class="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
-        <svg class="w-5 h-5 text-amber-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
-        Stok Menipis
-    </h3>
+<div class="mt-6 bg-white rounded-2xl p-6 shadow-sm border border-red-200">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <h3 class="text-lg font-semibold text-slate-800 flex items-center gap-2">
+            <span class="w-9 h-9 rounded-xl bg-red-100 flex items-center justify-center">
+                <svg class="w-5 h-5 text-red-600 animate-pulse" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+            </span>
+            Stok Menipis
+        </h3>
+        <a href="{{ route('stock.low') }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-xl shadow-lg shadow-red-500/30 hover:bg-red-700 transition-colors">
+            Kelola Restock →
+        </a>
+    </div>
         <!-- Mobile: card list -->
     <div class="md:hidden divide-y divide-slate-100">
         @foreach($data['low_stock'] as $prod)
