@@ -4,6 +4,7 @@ set -euo pipefail
 ENV_FILE="/root/stockku/.env"
 BACKUP_DIR="/root/stockku/storage/backups"
 KEEP_DAYS=14
+APP_DIR="/root/stockku"
 
 [ -f "$ENV_FILE" ] || { echo "ERROR: $ENV_FILE not found" >&2; exit 1; }
 
@@ -16,17 +17,31 @@ DB_PASSWORD=$(grep -E '^DB_PASSWORD=' "$ENV_FILE" | cut -d= -f2- | tr -d '"')
 [ -d "$BACKUP_DIR" ] || mkdir -p "$BACKUP_DIR"
 
 STAMP=$(date +%Y%m%d-%H%M%S)
-OUT_FILE="$BACKUP_DIR/stock-$STAMP.sql.gz"
+TMP_DIR="$BACKUP_DIR/tmp-$STAMP"
+OUT_FILE="$BACKUP_DIR/stock-$STAMP.tar.gz"
 
-mysqldump \
+mkdir -p "$TMP_DIR"
+
+# 1. Database dump (password via env, tidak tampil di process list)
+MYSQL_PWD="$DB_PASSWORD" mysqldump \
   --skip-ssl \
   --host="$DB_HOST" \
   --port="$DB_PORT" \
   --user="$DB_USERNAME" \
-  --password="$DB_PASSWORD" \
   --single-transaction --routines --triggers \
-  "$DB_DATABASE" | gzip > "$OUT_FILE"
+  "$DB_DATABASE" | gzip > "$TMP_DIR/database.sql.gz"
 
-find "$BACKUP_DIR" -name 'stock-*.sql.gz' -mtime +"$KEEP_DAYS" -delete
+# 2. File upload (foto produk)
+if [ -d "$APP_DIR/storage/app/public" ]; then
+  tar -czf "$TMP_DIR/public-files.tar.gz" -C "$APP_DIR/storage/app" public
+fi
+
+# 3. Konfigurasi (.env) — wajib untuk restorasi penuh
+cp "$ENV_FILE" "$TMP_DIR/.env"
+
+tar -czf "$OUT_FILE" -C "$TMP_DIR" .
+rm -rf "$TMP_DIR"
+
+find "$BACKUP_DIR" -name 'stock-*.tar.gz' -mtime +"$KEEP_DAYS" -delete
 
 echo "Backup OK: $OUT_FILE ($(du -h "$OUT_FILE" | cut -f1))"

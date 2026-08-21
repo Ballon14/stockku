@@ -107,7 +107,7 @@
 
             <div class="flex gap-3">
                 <a href="{{ route('sales.index') }}" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl text-sm font-medium hover:bg-slate-200">Batal</a>
-                <button type="submit" class="px-6 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl text-sm font-semibold shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50 transition-all" x-bind:disabled="selectedItems.length === 0" x-bind:class="{ 'opacity-50 cursor-not-allowed': selectedItems.length === 0 }">Proses Retur</button>
+                <button type="submit" class="px-6 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl text-sm font-semibold shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50 transition-all" x-bind:disabled="selectedItems.length === 0" x-bind:class="{ 'opacity-50 cursor-not-allowed': selectedItems.length === 0 }">Proses Retur</button>
             </div>
         </form>
     </div>

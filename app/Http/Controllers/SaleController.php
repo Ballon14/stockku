@@ -43,6 +43,11 @@ class SaleController extends Controller
 
     public function receipt(Sale $sale)
     {
+        // Kasir hanya bisa lihat struk transaksinya sendiri
+        if (auth()->user()->hasRole('kasir') && $sale->user_id !== auth()->id()) {
+            abort(403);
+        }
+
         $sale->load(['items.product', 'user']);
 
         return view('sales.receipt', compact('sale'));

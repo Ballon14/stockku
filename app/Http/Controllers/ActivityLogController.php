@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ActivityLog;
 use App\Models\User;
+use Carbon\Carbon;
 
 class ActivityLogController extends Controller
 {
@@ -20,11 +21,11 @@ class ActivityLogController extends Controller
         }
 
         if ($startDate = request('start_date')) {
-            $query->whereDate('created_at', '>=', $startDate);
+            $query->where('created_at', '>=', $startDate);
         }
 
         if ($endDate = request('end_date')) {
-            $query->whereDate('created_at', '<=', $endDate);
+            $query->where('created_at', '<', Carbon::parse($endDate)->addDay());
         }
 
         $logs = $query->paginate(15)->withQueryString();
@@ -34,7 +35,7 @@ class ActivityLogController extends Controller
 
         $stats = [
             'total' => ActivityLog::count(),
-            'today' => ActivityLog::whereDate('created_at', today())->count(),
+            'today' => ActivityLog::where('created_at', '>=', today())->where('created_at', '<', today()->addDay())->count(),
             'failed_login' => ActivityLog::where('action', 'auth.login_failed')->count(),
         ];
 

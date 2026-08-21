@@ -55,6 +55,7 @@ Route::middleware(['auth', 'ensure-attended'])->group(function () {
         // Stock
         Route::get('/stock', [StockController::class, 'index'])->name('stock.index');
         Route::get('/stock/low', [StockController::class, 'lowStock'])->name('stock.low');
+        Route::post('/stock/adjust', [StockController::class, 'adjust'])->name('stock.adjust');
 
         // Sale Returns
         Route::get('/sale-returns', [SaleReturnController::class, 'index'])->name('sale-returns.index');

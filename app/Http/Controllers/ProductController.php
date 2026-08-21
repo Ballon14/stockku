@@ -37,7 +37,7 @@ class ProductController extends Controller
     public function store(ProductRequest $request)
     {
         $product = $this->productService->store(
-            $request->except('foto'),
+            $request->validated(),
             $request->file('foto')
         );
         app(ActivityLogger::class)->log('product.create', 'Produk "'.$product->name.'" (SKU: '.$product->sku.') ditambahkan.');
@@ -64,7 +64,7 @@ class ProductController extends Controller
     {
         $this->productService->update(
             $product,
-            $request->except('foto'),
+            $request->validated(),
             $request->file('foto')
         );
         app(ActivityLogger::class)->log('product.update', 'Produk "'.$product->name.'" (SKU: '.$product->sku.') diperbarui.');

@@ -10,7 +10,7 @@ class EmployeeService
 {
     public function getAll($search = null)
     {
-        $query = Employee::with('user');
+        $query = Employee::with('user.roles');
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -59,6 +59,11 @@ class EmployeeService
 
     public function delete(Employee $employee): bool
     {
+        if ($employee->user) {
+            $employee->user->update(['is_active' => false]);
+            \DB::table('sessions')->where('user_id', $employee->user->id)->delete();
+        }
+
         return $employee->delete();
     }
 }

@@ -144,7 +144,7 @@
                 <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
                     <span class="font-bold text-emerald-600">Hadir {{ $summary['hadir'] }}</span>
                     <span class="font-semibold text-amber-500">Sakit {{ $summary['sakit'] }}</span>
-                    <span class="font-semibold text-blue-500">Izin {{ $summary['izin'] }}</span>
+                    <span class="font-semibold text-indigo-500">Izin {{ $summary['izin'] }}</span>
                     <span class="font-semibold text-purple-500">Cuti {{ $summary['cuti'] }}</span>
                     <span class="font-bold text-red-500">Alpha {{ $summary['alpha'] }}</span>
                 </div>
@@ -182,7 +182,7 @@
                         </td>
                         <td class="py-3 px-4 text-center font-bold text-emerald-600">{{ $summary['hadir'] }}</td>
                         <td class="py-3 px-4 text-center font-semibold text-amber-500">{{ $summary['sakit'] }}</td>
-                        <td class="py-3 px-4 text-center font-semibold text-blue-500">{{ $summary['izin'] }}</td>
+                        <td class="py-3 px-4 text-center font-semibold text-indigo-500">{{ $summary['izin'] }}</td>
                         <td class="py-3 px-4 text-center font-semibold text-purple-500">{{ $summary['cuti'] }}</td>
                         <td class="py-3 px-4 text-center font-bold text-red-500">{{ $summary['alpha'] }}</td>
                     </tr>

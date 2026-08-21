@@ -60,9 +60,9 @@
         <p class="text-sm font-medium text-emerald-700 mb-1">Total Pendapatan</p>
         <p class="text-3xl font-bold text-emerald-900">Rp {{ number_format($data['summary']['total_revenue'], 0, ',', '.') }}</p>
     </div>
-    <div class="bg-blue-50 border border-blue-100 rounded-2xl p-6">
-        <p class="text-sm font-medium text-blue-700 mb-1">Item Terjual</p>
-        <p class="text-3xl font-bold text-blue-900">{{ collect($data['items'])->sum('qty') }}</p>
+    <div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-6">
+        <p class="text-sm font-medium text-indigo-700 mb-1">Item Terjual</p>
+        <p class="text-3xl font-bold text-indigo-900">{{ collect($data['items'])->sum('qty') }}</p>
     </div>
 </div>
 

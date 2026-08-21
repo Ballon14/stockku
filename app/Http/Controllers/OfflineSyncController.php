@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Services\SaleService;
+use App\Support\AttendanceGate;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -27,6 +28,13 @@ class OfflineSyncController extends Controller
 
     public function sync(Request $request): JsonResponse
     {
+        if (AttendanceGate::isReadOnly(auth()->user())) {
+            return response()->json([
+                'results' => [],
+                'error' => 'Anda belum clock-in. Sinkronisasi offline ditolak sampai Anda clock-in.',
+            ], 403);
+        }
+
         $data = $request->validate([
             'transactions' => ['required', 'array'],
             'transactions.*.offline_id' => ['required', 'string', 'max:100'],
@@ -88,6 +96,12 @@ class OfflineSyncController extends Controller
                     'offline_id' => $transaction['offline_id'],
                     'status' => 'failed',
                     'message' => 'Transaksi sudah pernah disinkronkan.',
+                ];
+            } catch (\Throwable $e) {
+                $results[] = [
+                    'offline_id' => $transaction['offline_id'],
+                    'status' => 'failed',
+                    'message' => $e->getMessage(),
                 ];
             }
         }

@@ -18,7 +18,7 @@ class LeaveRequestController extends Controller
         $user = auth()->user();
 
         if ($user->hasRole(['admin', 'manager'])) {
-            $leaveRequests = LeaveRequest::with('employee')
+            $leaveRequests = LeaveRequest::with(['employee', 'approvedBy'])
                 ->latest()
                 ->paginate(15);
         } else {
@@ -27,6 +27,7 @@ class LeaveRequestController extends Controller
                 return redirect()->route('dashboard')->with('error', 'Data karyawan tidak ditemukan.');
             }
             $leaveRequests = $employee->leaveRequests()
+                ->with('approvedBy')
                 ->latest()
                 ->paginate(15);
         }
@@ -53,9 +54,13 @@ class LeaveRequestController extends Controller
             return back()->with('error', 'Data karyawan tidak ditemukan.');
         }
 
-        $leaveRequest = $this->attendanceService->createLeaveRequest($employee, $request->only([
-            'jenis', 'tanggal_mulai', 'tanggal_selesai', 'keterangan',
-        ]));
+        try {
+            $leaveRequest = $this->attendanceService->createLeaveRequest($employee, $request->only([
+                'jenis', 'tanggal_mulai', 'tanggal_selesai', 'keterangan',
+            ]));
+        } catch (\RuntimeException $e) {
+            return back()->with('error', $e->getMessage());
+        }
 
         app(ActivityLogger::class)->log('leave.create', 'Pengajuan '.$leaveRequest->jenis.' ('.$leaveRequest->tanggal_mulai.' s/d '.$leaveRequest->tanggal_selesai.') dibuat.');
 
@@ -64,11 +69,17 @@ class LeaveRequestController extends Controller
 
     public function approve(LeaveRequest $leaveRequest, Request $request)
     {
-        $this->attendanceService->approveLeaveRequest(
-            $leaveRequest,
-            auth()->id(),
-            $request->input('catatan_approval')
-        );
+        $this->ensureNotSelfApproval($leaveRequest);
+
+        try {
+            $this->attendanceService->approveLeaveRequest(
+                $leaveRequest,
+                auth()->id(),
+                $request->input('catatan_approval')
+            );
+        } catch (\RuntimeException $e) {
+            return back()->with('error', $e->getMessage());
+        }
 
         app(ActivityLogger::class)->log('leave.approve', 'Pengajuan '.$leaveRequest->jenis.' milik '.$leaveRequest->employee->nama.' disetujui.');
 
@@ -77,11 +88,17 @@ class LeaveRequestController extends Controller
 
     public function reject(LeaveRequest $leaveRequest, Request $request)
     {
-        $this->attendanceService->rejectLeaveRequest(
-            $leaveRequest,
-            auth()->id(),
-            $request->input('catatan_approval')
-        );
+        $this->ensureNotSelfApproval($leaveRequest);
+
+        try {
+            $this->attendanceService->rejectLeaveRequest(
+                $leaveRequest,
+                auth()->id(),
+                $request->input('catatan_approval')
+            );
+        } catch (\RuntimeException $e) {
+            return back()->with('error', $e->getMessage());
+        }
 
         app(ActivityLogger::class)->log('leave.reject', 'Pengajuan '.$leaveRequest->jenis.' milik '.$leaveRequest->employee->nama.' ditolak.');
 
@@ -105,5 +122,12 @@ class LeaveRequestController extends Controller
         app(ActivityLogger::class)->log('leave.cancel', 'Pengajuan '.$leaveRequest->jenis.' ('.$leaveRequest->tanggal_mulai.' s/d '.$leaveRequest->tanggal_selesai.') dibatalkan oleh pengaju.');
 
         return back()->with('success', 'Pengajuan dibatalkan.');
+    }
+
+    private function ensureNotSelfApproval(LeaveRequest $leaveRequest): void
+    {
+        if (auth()->user()->employee && $leaveRequest->employee_id === auth()->user()->employee->id) {
+            abort(403, 'Anda tidak dapat menyetujui/menolak pengajuan sendiri.');
+        }
     }
 }

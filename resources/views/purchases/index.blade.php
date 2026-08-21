@@ -45,7 +45,7 @@
                     <p class="font-mono text-xs font-medium text-indigo-600">{{ $purchase->invoice_number }}</p>
                     <p class="text-xs text-slate-400 mt-0.5">{{ \Carbon\Carbon::parse($purchase->tanggal)->format('d/m/Y') }} · {{ $purchase->user->name }}</p>
                 </div>
-                <a href="{{ route('purchases.show', $purchase) }}" class="shrink-0 p-1.5 rounded-lg text-slate-400 hover:bg-blue-50 hover:text-blue-600" title="Detail"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></a>
+                <a href="{{ route('purchases.show', $purchase) }}" class="shrink-0 p-1.5 rounded-lg text-slate-400 hover:bg-indigo-50 hover:text-indigo-600" title="Detail"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></a>
             </div>
             <div class="flex items-center justify-between">
                 <p class="text-xs text-slate-500 truncate">Supplier: <span class="text-slate-700 font-medium">{{ $purchase->supplier->name }}</span></p>
@@ -81,7 +81,7 @@
                     <td class="py-3 px-4 text-slate-600">{{ $purchase->user->name }}</td>
                     <td class="py-3 px-4 text-right font-semibold text-slate-700">Rp {{ number_format($purchase->total, 0, ',', '.') }}</td>
                     <td class="py-3 px-4 text-center">
-                        <a href="{{ route('purchases.show', $purchase) }}" class="inline-flex p-1.5 rounded-lg text-slate-400 hover:bg-blue-50 hover:text-blue-600 transition-colors" title="Detail">
+                        <a href="{{ route('purchases.show', $purchase) }}" class="inline-flex p-1.5 rounded-lg text-slate-400 hover:bg-indigo-50 hover:text-indigo-600 transition-colors" title="Detail">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                         </a>
                     </td>

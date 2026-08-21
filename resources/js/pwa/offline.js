@@ -98,8 +98,21 @@ export async function processQueue() {
             body: JSON.stringify({ transactions: pending }),
         });
 
+        if (response.status === 419) {
+            // CSRF token kedaluwarsa — muat ulang untuk mendapatkan token baru
+            window.location.reload();
+            return { synced: [], failed: [] };
+        }
+
         if (!response.ok) {
-            throw new Error('Sinkronisasi gagal, coba lagi nanti.');
+            let message = 'Sinkronisasi gagal, coba lagi nanti.';
+            try {
+                const body = await response.json();
+                message = body.error || message;
+            } catch (e) {
+                // ignore
+            }
+            throw new Error(message);
         }
 
         const { results } = await response.json();

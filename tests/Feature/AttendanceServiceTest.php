@@ -93,4 +93,94 @@ class AttendanceServiceTest extends TestCase
             'is_active' => true,
         ]);
     }
+
+    public function test_clock_in_does_not_override_approved_leave_status(): void
+    {
+        $employee = $this->makeEmployee('Emp Izin', 'emp-izin@stockku.com');
+        $today = now()->toDateString();
+
+        Attendance::create(['employee_id' => $employee->id, 'tanggal' => $today, 'status' => 'izin', 'keterangan' => 'Izin keluarga']);
+
+        $attendance = app(AttendanceService::class)->clockIn($employee);
+
+        $this->assertSame('izin', $attendance->fresh()->status);
+        $this->assertNotNull($attendance->fresh()->clock_in);
+    }
+
+    public function test_get_today_summary_subtracts_approved_leave_from_absent(): void
+    {
+        $emp1 = $this->makeEmployee('Emp Hadir', 'emp-hadir@stockku.com');
+        $emp2 = $this->makeEmployee('Emp Izin', 'emp-izin2@stockku.com');
+
+        Attendance::create(['employee_id' => $emp1->id, 'tanggal' => now()->toDateString(), 'clock_in' => '08:00:00', 'status' => 'hadir']);
+
+        app(AttendanceService::class)->createLeaveRequest($emp2, [
+            'jenis' => 'izin',
+            'tanggal_mulai' => now()->toDateString(),
+            'tanggal_selesai' => now()->toDateString(),
+            'keterangan' => 'Sakit',
+        ])->update(['status' => 'approved']);
+
+        $summary = app(AttendanceService::class)->getTodaySummary();
+
+        $this->assertSame(2, $summary['total']);
+        $this->assertSame(1, $summary['hadir']);
+        $this->assertSame(1, $summary['berizin']);
+        $this->assertSame(0, $summary['tidak_hadir']);
+    }
+
+    public function test_approve_only_allows_pending_requests(): void
+    {
+        $employee = $this->makeEmployee('Emp Approve', 'emp-approve@stockku.com');
+        $leaveRequest = app(AttendanceService::class)->createLeaveRequest($employee, [
+            'jenis' => 'cuti',
+            'tanggal_mulai' => now()->toDateString(),
+            'tanggal_selesai' => now()->toDateString(),
+        ]);
+        $leaveRequest->update(['status' => 'approved']);
+
+        $this->expectException(\RuntimeException::class);
+        app(AttendanceService::class)->approveLeaveRequest($leaveRequest, 1);
+    }
+
+    public function test_reject_after_approve_reverses_attendance_records(): void
+    {
+        $employee = $this->makeEmployee('Emp Reject', 'emp-reject@stockku.com');
+        $leaveRequest = app(AttendanceService::class)->createLeaveRequest($employee, [
+            'jenis' => 'sakit',
+            'tanggal_mulai' => now()->toDateString(),
+            'tanggal_selesai' => now()->toDateString(),
+            'keterangan' => 'Demam',
+        ]);
+
+        app(AttendanceService::class)->approveLeaveRequest($leaveRequest, 1);
+        $this->assertNotNull(Attendance::where('employee_id', $employee->id)
+            ->whereDate('tanggal', now()->toDateString())
+            ->where('status', 'sakit')
+            ->first());
+
+        app(AttendanceService::class)->rejectLeaveRequest($leaveRequest, 1, 'Ditolak');
+        $this->assertNull(Attendance::where('employee_id', $employee->id)
+            ->whereDate('tanggal', now()->toDateString())
+            ->where('status', 'sakit')
+            ->first());
+    }
+
+    public function test_create_leave_request_rejects_overlapping_periods(): void
+    {
+        $employee = $this->makeEmployee('Emp Overlap', 'emp-overlap@stockku.com');
+
+        app(AttendanceService::class)->createLeaveRequest($employee, [
+            'jenis' => 'cuti',
+            'tanggal_mulai' => now()->toDateString(),
+            'tanggal_selesai' => now()->addDays(2)->toDateString(),
+        ]);
+
+        $this->expectException(\RuntimeException::class);
+        app(AttendanceService::class)->createLeaveRequest($employee, [
+            'jenis' => 'izin',
+            'tanggal_mulai' => now()->addDay()->toDateString(),
+            'tanggal_selesai' => now()->addDays(3)->toDateString(),
+        ]);
+    }
 }

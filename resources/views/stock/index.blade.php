@@ -40,6 +40,25 @@
     </div>
 </div>
 
+<div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 mb-6">
+    <h4 class="text-sm font-semibold text-slate-700 mb-3">Koreksi Stok (Penyesuaian)</h4>
+    <form method="POST" action="{{ route('stock.adjust') }}" class="flex flex-wrap gap-3 items-end">
+        @csrf
+        <input type="hidden" name="product_id" value="{{ $product->id }}">
+        <div>
+            <label class="text-xs font-medium text-slate-500">Jumlah (+/-)</label>
+            <input type="number" name="qty" min="-999999" max="999999" required placeholder="mis. 5 atau -3"
+                class="w-40 mt-1 rounded-xl border-slate-200 text-sm focus:border-indigo-500 focus:ring-indigo-200">
+        </div>
+        <div class="flex-1 min-w-[250px]">
+            <label class="text-xs font-medium text-slate-500">Keterangan</label>
+            <input type="text" name="keterangan" maxlength="500" placeholder="mis. Opname fisik, stok hilang, bonus dari supplier"
+                class="w-full mt-1 rounded-xl border-slate-200 text-sm focus:border-indigo-500 focus:ring-indigo-200">
+        </div>
+        <button type="submit" class="px-4 py-2 bg-amber-500 text-white rounded-xl text-sm font-medium">Terapkan Koreksi</button>
+    </form>
+</div>
+
 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
     <!-- Mobile: card list -->
     <div class="md:hidden divide-y divide-slate-100">
@@ -52,13 +71,14 @@
                 </div>
                 <span class="shrink-0 px-2 py-0.5 rounded-full text-xs font-semibold
                     {{ $mv->type === 'in' || $mv->type === 'return' ? 'bg-emerald-100 text-emerald-700' :
-                       ($mv->type === 'out' ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-700') }}">
+                       ($mv->type === 'out' ? 'bg-red-100 text-red-700' :
+                        ($mv->type === 'adjustment' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-700')) }}">
                     {{ $mv->type_label }}
                 </span>
             </div>
             <div class="flex items-center gap-6 text-sm">
-                <span class="font-semibold text-emerald-600">{{ $mv->type === 'in' || $mv->type === 'return' ? '+' . $mv->qty : '-' }}</span>
-                <span class="font-semibold text-red-600">{{ $mv->type === 'out' ? '-' . $mv->qty : '-' }}</span>
+                <span class="font-semibold text-emerald-600">{{ ($mv->type === 'in' || $mv->type === 'return' || ($mv->type === 'adjustment' && $mv->qty > 0)) ? '+' . $mv->qty : '-' }}</span>
+                <span class="font-semibold text-red-600">{{ $mv->type === 'out' ? '-' . $mv->qty : ($mv->type === 'adjustment' && $mv->qty < 0 ? $mv->qty : '-') }}</span>
                 <span class="ml-auto text-slate-800">Sisa: <span class="font-bold">{{ $mv->stok_sesudah }}</span></span>
             </div>
             @if($mv->keterangan)
@@ -91,12 +111,13 @@
                     <td class="py-3 px-4 text-center">
                         <span class="px-2 py-0.5 rounded-full text-xs font-semibold
                             {{ $mv->type === 'in' || $mv->type === 'return' ? 'bg-emerald-100 text-emerald-700' :
-                               ($mv->type === 'out' ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-700') }}">
+                               ($mv->type === 'out' ? 'bg-red-100 text-red-700' :
+                                ($mv->type === 'adjustment' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-700')) }}">
                             {{ $mv->type_label }}
                         </span>
                     </td>
-                    <td class="py-3 px-4 text-center font-semibold text-emerald-600">{{ $mv->type === 'in' || $mv->type === 'return' ? '+' . $mv->qty : '-' }}</td>
-                    <td class="py-3 px-4 text-center font-semibold text-red-600">{{ $mv->type === 'out' ? '-' . $mv->qty : '-' }}</td>
+                    <td class="py-3 px-4 text-center font-semibold text-emerald-600">{{ ($mv->type === 'in' || $mv->type === 'return' || ($mv->type === 'adjustment' && $mv->qty > 0)) ? '+' . $mv->qty : '-' }}</td>
+                    <td class="py-3 px-4 text-center font-semibold text-red-600">{{ $mv->type === 'out' ? '-' . $mv->qty : ($mv->type === 'adjustment' && $mv->qty < 0 ? $mv->qty : '-') }}</td>
                     <td class="py-3 px-4 text-center font-bold text-slate-800">{{ $mv->stok_sesudah }}</td>
                     <td class="py-3 px-4 text-slate-500 text-xs">{{ $mv->keterangan }}</td>
                     <td class="py-3 px-4 text-slate-600 text-xs">{{ $mv->user->name }}</td>

@@ -61,7 +61,7 @@
                 <span class="text-slate-500">Aktif: <span class="font-semibold text-slate-700">{{ $row['total_days'] }}</span></span>
                 <span class="font-bold text-emerald-600">Hadir {{ $row['hadir'] }}</span>
                 <span class="text-amber-500">Sakit {{ $row['sakit'] }}</span>
-                <span class="text-blue-500">Izin {{ $row['izin'] }}</span>
+                <span class="text-indigo-500">Izin {{ $row['izin'] }}</span>
                 <span class="text-purple-500">Cuti {{ $row['cuti'] }}</span>
                 <span class="font-bold text-red-500">Alpha {{ $row['alpha'] }}</span>
             </div>
@@ -95,7 +95,7 @@
                     <td class="py-3 px-4 text-center font-semibold text-slate-700">{{ $row['total_days'] }}</td>
                     <td class="py-3 px-4 text-center font-bold text-emerald-600">{{ $row['hadir'] }}</td>
                     <td class="py-3 px-4 text-center text-amber-500">{{ $row['sakit'] }}</td>
-                    <td class="py-3 px-4 text-center text-blue-500">{{ $row['izin'] }}</td>
+                    <td class="py-3 px-4 text-center text-indigo-500">{{ $row['izin'] }}</td>
                     <td class="py-3 px-4 text-center text-purple-500">{{ $row['cuti'] }}</td>
                     <td class="py-3 px-4 text-center font-bold text-red-500">{{ $row['alpha'] }}</td>
                     <td class="py-3 px-4 text-center">

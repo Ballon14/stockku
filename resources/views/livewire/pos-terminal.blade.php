@@ -284,14 +284,14 @@
     <!-- ===================== POS OFFLINE (Alpine + IndexedDB) ===================== -->
     <div x-show="!online" x-cloak x-data="offlinePos()">
         <!-- Offline notice -->
-        <div class="mb-4 rounded-xl bg-sky-50 border border-sky-200 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="mb-4 rounded-xl bg-indigo-50 border border-indigo-200 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div class="flex items-center gap-2">
-                <svg class="w-5 h-5 text-sky-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636a9 9 0 010 12.728m-12.728 0a9 9 0 010-12.728m9.9 2.829a5 5 0 010 7.07m-7.072 0a5 5 0 010-7.07M13 12a1 1 0 11-2 0 1 1 0 012 0z"/></svg>
-                <p class="text-sm font-medium text-sky-800">Mode offline — transaksi disimpan dan disinkronkan otomatis saat koneksi kembali.</p>
+                <svg class="w-5 h-5 text-indigo-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636a9 9 0 010 12.728m-12.728 0a9 9 0 010-12.728m9.9 2.829a5 5 0 010 7.07m-7.072 0a5 5 0 010-7.07M13 12a1 1 0 11-2 0 1 1 0 012 0z"/></svg>
+                <p class="text-sm font-medium text-indigo-800">Mode offline — transaksi disimpan dan disinkronkan otomatis saat koneksi kembali.</p>
             </div>
             <div class="flex items-center gap-3">
-                <span x-show="queueCount > 0" class="text-xs font-bold text-sky-700 bg-sky-100 rounded-full px-2.5 py-1" x-text="queueCount + ' dalam antrian'"></span>
-                <button @click="syncNow()" :disabled="syncing" class="text-sm font-semibold text-sky-800 bg-sky-200 hover:bg-sky-300 rounded-lg px-3 py-1.5 transition-colors disabled:opacity-50" x-text="syncing ? 'Menyinkronkan...' : 'Sinkronkan Sekarang'"></button>
+                <span x-show="queueCount > 0" class="text-xs font-bold text-indigo-700 bg-indigo-100 rounded-full px-2.5 py-1" x-text="queueCount + ' dalam antrian'"></span>
+                <button @click="syncNow()" :disabled="syncing" class="text-sm font-semibold text-indigo-800 bg-indigo-200 hover:bg-indigo-300 rounded-lg px-3 py-1.5 transition-colors disabled:opacity-50" x-text="syncing ? 'Menyinkronkan...' : 'Sinkronkan Sekarang'"></button>
             </div>
         </div>
 

@@ -131,4 +131,53 @@ class StockServiceTest extends TestCase
         $this->assertNotNull($movement->user_id);
         $this->assertDatabaseHas('stock_movements', ['id' => $movement->id, 'user_id' => auth()->id()]);
     }
+
+    public function test_record_movement_rejects_zero_or_negative_qty(): void
+    {
+        $this->actingAsUser();
+        $product = $this->makeProduct(stok: 5);
+
+        $this->expectException(\InvalidArgumentException::class);
+        app(StockService::class)->recordMovement($product, 'in', 0);
+        app(StockService::class)->recordMovement($product, 'out', -2);
+    }
+
+    public function test_adjustment_adds_and_subtracts_stock(): void
+    {
+        $this->actingAsUser();
+        $product = $this->makeProduct(stok: 10);
+
+        app(StockService::class)->recordMovement($product, 'adjustment', 5, null, null, 'Opname fisik');
+        $this->assertSame(15, $product->fresh()->stok);
+
+        app(StockService::class)->recordMovement($product, 'adjustment', -3, null, null, 'Stok hilang');
+        $this->assertSame(12, $product->fresh()->stok);
+
+        $this->assertDatabaseHas('stock_movements', [
+            'product_id' => $product->id,
+            'type' => 'adjustment',
+            'qty' => -3,
+            'stok_sebelum' => 15,
+            'stok_sesudah' => 12,
+        ]);
+    }
+
+    public function test_adjustment_clamps_stock_at_zero(): void
+    {
+        $this->actingAsUser();
+        $product = $this->makeProduct(stok: 3);
+
+        app(StockService::class)->recordMovement($product, 'adjustment', -20);
+
+        $this->assertSame(0, $product->fresh()->stok);
+    }
+
+    public function test_adjustment_rejects_zero_qty(): void
+    {
+        $this->actingAsUser();
+        $product = $this->makeProduct(stok: 3);
+
+        $this->expectException(\InvalidArgumentException::class);
+        app(StockService::class)->recordMovement($product, 'adjustment', 0);
+    }
 }

@@ -26,7 +26,7 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans text-gray-900 antialiased">
+    <body class="font-sans text-slate-900 antialiased">
         <div class="relative min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 overflow-hidden bg-slate-950">
             <!-- Background gradient -->
             <div class="absolute inset-0 bg-gradient-to-br from-indigo-950 via-slate-900 to-purple-950"></div>
@@ -34,8 +34,8 @@
             <!-- Decorative blurred blobs -->
             <div class="absolute -top-32 -left-32 w-[480px] h-[480px] bg-indigo-600 rounded-full blur-3xl opacity-30 animate-pulse"></div>
             <div class="absolute -bottom-40 -right-40 w-[520px] h-[520px] bg-purple-600 rounded-full blur-3xl opacity-30"></div>
-            <div class="absolute top-1/3 right-1/4 w-72 h-72 bg-fuchsia-500 rounded-full blur-3xl opacity-20"></div>
-            <div class="absolute bottom-1/4 left-1/5 w-64 h-64 bg-sky-500 rounded-full blur-3xl opacity-20"></div>
+            <div class="absolute top-1/3 right-1/4 w-72 h-72 bg-purple-500 rounded-full blur-3xl opacity-20"></div>
+            <div class="absolute bottom-1/4 left-1/5 w-64 h-64 bg-indigo-500 rounded-full blur-3xl opacity-20"></div>
 
             <!-- Subtle grid overlay -->
             <div class="absolute inset-0 opacity-[0.05]" style="background-image: linear-gradient(to right, rgba(255,255,255,.6) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,.6) 1px, transparent 1px); background-size: 40px 40px;"></div>

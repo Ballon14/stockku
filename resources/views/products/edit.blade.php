@@ -41,8 +41,11 @@
                     <input type="number" name="harga_jual" value="{{ old('harga_jual', $product->harga_jual) }}" min="0" class="w-full rounded-xl border-slate-200 text-sm" required>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Stok</label>
-                    <input type="number" name="stok" value="{{ old('stok', $product->stok) }}" min="0" class="w-full rounded-xl border-slate-200 text-sm" required>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Stok Saat Ini</label>
+                    <div class="w-full rounded-xl bg-slate-50 border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700">
+                        {{ $product->stok }} {{ $product->satuan }}
+                    </div>
+                    <p class="text-xs text-slate-400 mt-1">Stok hanya berubah lewat transaksi (penjualan, pembelian, retur, penyesuaian).</p>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">Minimum Stok</label>

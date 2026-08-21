@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\SaleReturn;
+use Carbon\Carbon;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -197,10 +198,10 @@ class SaleService
         $query = Sale::with(['user', 'items.product'])->latest('id');
 
         if ($startDate) {
-            $query->whereDate('created_at', '>=', $startDate);
+            $query->where('created_at', '>=', $startDate);
         }
         if ($endDate) {
-            $query->whereDate('created_at', '<=', $endDate);
+            $query->where('created_at', '<', Carbon::parse($endDate)->addDay());
         }
         if ($userId) {
             $query->where('user_id', $userId);

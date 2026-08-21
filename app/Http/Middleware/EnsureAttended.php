@@ -41,6 +41,10 @@ class EnsureAttended
                 ? 'Anda sudah clock-out hari ini. Aksi ini hanya dapat dilakukan setelah clock-in kembali besok.'
                 : 'Anda wajib clock-in terlebih dahulu untuk melakukan aksi ini.';
 
+            if ($request->expectsJson()) {
+                return response()->json(['error' => $message], 403);
+            }
+
             return redirect()->route('attendance.clock')->with('warning', $message);
         }
 

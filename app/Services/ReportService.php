@@ -18,8 +18,8 @@ class ReportService
     public function getSalesReport($startDate, $endDate, $userId = null, $productId = null, $paginate = true)
     {
         $query = Sale::with(['user', 'items.product.category'])
-            ->whereDate('created_at', '>=', $startDate)
-            ->whereDate('created_at', '<=', $endDate)
+            ->where('created_at', '>=', $startDate)
+            ->where('created_at', '<', Carbon::parse($endDate)->addDay())
             ->where('status', '!=', 'returned');
 
         if ($userId) {
@@ -97,8 +97,8 @@ class ReportService
     public function getProfitLossReport($startDate, $endDate)
     {
         $sales = Sale::with('items.product')
-            ->whereDate('created_at', '>=', $startDate)
-            ->whereDate('created_at', '<=', $endDate)
+            ->where('created_at', '>=', $startDate)
+            ->where('created_at', '<', Carbon::parse($endDate)->addDay())
             ->where('status', '!=', 'returned')
             ->get();
 
@@ -116,8 +116,8 @@ class ReportService
 
         // Retur
         $totalRetur = SaleReturn::whereHas('sale', function ($q) use ($startDate, $endDate) {
-            $q->whereDate('created_at', '>=', $startDate)
-                ->whereDate('created_at', '<=', $endDate);
+            $q->where('created_at', '>=', $startDate)
+                ->where('created_at', '<', Carbon::parse($endDate)->addDay());
         })->where('status', 'approved')->sum('total_refund');
 
         $gross_profit = $net_revenue - $cogs - $totalRetur;
@@ -135,8 +135,8 @@ class ReportService
     public function getStockReport($startDate, $endDate, $productId = null)
     {
         $query = StockMovement::with(['product', 'user'])
-            ->whereDate('created_at', '>=', $startDate)
-            ->whereDate('created_at', '<=', $endDate);
+            ->where('created_at', '>=', $startDate)
+            ->where('created_at', '<', Carbon::parse($endDate)->addDay());
 
         if ($productId) {
             $query->where('product_id', $productId);
@@ -193,7 +193,7 @@ class ReportService
         $startOfMonth = Carbon::now()->startOfMonth();
 
         // Penjualan hari ini
-        $salesToday = Sale::whereDate('created_at', $today)
+        $salesToday = Sale::whereBetween('created_at', [$today->copy()->startOfDay(), $today->copy()->endOfDay()])
             ->where('status', '!=', 'returned')
             ->selectRaw('COALESCE(SUM(grand_total), 0) as total, COUNT(*) as jumlah')
             ->first();
@@ -205,7 +205,7 @@ class ReportService
             DB::raw('COUNT(*) as count')
         )
             ->where('status', '!=', 'returned')
-            ->whereDate('created_at', '>=', $today->copy()->subDays(6))
+            ->where('created_at', '>=', $today->copy()->subDays(6))
             ->groupBy(DB::raw('DATE(created_at)'))
             ->orderBy('date')
             ->get()
@@ -218,7 +218,7 @@ class ReportService
             DB::raw('COUNT(*) as count')
         )
             ->where('status', '!=', 'returned')
-            ->whereDate('created_at', '>=', $today->copy()->subDays(29))
+            ->where('created_at', '>=', $today->copy()->subDays(29))
             ->groupBy(DB::raw('DATE(created_at)'))
             ->orderBy('date')
             ->get()
@@ -226,7 +226,7 @@ class ReportService
 
         // Grafik penjualan 12 bulan terakhir (agregasi di PHP agar kompatibel semua driver)
         $monthlySales = Sale::where('status', '!=', 'returned')
-            ->whereDate('created_at', '>=', $today->copy()->subMonths(11)->startOfMonth())
+            ->where('created_at', '>=', $today->copy()->subMonths(11)->startOfMonth())
             ->get(['created_at', 'grand_total'])
             ->groupBy(fn ($sale) => $sale->created_at->format('Y-m'))
             ->map(fn ($items) => ['total' => (float) $items->sum('grand_total'), 'count' => $items->count()]);
@@ -244,7 +244,7 @@ class ReportService
             DB::raw('SUM(subtotal) as total_sales')
         )
             ->whereHas('sale', function ($q) use ($startOfMonth) {
-                $q->whereDate('created_at', '>=', $startOfMonth)
+                $q->where('created_at', '>=', $startOfMonth)
                     ->where('status', '!=', 'returned');
             })
             ->groupBy('product_id')
@@ -265,7 +265,7 @@ class ReportService
             ->count();
 
         // Penjualan bulan ini
-        $salesThisMonth = Sale::whereDate('created_at', '>=', $startOfMonth)
+        $salesThisMonth = Sale::where('created_at', '>=', $startOfMonth)
             ->where('status', '!=', 'returned')
             ->sum('grand_total');
 

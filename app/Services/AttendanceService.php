@@ -14,13 +14,22 @@ class AttendanceService
         $today = Carbon::today()->toDateString();
         $now = Carbon::now()->toTimeString();
 
-        $attendance = Attendance::firstOrCreate(
-            ['employee_id' => $employee->id, 'tanggal' => $today],
-            ['clock_in' => $now, 'status' => 'hadir']
-        );
+        $attendance = Attendance::where('employee_id', $employee->id)
+            ->whereDate('tanggal', $today)
+            ->first();
 
-        if (! $attendance->wasRecentlyCreated && ! $attendance->clock_in) {
-            $attendance->update(['clock_in' => $now, 'status' => 'hadir']);
+        if (! $attendance) {
+            return Attendance::create([
+                'employee_id' => $employee->id,
+                'tanggal' => $today,
+                'clock_in' => $now,
+                'status' => 'hadir',
+            ]);
+        }
+
+        // Jangan timpa status izin/sakit/cuti yang sudah disetujui
+        if (! $attendance->clock_in) {
+            $attendance->update(['clock_in' => $now]);
         }
 
         return $attendance;
@@ -55,7 +64,9 @@ class AttendanceService
             ->orderBy('tanggal', 'desc');
 
         if ($month && $year) {
-            $query->whereMonth('tanggal', $month)->whereYear('tanggal', $year);
+            $start = Carbon::create($year, $month, 1)->startOfDay();
+            $end = $start->copy()->endOfMonth();
+            $query->whereDate('tanggal', '>=', $start)->whereDate('tanggal', '<=', $end);
         }
 
         return $query->paginate(31);
@@ -68,7 +79,9 @@ class AttendanceService
         if ($date) {
             $query->where('tanggal', $date);
         } elseif ($month && $year) {
-            $query->whereMonth('tanggal', $month)->whereYear('tanggal', $year);
+            $start = Carbon::create($year, $month, 1)->startOfDay();
+            $end = $start->copy()->endOfMonth();
+            $query->whereDate('tanggal', '>=', $start)->whereDate('tanggal', '<=', $end);
         }
 
         return $query->get();
@@ -76,18 +89,35 @@ class AttendanceService
 
     public function getTodaySummary(): array
     {
+        $today = Carbon::today()->toDateString();
         $totalEmployees = Employee::where('is_active', true)->count();
-        $present = Attendance::whereDate('tanggal', Carbon::today())->where('status', 'hadir')->count();
+        $hadir = Attendance::whereDate('tanggal', $today)->where('status', 'hadir')->count();
+        $berizin = LeaveRequest::where('status', 'approved')
+            ->whereDate('tanggal_mulai', '<=', $today)
+            ->whereDate('tanggal_selesai', '>=', $today)
+            ->count();
+        $tidakHadir = max(0, $totalEmployees - $hadir - $berizin);
 
         return [
             'total' => $totalEmployees,
-            'hadir' => $present,
-            'tidak_hadir' => $totalEmployees - $present,
+            'hadir' => $hadir,
+            'berizin' => $berizin,
+            'tidak_hadir' => $tidakHadir,
         ];
     }
 
     public function createLeaveRequest(Employee $employee, array $data): LeaveRequest
     {
+        $overlap = LeaveRequest::where('employee_id', $employee->id)
+            ->whereIn('status', ['pending', 'approved'])
+            ->where('tanggal_mulai', '<=', $data['tanggal_selesai'])
+            ->where('tanggal_selesai', '>=', $data['tanggal_mulai'])
+            ->exists();
+
+        if ($overlap) {
+            throw new \RuntimeException('Anda sudah memiliki pengajuan yang berjalan di rentang tanggal tersebut.');
+        }
+
         return LeaveRequest::create([
             'employee_id' => $employee->id,
             'jenis' => $data['jenis'],
@@ -100,6 +130,10 @@ class AttendanceService
 
     public function approveLeaveRequest(LeaveRequest $leaveRequest, int $approvedBy, ?string $catatan = null): LeaveRequest
     {
+        if ($leaveRequest->status !== 'pending') {
+            throw new \RuntimeException('Hanya pengajuan berstatus pending yang dapat disetujui.');
+        }
+
         $leaveRequest->update([
             'status' => 'approved',
             'approved_by' => $approvedBy,
@@ -111,10 +145,18 @@ class AttendanceService
         $end = Carbon::parse($leaveRequest->tanggal_selesai);
 
         for ($date = $start; $date->lte($end); $date->addDay()) {
-            Attendance::firstOrCreate(
-                ['employee_id' => $leaveRequest->employee_id, 'tanggal' => $date->toDateString()],
-                ['status' => $leaveRequest->jenis, 'keterangan' => $leaveRequest->keterangan]
-            );
+            $exists = Attendance::where('employee_id', $leaveRequest->employee_id)
+                ->whereDate('tanggal', $date->toDateString())
+                ->exists();
+
+            if (! $exists) {
+                Attendance::create([
+                    'employee_id' => $leaveRequest->employee_id,
+                    'tanggal' => $date->toDateString(),
+                    'status' => $leaveRequest->jenis,
+                    'keterangan' => $leaveRequest->keterangan,
+                ]);
+            }
         }
 
         return $leaveRequest;
@@ -122,11 +164,28 @@ class AttendanceService
 
     public function rejectLeaveRequest(LeaveRequest $leaveRequest, int $approvedBy, ?string $catatan = null): LeaveRequest
     {
+        if (! in_array($leaveRequest->status, ['pending', 'approved'], true)) {
+            throw new \RuntimeException('Pengajuan ini tidak dapat ditolak.');
+        }
+
+        $wasApproved = $leaveRequest->status === 'approved';
+
         $leaveRequest->update([
             'status' => 'rejected',
             'approved_by' => $approvedBy,
             'catatan_approval' => $catatan,
         ]);
+
+        // Batalkan catatan absensi yang dibuat saat persetujuan sebelumnya
+        if ($wasApproved) {
+            Attendance::where('employee_id', $leaveRequest->employee_id)
+                ->whereDate('tanggal', '>=', $leaveRequest->tanggal_mulai)
+                ->whereDate('tanggal', '<=', $leaveRequest->tanggal_selesai)
+                ->where('status', $leaveRequest->jenis)
+                ->whereNull('clock_in')
+                ->whereNull('clock_out')
+                ->delete();
+        }
 
         return $leaveRequest;
     }
