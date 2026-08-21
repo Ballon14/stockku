@@ -73,7 +73,7 @@
 
         <!-- Custom Confirm Modal -->
         <div id="stockku-confirm-modal" x-data="confirmDialog()">
-            <div x-show="open" x-cloak x-transition.opacity class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4" @keydown.escape.window="close()">
+            <div x-show="open" x-cloak style="display:none" x-transition.opacity class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4" @keydown.escape.window="close()">
                 <div @click="close()" class="absolute inset-0"></div>
                 <div x-show="open" x-transition.scale.origin.bottom class="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center" role="dialog" aria-modal="true">
                     <div class="mx-auto w-14 h-14 rounded-full flex items-center justify-center mb-4" :class="danger ? 'bg-red-100 dark:bg-red-900/30' : 'bg-indigo-100 dark:bg-indigo-900/30'">
