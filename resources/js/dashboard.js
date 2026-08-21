@@ -174,11 +174,6 @@ function initSalesChart() {
     });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    initSalesChart();
-    renderTopProductsChart();
-});
-
 function renderTopProductsChart() {
     if (!topCanvas) {
         return;
@@ -221,7 +216,13 @@ function renderTopProductsChart() {
     });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+function initDashboard() {
     initSalesChart();
     renderTopProductsChart();
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initDashboard);
+} else {
+    initDashboard();
+}
