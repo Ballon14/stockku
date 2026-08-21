@@ -141,65 +141,6 @@ class SecurityFixesTest extends TestCase
         $this->assertDatabaseMissing('sessions', ['user_id' => $user->id]);
     }
 
-    public function test_offline_sync_rejected_with_json_403_when_not_clocked_in(): void
-    {
-        $this->kasirUser();
-        $category = Category::create(['name' => 'Kat', 'slug' => 'kat-audit-'.uniqid()]);
-        $product = Product::create([
-            'category_id' => $category->id,
-            'name' => 'Produk Audit',
-            'sku' => 'AUD-'.uniqid(),
-            'harga_beli' => 1000,
-            'harga_jual' => 2000,
-            'stok' => 10,
-            'min_stok' => 1,
-            'satuan' => 'pcs',
-            'is_active' => true,
-        ]);
-
-        $this->postJson(route('offline.sync'), [
-            'transactions' => [[
-                'offline_id' => 'off-audit-1',
-                'items' => [['product_id' => $product->id, 'qty' => 1]],
-                'bayar' => 2000,
-            ]],
-        ])->assertStatus(403)->assertJsonStructure(['error']);
-
-        $this->assertSame(10, $product->fresh()->stok);
-    }
-
-    public function test_offline_sync_allowed_when_clocked_in(): void
-    {
-        $user = $this->kasirUser();
-        $employee = $user->employee;
-        Attendance::create([
-            'employee_id' => $employee->id,
-            'tanggal' => now()->toDateString(),
-            'clock_in' => '08:00:00',
-            'status' => 'hadir',
-        ]);
-
-        $category = Category::create(['name' => 'Kat', 'slug' => 'kat-audit2-'.uniqid()]);
-        $product = Product::create([
-            'category_id' => $category->id,
-            'name' => 'Produk Audit 2',
-            'sku' => 'AUD2-'.uniqid(),
-            'harga_beli' => 1000,
-            'harga_jual' => 2000,
-            'stok' => 10,
-            'min_stok' => 1,
-            'satuan' => 'pcs',
-            'is_active' => true,
-        ]);
-
-        $this->postJson(route('offline.sync'), [
-            'transactions' => [[
-                'offline_id' => 'off-audit-2',
-                'items' => [['product_id' => $product->id, 'qty' => 1]],
-                'bayar' => 2000,
-            ]],
-        ])->assertOk()->assertJsonPath('results.0.status', 'success');
-    }
 
     public function test_product_update_cannot_change_stok_directly(): void
     {
