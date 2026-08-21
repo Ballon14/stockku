@@ -306,19 +306,30 @@ export function offlinePos() {
 
 export function connection() {
     return {
-        online: navigator.onLine,
+        online: true,
         checking: false,
 
         async init() {
+            this.online = navigator.onLine;
             this.checkConnection();
 
-            window.addEventListener('online', () => this.checkConnection());
-            window.addEventListener('offline', () => this.checkConnection());
+            window.addEventListener('online', () => {
+                this.online = true;
+                this.checkConnection();
+            });
+            window.addEventListener('offline', () => {
+                this.online = false;
+            });
             setInterval(() => this.checkConnection(), 15000);
         },
 
         async checkConnection() {
             if (this.checking) {
+                return;
+            }
+
+            if (!navigator.onLine) {
+                this.online = false;
                 return;
             }
 
@@ -331,7 +342,10 @@ export function connection() {
                 });
                 this.online = response.ok;
             } catch (error) {
-                this.online = false;
+                // Fetch error (e.g. network timeout) — only go offline if
+                // the browser itself reports no connectivity. A server-side
+                // error (500, CSRF 419, etc.) should NOT hide the POS.
+                this.online = navigator.onLine;
             } finally {
                 this.checking = false;
             }
