@@ -28,7 +28,7 @@
                 <p class="text-sm text-slate-500 leading-relaxed">{{ $flash['message'] }}</p>
             </div>
             <div class="px-6 pb-6">
-                <button type="button" class="w-full py-2.5 rounded-xl font-semibold text-white shadow-lg transition-all hover:brightness-110 active:scale-[0.98] {{ $flash['type'] === 'success' ? 'bg-emerald-600 shadow-emerald-500/30' : ($flash['type'] === 'warning' ? 'bg-amber-500 shadow-amber-500/30' : 'bg-red-500 shadow-red-500/30') }}" onclick="this.closest('.flash-modal').remove(); if (!document.querySelector('.flash-modal')) document.querySelector('.flash-overlay')?.remove()">
+                <button type="button" class="w-full py-2.5 rounded-xl font-semibold text-white shadow-lg transition-all hover:brightness-110 active:scale-[0.98] {{ $flash['type'] === 'success' ? 'bg-emerald-600 shadow-emerald-500/30' : ($flash['type'] === 'warning' ? 'bg-amber-500 shadow-amber-500/30' : 'bg-red-500 shadow-red-500/30') }}" onclick="closeFlashModal(this)">
                     {{ $flash['type'] === 'warning' ? 'Mengerti' : 'OK' }}
                 </button>
             </div>
@@ -45,10 +45,23 @@
     }
 </style>
 <script>
+    // Hapus kartu modal, lalu bersihkan SEMUA overlay yang sudah tidak berisi kartu
+    // agar tidak ada backdrop kosong yang memblokir halaman.
+    function closeFlashModal(button) {
+        button.closest('.flash-modal')?.remove();
+        document.querySelectorAll('.flash-overlay').forEach(function (overlay) {
+            if (!overlay.querySelector('.flash-modal')) {
+                overlay.remove();
+            }
+        });
+    }
+
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') {
             document.querySelectorAll('.flash-modal').forEach(function (m) { m.remove(); });
-            if (!document.querySelector('.flash-modal')) document.querySelector('.flash-overlay')?.remove();
+            document.querySelectorAll('.flash-overlay').forEach(function (overlay) {
+                if (!overlay.querySelector('.flash-modal')) overlay.remove();
+            });
         }
     });
 </script>

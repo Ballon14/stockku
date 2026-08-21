@@ -30,16 +30,11 @@ export default defineConfig({
             },
             workbox: {
                 navigateFallback: null,
+                // Halaman HTML (navigasi) TIDAK boleh di-cache: aplikasi ter-autentikasi,
+                // HTML basi membawa popup flash lama & token CSRF kadaluarsa (419).
+                importScripts: ['/sw-cleanup.js'],
                 globPatterns: ['**/*.{js,css,svg,png,ico,woff2}'],
                 runtimeCaching: [
-                    {
-                        urlPattern: ({ request }) => request.mode === 'navigate',
-                        handler: 'NetworkFirst',
-                        options: {
-                            cacheName: 'stockku-pages',
-                            networkTimeoutSeconds: 5,
-                        },
-                    },
                     {
                         urlPattern: ({ url, sameOrigin }) => sameOrigin && url.pathname.startsWith('/build/'),
                         handler: 'StaleWhileRevalidate',
