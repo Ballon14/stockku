@@ -64,7 +64,7 @@
                         <template x-for="(item, index) in items" :key="'m-' + index">
                             <div class="p-3 space-y-3">
                                 <div class="flex items-start gap-2">
-                                    <select x-model="item.product_id" class="flex-1 min-w-0 rounded-lg border-slate-200 py-1.5 text-sm" required @change="updateHarga(index, $event)">
+                                    <select x-model="items[index].product_id" class="flex-1 min-w-0 rounded-lg border-slate-200 py-1.5 text-sm" required @change="updateHarga(index, $event)">
                                         <option value="">Pilih Produk...</option>
                                         @foreach($products as $prod)
                                         <option value="{{ $prod->id }}" data-harga="{{ $prod->harga_beli }}">{{ $prod->name }}</option>
@@ -77,11 +77,11 @@
                                 <div class="flex items-end gap-2">
                                     <div class="w-20">
                                         <label class="block text-xs text-slate-500 mb-1">Qty</label>
-                                        <input type="number" x-model="item.qty" min="1" class="w-full text-center rounded-lg border-slate-200 py-1.5 text-sm" required @input="calculateSubtotal(index)">
+                                        <input type="number" x-model="items[index].qty" min="1" class="w-full text-center rounded-lg border-slate-200 py-1.5 text-sm" required @input="calculateSubtotal(index)">
                                     </div>
                                     <div class="flex-1 min-w-0">
                                         <label class="block text-xs text-slate-500 mb-1">Harga Beli Satuan</label>
-                                        <input type="number" x-model="item.harga" min="0" class="w-full text-right rounded-lg border-slate-200 py-1.5 text-sm" required @input="calculateSubtotal(index)">
+                                        <input type="number" x-model="items[index].harga" min="0" class="w-full text-right rounded-lg border-slate-200 py-1.5 text-sm" required @input="calculateSubtotal(index)">
                                     </div>
                                     <div class="shrink-0 text-right">
                                         <label class="block text-xs text-slate-500 mb-1">Subtotal</label>
@@ -112,7 +112,7 @@
                             <template x-for="(item, index) in items" :key="index">
                                 <tr class="border-b border-slate-100 last:border-0">
                                     <td class="py-2 px-3">
-                                        <select x-model="item.product_id" class="w-full rounded-lg border-slate-200 py-1.5 text-sm" required @change="updateHarga(index, $event)">
+                                        <select x-model="items[index].product_id" class="w-full rounded-lg border-slate-200 py-1.5 text-sm" required @change="updateHarga(index, $event)">
                                             <option value="">Pilih Produk...</option>
                                             @foreach($products as $prod)
                                             <option value="{{ $prod->id }}" data-harga="{{ $prod->harga_beli }}">{{ $prod->name }}</option>
@@ -120,10 +120,10 @@
                                         </select>
                                     </td>
                                     <td class="py-2 px-3 text-center">
-                                        <input type="number" x-model="item.qty" min="1" class="w-20 text-center rounded-lg border-slate-200 py-1.5 text-sm" required @input="calculateSubtotal(index)">
+                                        <input type="number" x-model="items[index].qty" min="1" class="w-20 text-center rounded-lg border-slate-200 py-1.5 text-sm" required @input="calculateSubtotal(index)">
                                     </td>
                                     <td class="py-2 px-3 text-right">
-                                        <input type="number" x-model="item.harga" min="0" class="w-full text-right rounded-lg border-slate-200 py-1.5 text-sm" required @input="calculateSubtotal(index)">
+                                        <input type="number" x-model="items[index].harga" min="0" class="w-full text-right rounded-lg border-slate-200 py-1.5 text-sm" required @input="calculateSubtotal(index)">
                                     </td>
                                     <td class="py-2 px-3 text-right">
                                         <span class="font-semibold text-slate-700" x-text="'Rp ' + formatRupiah(item.subtotal)"></span>
@@ -152,9 +152,9 @@
             <!-- Hidden inputs for actual form submission -->
             <template x-for="(item, index) in items" :key="'submit-' + index">
                 <div>
-                    <input type="hidden" :name="`items[${index}][product_id]`" :value="item.product_id">
-                    <input type="hidden" :name="`items[${index}][qty]`" :value="item.qty">
-                    <input type="hidden" :name="`items[${index}][harga]`" :value="item.harga">
+                    <input type="hidden" :name="`items[${index}][product_id]`" :value="items[index].product_id">
+                    <input type="hidden" :name="`items[${index}][qty]`" :value="items[index].qty">
+                    <input type="hidden" :name="`items[${index}][harga]`" :value="items[index].harga">
                 </div>
             </template>
 
