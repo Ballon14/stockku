@@ -32,6 +32,16 @@
         </div>
         @endif
 
+        @if($purchase->foto_nota)
+        <div class="mb-6">
+            <h3 class="text-sm font-semibold text-slate-700 mb-2">Foto Nota / Bukti Pembelian</h3>
+            <a href="{{ asset('storage/' . $purchase->foto_nota) }}" target="_blank" class="block w-48 rounded-xl overflow-hidden border border-slate-200 hover:border-indigo-400 transition-colors shadow-sm hover:shadow">
+                <img src="{{ asset('storage/' . $purchase->foto_nota) }}" alt="Foto Nota" class="w-full h-auto object-cover">
+            </a>
+            <p class="text-xs text-slate-400 mt-1">Klik gambar untuk melihat ukuran penuh</p>
+        </div>
+        @endif
+
         <h3 class="text-lg font-semibold text-slate-800 mb-3">Item Produk</h3>
         <div class="border rounded-xl border-slate-200 overflow-hidden mb-6">
             <div class="overflow-x-auto">

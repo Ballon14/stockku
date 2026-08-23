@@ -16,6 +16,7 @@ class Purchase extends Model
         'total',
         'status',
         'keterangan',
+        'foto_nota',
     ];
 
     protected $casts = [

@@ -6,7 +6,7 @@
 
 <div class="max-w-4xl" x-data="purchaseForm()">
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-        <form method="POST" action="{{ route('purchases.store') }}">
+        <form method="POST" action="{{ route('purchases.store') }}" enctype="multipart/form-data">
             @csrf
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -25,9 +25,28 @@
                     <input type="date" name="tanggal" value="{{ old('tanggal', date('Y-m-d')) }}" class="w-full rounded-xl border-slate-200 text-sm focus:border-indigo-500 focus:ring-indigo-200" required>
                     @error('tanggal') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                 </div>
-                <div class="md:col-span-2">
+                <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">Keterangan / No. Referensi Surat Jalan</label>
                     <textarea name="keterangan" rows="2" class="w-full rounded-xl border-slate-200 text-sm focus:border-indigo-500 focus:ring-indigo-200">{{ old('keterangan') }}</textarea>
+                </div>
+                <div x-data="{ preview: null }">
+                    <label class="block text-sm font-medium text-slate-700 mb-1">
+                        Foto Nota / Bukti Pembelian
+                        <span class="text-xs text-slate-400 font-normal">(maks 2MB)</span>
+                    </label>
+                    <div class="relative">
+                        <input type="file" name="foto_nota" accept="image/jpeg,image/png,image/webp"
+                            class="w-full rounded-xl border-slate-200 text-sm focus:border-indigo-500 focus:ring-indigo-200 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-600 hover:file:bg-indigo-100"
+                            @change="if ($event.target.files[0]) { const r = new FileReader(); r.onload = e => preview = e.target.result; r.readAsDataURL($event.target.files[0]); } else { preview = null; }">
+                    </div>
+                    <template x-if="preview">
+                        <div class="mt-2 relative inline-block">
+                            <img :src="preview" alt="Preview Nota" class="h-24 rounded-lg border border-slate-200 shadow-sm object-cover">
+                            <button type="button" @click="preview = null; $el.closest('[x-data]').querySelector('input[type=file]').value = ''"
+                                class="absolute -top-1.5 -right-1.5 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600 shadow">×</button>
+                        </div>
+                    </template>
+                    @error('foto_nota') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                 </div>
             </div>
 

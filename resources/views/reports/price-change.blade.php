@@ -1,8 +1,8 @@
 <x-app-layout>
-@section('title', 'Rekap Perubahan Harga')
+@section('title', 'Rekap Perubahan Harga Beli')
 <x-slot name="header">
     <div class="flex flex-wrap items-center justify-between gap-3">
-        <h2 class="text-xl sm:text-2xl font-bold text-slate-800">Rekap Perubahan Harga</h2>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-800">Rekap Perubahan Harga Beli</h2>
         <form method="GET" action="{{ route('reports.price-change') }}" target="_blank">
             <input type="hidden" name="start_date" value="{{ $startDate }}">
             <input type="hidden" name="end_date" value="{{ $endDate }}">
@@ -66,34 +66,34 @@
     </div>
 </div>
 
-<!-- Current vs Last Sold Price (Alert) -->
-@if($data['current_vs_last_sold']->isNotEmpty())
+<!-- Current vs Last Bought Price (Alert) -->
+@if($data['current_vs_last_bought']->isNotEmpty())
 <div class="bg-amber-50 border border-amber-200 rounded-2xl p-5 mb-6">
     <div class="flex items-center gap-2 mb-3">
         <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.072 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
-        <h3 class="font-semibold text-amber-800">Harga Jual Saat Ini Berbeda dengan Terakhir Dijual</h3>
+        <h3 class="font-semibold text-amber-800">Harga Beli Saat Ini Berbeda dengan Terakhir Dibeli</h3>
     </div>
-    <p class="text-xs text-amber-700 mb-3">Produk-produk berikut memiliki harga jual di master data yang berbeda dari harga saat terakhir kali dijual.</p>
+    <p class="text-xs text-amber-700 mb-3">Produk-produk berikut memiliki harga beli di master data yang berbeda dari harga saat terakhir kali direstock/dibeli.</p>
     <div class="overflow-x-auto">
         <table class="w-full text-sm">
             <thead>
                 <tr class="border-b border-amber-200">
                     <th class="text-left py-2 px-3 font-semibold text-amber-800 text-xs">Produk</th>
-                    <th class="text-right py-2 px-3 font-semibold text-amber-800 text-xs">Harga Terakhir Dijual</th>
-                    <th class="text-right py-2 px-3 font-semibold text-amber-800 text-xs">Harga Jual Sekarang</th>
+                    <th class="text-right py-2 px-3 font-semibold text-amber-800 text-xs">Harga Terakhir Dibeli</th>
+                    <th class="text-right py-2 px-3 font-semibold text-amber-800 text-xs">Harga Beli Sekarang</th>
                     <th class="text-right py-2 px-3 font-semibold text-amber-800 text-xs">Selisih</th>
                     <th class="text-center py-2 px-3 font-semibold text-amber-800 text-xs">Status</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($data['current_vs_last_sold'] as $item)
+                @foreach($data['current_vs_last_bought'] as $item)
                 <tr class="border-b border-amber-100/60">
                     <td class="py-2 px-3">
                         <span class="font-medium text-slate-700">{{ $item->product_name }}</span>
                         <span class="text-xs text-slate-400 font-mono ml-1">{{ $item->product_sku }}</span>
                     </td>
-                    <td class="py-2 px-3 text-right text-slate-600">Rp {{ number_format($item->harga_terakhir_dijual, 0, ',', '.') }}</td>
-                    <td class="py-2 px-3 text-right font-semibold text-slate-800">Rp {{ number_format($item->harga_jual_sekarang, 0, ',', '.') }}</td>
+                    <td class="py-2 px-3 text-right text-slate-600">Rp {{ number_format($item->harga_terakhir_dibeli, 0, ',', '.') }}</td>
+                    <td class="py-2 px-3 text-right font-semibold text-slate-800">Rp {{ number_format($item->harga_beli_sekarang, 0, ',', '.') }}</td>
                     <td class="py-2 px-3 text-right font-bold {{ $item->tipe === 'naik' ? 'text-emerald-600' : 'text-red-600' }}">
                         {{ $item->tipe === 'naik' ? '+' : '' }}Rp {{ number_format($item->selisih, 0, ',', '.') }}
                         <span class="text-xs font-normal">({{ $item->tipe === 'naik' ? '+' : '' }}{{ $item->persen }}%)</span>
@@ -120,8 +120,8 @@
 <!-- Riwayat Perubahan Harga -->
 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
     <div class="p-4 border-b border-slate-100 bg-slate-50">
-        <h3 class="font-semibold text-slate-700">Riwayat Perubahan Harga di Transaksi</h3>
-        <p class="text-xs text-slate-500 mt-0.5">Terdeteksi saat harga jual produk berubah antara dua transaksi berbeda</p>
+        <h3 class="font-semibold text-slate-700">Riwayat Perubahan Harga Beli (Restock)</h3>
+        <p class="text-xs text-slate-500 mt-0.5">Terdeteksi saat harga beli produk berubah antara dua transaksi pembelian berbeda</p>
     </div>
 
     <!-- Mobile: card list -->
@@ -149,8 +149,8 @@
                 <span class="font-bold {{ $change->tipe === 'naik' ? 'text-emerald-600' : 'text-red-600' }}">Rp {{ number_format($change->harga_baru, 0, ',', '.') }}</span>
             </div>
             <div class="flex items-center justify-between text-xs text-slate-400">
-                <span>{{ $change->tanggal->format('d/m/Y H:i') }}</span>
-                <span>{{ $change->kasir }}</span>
+                <span>{{ $change->tanggal->format('d/m/Y') }}</span>
+                <span>{{ $change->pencatat }}</span>
             </div>
         </div>
         @empty
@@ -170,14 +170,14 @@
                     <th class="text-right py-3 px-4 font-semibold text-slate-600">Harga Baru</th>
                     <th class="text-right py-3 px-4 font-semibold text-slate-600">Selisih</th>
                     <th class="text-center py-3 px-4 font-semibold text-slate-600">Status</th>
-                    <th class="text-left py-3 px-4 font-semibold text-slate-600">Invoice</th>
-                    <th class="text-left py-3 px-4 font-semibold text-slate-600">Kasir</th>
+                    <th class="text-left py-3 px-4 font-semibold text-slate-600">Invoice Pembelian</th>
+                    <th class="text-left py-3 px-4 font-semibold text-slate-600">Pencatat</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($data['changes'] as $change)
                 <tr class="border-b border-slate-50 hover:bg-slate-50/50">
-                    <td class="py-3 px-4 text-slate-600 whitespace-nowrap">{{ $change->tanggal->format('d/m/Y H:i') }}</td>
+                    <td class="py-3 px-4 text-slate-600 whitespace-nowrap">{{ $change->tanggal->format('d/m/Y') }}</td>
                     <td class="py-3 px-4">
                         <span class="font-medium text-slate-700 block">{{ $change->product_name }}</span>
                         <span class="text-xs text-slate-400 font-mono">{{ $change->product_sku }}</span>
@@ -201,7 +201,7 @@
                         </span>
                     </td>
                     <td class="py-3 px-4 text-xs text-slate-500 whitespace-nowrap">{{ $change->invoice_perubahan }}</td>
-                    <td class="py-3 px-4 text-slate-600 text-xs">{{ $change->kasir }}</td>
+                    <td class="py-3 px-4 text-slate-600 text-xs">{{ $change->pencatat }}</td>
                 </tr>
                 @empty
                 <tr>

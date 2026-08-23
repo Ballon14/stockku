@@ -13,14 +13,20 @@ class PurchaseService
         protected StockService $stockService
     ) {}
 
-    public function createPurchase(int $supplierId, string $tanggal, array $items, ?string $keterangan = null): Purchase
+    public function createPurchase(int $supplierId, string $tanggal, array $items, ?string $keterangan = null, $fotoNota = null): Purchase
     {
-        return DB::transaction(function () use ($supplierId, $tanggal, $items, $keterangan) {
+        return DB::transaction(function () use ($supplierId, $tanggal, $items, $keterangan, $fotoNota) {
             $total = 0;
 
             foreach ($items as &$item) {
                 $item['subtotal'] = $item['harga'] * $item['qty'];
                 $total += $item['subtotal'];
+            }
+
+            // Store foto nota if uploaded
+            $fotoNotaPath = null;
+            if ($fotoNota) {
+                $fotoNotaPath = $fotoNota->store('purchases/nota', 'public');
             }
 
             $purchase = Purchase::create([
@@ -31,6 +37,7 @@ class PurchaseService
                 'total' => $total,
                 'status' => 'received',
                 'keterangan' => $keterangan,
+                'foto_nota' => $fotoNotaPath,
             ]);
 
             foreach ($items as $item) {

@@ -330,25 +330,26 @@ class ReportService
      */
     public function getPriceChangeReport($startDate, $endDate, $productId = null, $paginate = true)
     {
-        // Get all sale items within the date range, ordered by product and date
-        $query = SaleItem::select('sale_items.*')
-            ->join('sales', 'sales.id', '=', 'sale_items.sale_id')
-            ->where('sales.status', '!=', 'returned')
-            ->where('sales.created_at', '>=', $startDate)
-            ->where('sales.created_at', '<', Carbon::parse($endDate)->addDay())
-            ->with(['product.category', 'sale:id,invoice_number,created_at,user_id', 'sale.user:id,name'])
-            ->orderBy('sale_items.product_id')
-            ->orderBy('sales.created_at');
+        // Get all purchase items within the date range, ordered by product and date
+        $query = \App\Models\PurchaseItem::select('purchase_items.*')
+            ->join('purchases', 'purchases.id', '=', 'purchase_items.purchase_id')
+            ->where('purchases.status', '!=', 'cancelled')
+            ->where('purchases.tanggal', '>=', $startDate)
+            ->where('purchases.tanggal', '<=', $endDate)
+            ->with(['product.category', 'purchase:id,invoice_number,tanggal,user_id', 'purchase.user:id,name'])
+            ->orderBy('purchase_items.product_id')
+            ->orderBy('purchases.tanggal')
+            ->orderBy('purchases.created_at');
 
         if ($productId) {
-            $query->where('sale_items.product_id', $productId);
+            $query->where('purchase_items.product_id', $productId);
         }
 
-        $saleItems = $query->get();
+        $purchaseItems = $query->get();
 
         // Group by product and detect price changes
         $changes = collect();
-        $grouped = $saleItems->groupBy('product_id');
+        $grouped = $purchaseItems->groupBy('product_id');
 
         foreach ($grouped as $prodId => $items) {
             $prevPrice = null;
@@ -372,16 +373,16 @@ class ReportService
                         'selisih' => $diff,
                         'persen' => round($pctChange, 1),
                         'tipe' => $diff > 0 ? 'naik' : 'turun',
-                        'tanggal' => $item->sale->created_at,
+                        'tanggal' => Carbon::parse($item->purchase->tanggal),
                         'invoice_sebelumnya' => $prevInvoice,
-                        'invoice_perubahan' => $item->sale->invoice_number,
-                        'kasir' => $item->sale->user->name ?? '-',
+                        'invoice_perubahan' => $item->purchase->invoice_number,
+                        'pencatat' => $item->purchase->user->name ?? '-',
                     ]);
                 }
 
                 $prevPrice = $currentPrice;
-                $prevDate = $item->sale->created_at;
-                $prevInvoice = $item->sale->invoice_number;
+                $prevDate = $item->purchase->tanggal;
+                $prevInvoice = $item->purchase->invoice_number;
             }
         }
 
@@ -393,30 +394,31 @@ class ReportService
         }
         $products = $productsQuery->get();
 
-        $currentVsLastSold = collect();
+        $currentVsLastBought = collect();
         foreach ($products as $product) {
-            $lastSaleItem = SaleItem::select('sale_items.*')
-                ->join('sales', 'sales.id', '=', 'sale_items.sale_id')
-                ->where('sales.status', '!=', 'returned')
-                ->where('sale_items.product_id', $product->id)
-                ->orderByDesc('sales.created_at')
+            $lastPurchaseItem = \App\Models\PurchaseItem::select('purchase_items.*')
+                ->join('purchases', 'purchases.id', '=', 'purchase_items.purchase_id')
+                ->where('purchases.status', '!=', 'cancelled')
+                ->where('purchase_items.product_id', $product->id)
+                ->orderByDesc('purchases.tanggal')
+                ->orderByDesc('purchases.created_at')
                 ->first();
 
-            if ($lastSaleItem) {
-                $lastSoldPrice = (float) $lastSaleItem->harga;
-                $currentPrice = (float) $product->harga_jual;
+            if ($lastPurchaseItem) {
+                $lastBoughtPrice = (float) $lastPurchaseItem->harga;
+                $currentPrice = (float) $product->harga_beli;
 
-                if ($currentPrice !== $lastSoldPrice) {
-                    $diff = $currentPrice - $lastSoldPrice;
-                    $pctChange = $lastSoldPrice > 0 ? ($diff / $lastSoldPrice) * 100 : 0;
+                if ($currentPrice !== $lastBoughtPrice) {
+                    $diff = $currentPrice - $lastBoughtPrice;
+                    $pctChange = $lastBoughtPrice > 0 ? ($diff / $lastBoughtPrice) * 100 : 0;
 
-                    $currentVsLastSold->push((object) [
+                    $currentVsLastBought->push((object) [
                         'product_id' => $product->id,
                         'product_name' => $product->name,
                         'product_sku' => $product->sku,
                         'category_name' => $product->category->name ?? '-',
-                        'harga_terakhir_dijual' => $lastSoldPrice,
-                        'harga_jual_sekarang' => $currentPrice,
+                        'harga_terakhir_dibeli' => $lastBoughtPrice,
+                        'harga_beli_sekarang' => $currentPrice,
                         'selisih' => $diff,
                         'persen' => round($pctChange, 1),
                         'tipe' => $diff > 0 ? 'naik' : 'turun',
@@ -445,7 +447,7 @@ class ReportService
             return [
                 'summary' => $summary,
                 'changes' => $changes,
-                'current_vs_last_sold' => $currentVsLastSold,
+                'current_vs_last_bought' => $currentVsLastBought,
             ];
         }
 
@@ -463,7 +465,7 @@ class ReportService
         return [
             'summary' => $summary,
             'changes' => $paginated,
-            'current_vs_last_sold' => $currentVsLastSold,
+            'current_vs_last_bought' => $currentVsLastBought,
         ];
     }
 }

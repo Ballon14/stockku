@@ -17,6 +17,7 @@ class PurchaseRequest extends FormRequest
             'supplier_id' => 'required|exists:suppliers,id',
             'tanggal' => 'required|date',
             'keterangan' => 'nullable|string|max:1000',
+            'foto_nota' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:products,id',
             'items.*.qty' => 'required|integer|min:1',

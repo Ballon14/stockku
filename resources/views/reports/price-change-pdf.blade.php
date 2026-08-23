@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="utf-8">
-    <title>Rekap Perubahan Harga</title>
+    <title>Rekap Perubahan Harga Beli</title>
     <style>
         body { font-family: sans-serif; font-size: 12px; }
         .header { text-align: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #333; }
@@ -28,7 +28,7 @@
 </head>
 <body>
     <div class="header">
-        <div class="title">REKAP PERUBAHAN HARGA</div>
+        <div class="title">REKAP PERUBAHAN HARGA BELI (RESTOCK)</div>
         <div class="subtitle">StockKu - Toko Serba Ada</div>
         <div class="subtitle">Periode: {{ \Carbon\Carbon::parse($startDate)->format('d/m/Y') }} s/d {{ \Carbon\Carbon::parse($endDate)->format('d/m/Y') }}</div>
     </div>
@@ -44,28 +44,28 @@
         </table>
     </div>
 
-    @if($data['current_vs_last_sold']->isNotEmpty())
+    @if($data['current_vs_last_bought']->isNotEmpty())
     <div class="alert-box">
-        <div class="alert-title">⚠ Harga Jual Saat Ini Berbeda dengan Terakhir Dijual</div>
-        <div class="alert-text">Produk berikut memiliki harga jual di master data yang berbeda dari harga saat terakhir kali dijual.</div>
+        <div class="alert-title">⚠ Harga Beli Saat Ini Berbeda dengan Terakhir Dibeli</div>
+        <div class="alert-text">Produk berikut memiliki harga beli di master data yang berbeda dari harga saat terakhir kali direstock/dibeli.</div>
         <table>
             <thead>
                 <tr>
                     <th>Produk</th>
                     <th>Kode/SKU</th>
-                    <th class="text-right">Harga Terakhir Dijual</th>
-                    <th class="text-right">Harga Jual Sekarang</th>
+                    <th class="text-right">Harga Terakhir Dibeli</th>
+                    <th class="text-right">Harga Beli Sekarang</th>
                     <th class="text-right">Selisih</th>
                     <th class="text-center">Status</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($data['current_vs_last_sold'] as $item)
+                @foreach($data['current_vs_last_bought'] as $item)
                 <tr>
                     <td>{{ $item->product_name }}</td>
                     <td>{{ $item->product_sku }}</td>
-                    <td class="text-right">Rp {{ number_format($item->harga_terakhir_dijual, 0, ',', '.') }}</td>
-                    <td class="text-right" style="font-weight: bold;">Rp {{ number_format($item->harga_jual_sekarang, 0, ',', '.') }}</td>
+                    <td class="text-right">Rp {{ number_format($item->harga_terakhir_dibeli, 0, ',', '.') }}</td>
+                    <td class="text-right" style="font-weight: bold;">Rp {{ number_format($item->harga_beli_sekarang, 0, ',', '.') }}</td>
                     <td class="text-right {{ $item->tipe === 'naik' ? 'text-naik' : 'text-turun' }}">
                         {{ $item->tipe === 'naik' ? '+' : '' }}Rp {{ number_format($item->selisih, 0, ',', '.') }} ({{ $item->tipe === 'naik' ? '+' : '' }}{{ $item->persen }}%)
                     </td>
@@ -81,7 +81,7 @@
     </div>
     @endif
 
-    <h3>Riwayat Perubahan Harga di Transaksi</h3>
+    <h3>Riwayat Perubahan Harga Beli (Restock)</h3>
     <table>
         <thead>
             <tr>
@@ -94,14 +94,14 @@
                 <th class="text-right">Selisih</th>
                 <th class="text-center">Status</th>
                 <th>Invoice</th>
-                <th>Kasir</th>
+                <th>Pencatat</th>
             </tr>
         </thead>
         <tbody>
             @forelse($data['changes'] as $i => $change)
             <tr>
                 <td class="text-center">{{ $i + 1 }}</td>
-                <td style="white-space: nowrap;">{{ $change->tanggal->format('d/m/Y H:i') }}</td>
+                <td style="white-space: nowrap;">{{ $change->tanggal->format('d/m/Y') }}</td>
                 <td>
                     {{ $change->product_name }}
                     <br><span style="font-size: 10px; color: #999;">{{ $change->product_sku }}</span>
@@ -119,7 +119,7 @@
                     </span>
                 </td>
                 <td style="font-size: 10px; white-space: nowrap;">{{ $change->invoice_perubahan }}</td>
-                <td>{{ $change->kasir }}</td>
+                <td>{{ $change->pencatat }}</td>
             </tr>
             @empty
             <tr>

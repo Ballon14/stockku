@@ -41,7 +41,8 @@ class PurchaseController extends Controller
             $request->input('supplier_id'),
             $request->input('tanggal'),
             $request->input('items'),
-            $request->input('keterangan')
+            $request->input('keterangan'),
+            $request->file('foto_nota')
         );
 
         app(ActivityLogger::class)->log('purchase.create', 'Pembelian '.$purchase->invoice_number.' dicatat (Total: Rp '.number_format($purchase->total, 0, ',', '.').').');
