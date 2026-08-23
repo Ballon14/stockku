@@ -96,4 +96,25 @@ class ReportController extends Controller
 
         return view('reports.attendance', compact('data', 'startDate', 'endDate', 'employeeId', 'employees'));
     }
+
+    public function priceChange(Request $request)
+    {
+        $startDate = $request->input('start_date', now()->startOfMonth()->toDateString());
+        $endDate = $request->input('end_date', now()->toDateString());
+        $productId = $request->input('product_id');
+
+        $data = $this->reportService->getPriceChangeReport($startDate, $endDate, $productId);
+        $products = Product::where('is_active', true)->orderBy('name')->get();
+
+        if ($request->input('export') === 'pdf') {
+            $data = $this->reportService->getPriceChangeReport($startDate, $endDate, $productId, false);
+            $pdf = Pdf::loadView('reports.price-change-pdf', compact('data', 'startDate', 'endDate'));
+
+            $filename = 'rekap-perubahan-harga_' . $startDate . '_sd_' . $endDate . '.pdf';
+
+            return $pdf->download($filename);
+        }
+
+        return view('reports.price-change', compact('data', 'startDate', 'endDate', 'productId', 'products'));
+    }
 }

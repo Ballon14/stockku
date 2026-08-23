@@ -323,4 +323,147 @@ class ReportService
             'average' => $count > 0 ? $total / $count : 0,
         ];
     }
+
+    /**
+     * Rekap perubahan harga jual produk.
+     * Membandingkan harga di sale_items antar transaksi untuk mendeteksi kenaikan/penurunan.
+     */
+    public function getPriceChangeReport($startDate, $endDate, $productId = null, $paginate = true)
+    {
+        // Get all sale items within the date range, ordered by product and date
+        $query = SaleItem::select('sale_items.*')
+            ->join('sales', 'sales.id', '=', 'sale_items.sale_id')
+            ->where('sales.status', '!=', 'returned')
+            ->where('sales.created_at', '>=', $startDate)
+            ->where('sales.created_at', '<', Carbon::parse($endDate)->addDay())
+            ->with(['product.category', 'sale:id,invoice_number,created_at,user_id', 'sale.user:id,name'])
+            ->orderBy('sale_items.product_id')
+            ->orderBy('sales.created_at');
+
+        if ($productId) {
+            $query->where('sale_items.product_id', $productId);
+        }
+
+        $saleItems = $query->get();
+
+        // Group by product and detect price changes
+        $changes = collect();
+        $grouped = $saleItems->groupBy('product_id');
+
+        foreach ($grouped as $prodId => $items) {
+            $prevPrice = null;
+            $prevDate = null;
+            $prevInvoice = null;
+
+            foreach ($items as $item) {
+                $currentPrice = (float) $item->harga;
+
+                if ($prevPrice !== null && $currentPrice !== $prevPrice) {
+                    $diff = $currentPrice - $prevPrice;
+                    $pctChange = $prevPrice > 0 ? ($diff / $prevPrice) * 100 : 0;
+
+                    $changes->push((object) [
+                        'product_id' => $prodId,
+                        'product_name' => $item->product->name ?? '-',
+                        'product_sku' => $item->product->sku ?? '-',
+                        'category_name' => $item->product->category->name ?? '-',
+                        'harga_lama' => $prevPrice,
+                        'harga_baru' => $currentPrice,
+                        'selisih' => $diff,
+                        'persen' => round($pctChange, 1),
+                        'tipe' => $diff > 0 ? 'naik' : 'turun',
+                        'tanggal' => $item->sale->created_at,
+                        'invoice_sebelumnya' => $prevInvoice,
+                        'invoice_perubahan' => $item->sale->invoice_number,
+                        'kasir' => $item->sale->user->name ?? '-',
+                    ]);
+                }
+
+                $prevPrice = $currentPrice;
+                $prevDate = $item->sale->created_at;
+                $prevInvoice = $item->sale->invoice_number;
+            }
+        }
+
+        // Also detect "current price vs last sold price" for products that have changed
+        // since their last sale (current harga_jual differs from last sale price)
+        $productsQuery = Product::where('is_active', true)->with('category');
+        if ($productId) {
+            $productsQuery->where('id', $productId);
+        }
+        $products = $productsQuery->get();
+
+        $currentVsLastSold = collect();
+        foreach ($products as $product) {
+            $lastSaleItem = SaleItem::select('sale_items.*')
+                ->join('sales', 'sales.id', '=', 'sale_items.sale_id')
+                ->where('sales.status', '!=', 'returned')
+                ->where('sale_items.product_id', $product->id)
+                ->orderByDesc('sales.created_at')
+                ->first();
+
+            if ($lastSaleItem) {
+                $lastSoldPrice = (float) $lastSaleItem->harga;
+                $currentPrice = (float) $product->harga_jual;
+
+                if ($currentPrice !== $lastSoldPrice) {
+                    $diff = $currentPrice - $lastSoldPrice;
+                    $pctChange = $lastSoldPrice > 0 ? ($diff / $lastSoldPrice) * 100 : 0;
+
+                    $currentVsLastSold->push((object) [
+                        'product_id' => $product->id,
+                        'product_name' => $product->name,
+                        'product_sku' => $product->sku,
+                        'category_name' => $product->category->name ?? '-',
+                        'harga_terakhir_dijual' => $lastSoldPrice,
+                        'harga_jual_sekarang' => $currentPrice,
+                        'selisih' => $diff,
+                        'persen' => round($pctChange, 1),
+                        'tipe' => $diff > 0 ? 'naik' : 'turun',
+                    ]);
+                }
+            }
+        }
+
+        // Sort changes by date descending (newest first)
+        $changes = $changes->sortByDesc('tanggal')->values();
+
+        // Summary
+        $totalNaik = $changes->where('tipe', 'naik')->count();
+        $totalTurun = $changes->where('tipe', 'turun')->count();
+        $totalChanges = $changes->count();
+        $productsAffected = $changes->pluck('product_id')->unique()->count();
+
+        $summary = [
+            'total_changes' => $totalChanges,
+            'total_naik' => $totalNaik,
+            'total_turun' => $totalTurun,
+            'products_affected' => $productsAffected,
+        ];
+
+        if (! $paginate) {
+            return [
+                'summary' => $summary,
+                'changes' => $changes,
+                'current_vs_last_sold' => $currentVsLastSold,
+            ];
+        }
+
+        $perPage = 20;
+        $page = (int) request('page', 1);
+
+        $paginated = new LengthAwarePaginator(
+            $changes->forPage($page, $perPage)->values(),
+            $changes->count(),
+            $perPage,
+            $page,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
+
+        return [
+            'summary' => $summary,
+            'changes' => $paginated,
+            'current_vs_last_sold' => $currentVsLastSold,
+        ];
+    }
 }

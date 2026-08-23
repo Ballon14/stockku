@@ -97,6 +97,7 @@ Route::middleware(['auth', 'ensure-attended'])->group(function () {
         Route::get('/profit-loss', [ReportController::class, 'profitLoss'])->name('reports.profit-loss');
         Route::get('/stock', [ReportController::class, 'stock'])->name('reports.stock');
         Route::get('/attendance', [ReportController::class, 'attendance'])->name('reports.attendance');
+        Route::get('/price-change', [ReportController::class, 'priceChange'])->name('reports.price-change');
     });
 });
 
