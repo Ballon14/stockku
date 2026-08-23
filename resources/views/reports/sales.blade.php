@@ -62,7 +62,7 @@
     </div>
     <div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-6">
         <p class="text-sm font-medium text-indigo-700 mb-1">Item Terjual</p>
-        <p class="text-3xl font-bold text-indigo-900">{{ collect($data['items'])->sum('qty') }}</p>
+        <p class="text-3xl font-bold text-indigo-900">{{ $data['summary']['total_items_sold'] }}</p>
     </div>
 </div>
 

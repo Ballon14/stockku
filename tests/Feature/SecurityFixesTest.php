@@ -189,7 +189,7 @@ class SecurityFixesTest extends TestCase
             'satuan' => 'pcs',
             'is_active' => true,
         ]);
-
+        
         $this->put(route('products.update', $product), [
             'category_id' => $category->id,
             'name' => 'Produk Stok 2',

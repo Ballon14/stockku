@@ -23,6 +23,9 @@
         <div class="title">LAPORAN PENJUALAN</div>
         <div class="subtitle">StockKu - Toko Serba Ada</div>
         <div class="subtitle">Periode: {{ \Carbon\Carbon::parse($startDate)->format('d/m/Y') }} s/d {{ \Carbon\Carbon::parse($endDate)->format('d/m/Y') }}</div>
+        @if(!empty($cashierName))
+        <div class="subtitle">Kasir: {{ $cashierName }}</div>
+        @endif
     </div>
 
     <div class="summary-box">
@@ -30,7 +33,7 @@
             <tr>
                 <td><strong>Total Transaksi Selesai:</strong><br>{{ $data['summary']['total_transactions'] }}</td>
                 <td><strong>Total Pendapatan:</strong><br>Rp {{ number_format($data['summary']['total_revenue'], 0, ',', '.') }}</td>
-                <td><strong>Total Item Terjual:</strong><br>{{ collect($data['items'])->sum('qty') }}</td>
+                <td><strong>Total Item Terjual:</strong><br>{{ $data['summary']['total_items_sold'] }}</td>
             </tr>
         </table>
     </div>
@@ -62,7 +65,7 @@
         <tfoot>
             <tr>
                 <th colspan="4" class="text-right">TOTAL KESELURUHAN</th>
-                <th class="text-center">{{ collect($data['items'])->sum('qty') }}</th>
+                <th class="text-center">{{ $data['summary']['total_items_sold'] }}</th>
                 <th class="text-right">Rp {{ number_format($data['summary']['total_revenue'], 0, ',', '.') }}</th>
             </tr>
         </tfoot>

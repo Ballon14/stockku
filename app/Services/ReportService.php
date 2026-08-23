@@ -54,6 +54,7 @@ class ReportService
         }
 
         $totalRevenue = $items->sum('subtotal');
+        $totalItemsSold = $items->sum('qty');
         $totalTransactions = $sales->filter(function ($sale) use ($productId) {
             if (! $productId) {
                 return true;
@@ -69,6 +70,7 @@ class ReportService
                 'summary' => [
                     'total_transactions' => $totalTransactions,
                     'total_revenue' => $totalRevenue,
+                    'total_items_sold' => $totalItemsSold,
                 ],
                 'items' => $items,
             ];
@@ -89,6 +91,7 @@ class ReportService
             'summary' => [
                 'total_transactions' => $totalTransactions,
                 'total_revenue' => $totalRevenue,
+                'total_items_sold' => $totalItemsSold,
             ],
             'items' => $paginated,
         ];

@@ -28,9 +28,24 @@ class ReportController extends Controller
 
         if ($request->input('export') === 'pdf') {
             $data = $this->reportService->getSalesReport($startDate, $endDate, $userId, $productId, false);
-            $pdf = Pdf::loadView('reports.sales-pdf', compact('data', 'startDate', 'endDate'));
 
-            return $pdf->download('laporan-penjualan.pdf');
+            // Determine cashier name for filename & display
+            $cashierName = null;
+            if ($userId) {
+                $cashier = $cashiers->firstWhere('id', $userId);
+                $cashierName = $cashier ? $cashier->name : null;
+            }
+
+            $pdf = Pdf::loadView('reports.sales-pdf', compact('data', 'startDate', 'endDate', 'cashierName'));
+
+            // Build descriptive filename: laporan-penjualan_YYYY-MM-DD_sd_YYYY-MM-DD[_NamaKasir].pdf
+            $filename = 'laporan-penjualan_' . $startDate . '_sd_' . $endDate;
+            if ($cashierName) {
+                $filename .= '_' . \Illuminate\Support\Str::slug($cashierName);
+            }
+            $filename .= '.pdf';
+
+            return $pdf->download($filename);
         }
 
         return view('reports.sales', compact('data', 'startDate', 'endDate', 'userId', 'productId', 'cashiers', 'products'));
