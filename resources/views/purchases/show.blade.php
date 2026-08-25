@@ -55,7 +55,18 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($purchase->items as $item)
+                    @php
+                        $groupedItems = $purchase->items->groupBy('product_id')->map(function ($items) {
+                            $first = $items->first();
+                            return (object)[
+                                'product' => $first->product,
+                                'qty' => $items->sum('qty'),
+                                'harga' => $first->harga,
+                                'subtotal' => $items->sum('subtotal'),
+                            ];
+                        });
+                    @endphp
+                    @foreach($groupedItems as $item)
                     <tr class="border-b border-slate-100 last:border-0">
                         <td class="py-3 px-4">
                             <span class="font-medium text-slate-700 block">{{ $item->product->name }}</span>
