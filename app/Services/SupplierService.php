@@ -35,6 +35,10 @@ class SupplierService
 
     public function delete(Supplier $supplier): bool
     {
+        if ($supplier->purchases()->exists()) {
+            throw new \RuntimeException('Supplier tidak dapat dihapus karena memiliki riwayat pembelian.');
+        }
+
         return $supplier->delete();
     }
 

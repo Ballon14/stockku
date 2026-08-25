@@ -103,12 +103,11 @@ class ReportController extends Controller
         $endDate = $request->input('end_date', now()->toDateString());
         $productId = $request->input('product_id');
 
-        $data = $this->reportService->getPriceChangeReport($startDate, $endDate, $productId);
         $products = Product::where('is_active', true)->orderBy('name')->get();
 
-        if ($request->export === 'pdf') {
+        if ($request->input('export') === 'pdf') {
             $data = $this->reportService->getPriceChangeReport($startDate, $endDate, $productId, false);
-            
+
             $pdf = Pdf::loadView('reports.price-change-pdf', [
                 'data' => $data,
                 'startDate' => $startDate,

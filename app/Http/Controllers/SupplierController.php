@@ -49,7 +49,11 @@ class SupplierController extends Controller
 
     public function destroy(Supplier $supplier)
     {
-        $this->supplierService->delete($supplier);
+        try {
+            $this->supplierService->delete($supplier);
+        } catch (\RuntimeException $e) {
+            return redirect()->route('suppliers.index')->with('error', $e->getMessage());
+        }
         app(ActivityLogger::class)->log('supplier.delete', 'Supplier "'.$supplier->name.'" dihapus.');
 
         return redirect()->route('suppliers.index')->with('success', 'Supplier berhasil dihapus.');

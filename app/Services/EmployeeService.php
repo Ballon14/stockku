@@ -52,6 +52,19 @@ class EmployeeService
             if (! empty($userData['role'])) {
                 $employee->user->syncRoles([$userData['role']]);
             }
+        } elseif ($userData && ! $employee->user) {
+            // Buat akun user baru untuk karyawan yang belum punya akun
+            if (empty($userData['password'])) {
+                throw new \RuntimeException('Password wajib diisi untuk membuat akun baru.');
+            }
+
+            $user = User::create([
+                'name' => $data['nama'] ?? $employee->nama,
+                'email' => $userData['email'],
+                'password' => Hash::make($userData['password']),
+            ]);
+            $user->assignRole($userData['role'] ?? 'karyawan');
+            $employee->update(['user_id' => $user->id]);
         }
 
         return $employee;

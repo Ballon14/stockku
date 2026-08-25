@@ -48,7 +48,11 @@ class CategoryController extends Controller
 
     public function destroy(Category $category)
     {
-        $this->categoryService->delete($category);
+        try {
+            $this->categoryService->delete($category);
+        } catch (\RuntimeException $e) {
+            return redirect()->route('categories.index')->with('error', $e->getMessage());
+        }
         app(ActivityLogger::class)->log('category.delete', 'Kategori "'.$category->name.'" dihapus.');
 
         return redirect()->route('categories.index')->with('success', 'Kategori berhasil dihapus.');

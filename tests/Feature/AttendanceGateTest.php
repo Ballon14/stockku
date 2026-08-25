@@ -58,8 +58,8 @@ class AttendanceGateTest extends TestCase
 
         $this->post(route('leave-requests.store'), [
             'jenis' => 'izin',
-            'tanggal_mulai' => '2026-08-25',
-            'tanggal_selesai' => '2026-08-25',
+            'tanggal_mulai' => now()->toDateString(),
+            'tanggal_selesai' => now()->toDateString(),
             'keterangan' => 'Tes admin bebas',
         ])->assertRedirect(route('leave-requests.index'));
     }
@@ -114,8 +114,8 @@ class AttendanceGateTest extends TestCase
         $this->actingAs($user)
             ->post(route('leave-requests.store'), [
                 'jenis' => 'izin',
-                'tanggal_mulai' => '2026-08-25',
-                'tanggal_selesai' => '2026-08-25',
+                'tanggal_mulai' => now()->toDateString(),
+                'tanggal_selesai' => now()->toDateString(),
                 'keterangan' => 'Harus diblokir',
             ])
             ->assertRedirect(route('attendance.clock'))

@@ -141,10 +141,10 @@ class AttendanceService
         ]);
 
         // Create attendance records for approved leave
-        $start = Carbon::parse($leaveRequest->tanggal_mulai);
-        $end = Carbon::parse($leaveRequest->tanggal_selesai);
+        $start = Carbon::parse($leaveRequest->tanggal_mulai)->copy();
+        $end = Carbon::parse($leaveRequest->tanggal_selesai)->copy();
 
-        for ($date = $start; $date->lte($end); $date->addDay()) {
+        for ($date = $start->copy(); $date->lte($end); $date->addDay()) {
             $exists = Attendance::where('employee_id', $leaveRequest->employee_id)
                 ->whereDate('tanggal', $date->toDateString())
                 ->exists();

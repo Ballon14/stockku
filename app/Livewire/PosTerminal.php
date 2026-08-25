@@ -105,7 +105,6 @@ class PosTerminal extends Component
         return Product::where('is_active', true)
             ->where(function ($query) use ($code) {
                 $query->where('barcode', $code)
-                    ->orWhere('sku', $code)
                     ->orWhereRaw('LOWER(sku) = ?', [mb_strtolower($code)]);
             })
             ->first();
@@ -149,7 +148,7 @@ class PosTerminal extends Component
                 unset($this->cart[$key]);
             } elseif ($qty <= $this->cart[$key]['stok']) {
                 $this->cart[$key]['qty'] = $qty;
-                $this->cart[$key]['subtotal'] = ($qty * $this->cart[$key]['harga']) - $this->cart[$key]['diskon'];
+                $this->cart[$key]['subtotal'] = max(0, ($qty * $this->cart[$key]['harga']) - $this->cart[$key]['diskon']);
             }
         }
         $this->syncDiskonFromPersen();
@@ -160,7 +159,7 @@ class PosTerminal extends Component
     {
         if (isset($this->cart[$key])) {
             $this->cart[$key]['diskon'] = max(0, $diskon);
-            $this->cart[$key]['subtotal'] = ($this->cart[$key]['qty'] * $this->cart[$key]['harga']) - $this->cart[$key]['diskon'];
+            $this->cart[$key]['subtotal'] = max(0, ($this->cart[$key]['qty'] * $this->cart[$key]['harga']) - $this->cart[$key]['diskon']);
         }
         $this->syncDiskonFromPersen();
         $this->saveCartToSession();

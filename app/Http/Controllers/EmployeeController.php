@@ -56,7 +56,7 @@ class EmployeeController extends Controller
     public function update(EmployeeRequest $request, Employee $employee)
     {
         $userData = null;
-        if ($request->input('create_account') && $employee->user) {
+        if ($request->input('create_account')) {
             $userData = [
                 'email' => $request->input('user_email'),
                 'password' => $request->input('user_password'),
@@ -99,6 +99,10 @@ class EmployeeController extends Controller
 
     public function destroy(Employee $employee)
     {
+        if ($employee->user && $employee->user->hasRole('admin')) {
+            return back()->with('error', 'Akun admin (owner) tidak dapat dihapus.');
+        }
+
         $this->employeeService->delete($employee);
         app(ActivityLogger::class)->log('employee.delete', 'Karyawan "'.$employee->nama.'" dihapus.');
 
