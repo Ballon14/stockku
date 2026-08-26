@@ -18,9 +18,9 @@ class PurchaseService
         return DB::transaction(function () use ($supplierId, $tanggal, $items, $keterangan, $fotoNota) {
             $total = 0;
 
-            foreach ($items as &$item) {
-                $item['subtotal'] = $item['harga'] * $item['qty'];
-                $total += $item['subtotal'];
+            foreach ($items as $key => $item) {
+                $items[$key]['subtotal'] = $item['harga'] * $item['qty'];
+                $total += $items[$key]['subtotal'];
             }
 
             // Store foto nota if uploaded
