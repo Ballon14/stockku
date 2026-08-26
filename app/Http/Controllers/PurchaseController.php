@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PurchaseRequest;
-use App\Models\Product;
 use App\Models\Purchase;
 use App\Services\ActivityLogger;
 use App\Services\PurchaseService;
@@ -29,10 +28,7 @@ class PurchaseController extends Controller
 
     public function create()
     {
-        $suppliers = $this->supplierService->getActive();
-        $products = Product::where('is_active', true)->orderBy('name')->get();
-
-        return view('purchases.create', compact('suppliers', 'products'));
+        return view('purchases.create');
     }
 
     public function store(PurchaseRequest $request)
