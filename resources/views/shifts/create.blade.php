@@ -22,13 +22,15 @@
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-slate-700">Jam Masuk (Start Time)</label>
-                    <input type="time" name="start_time" value="{{ old('start_time') }}" required class="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-200">
+                    <input type="text" name="start_time" value="{{ old('start_time') }}" required placeholder="08:00" pattern="^([01]?\d|2[0-3]):[0-5]\d$" class="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-200">
+                    <p class="mt-1 text-xs text-slate-400">Format: HH:MM (24 jam), contoh: 08:00</p>
                     @error('start_time') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
                 </div>
                 
                 <div>
                     <label class="block text-sm font-medium text-slate-700">Jam Keluar (End Time)</label>
-                    <input type="time" name="end_time" value="{{ old('end_time') }}" required class="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-200">
+                    <input type="text" name="end_time" value="{{ old('end_time') }}" required placeholder="17:00" pattern="^([01]?\d|2[0-3]):[0-5]\d$" class="mt-1 block w-full rounded-xl border-slate-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-200">
+                    <p class="mt-1 text-xs text-slate-400">Format: HH:MM (24 jam), contoh: 17:00</p>
                     @error('end_time') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
                 </div>
             </div>
