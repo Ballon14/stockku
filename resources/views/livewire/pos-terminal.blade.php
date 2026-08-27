@@ -221,6 +221,15 @@
                         <div>
                             <label class="text-xs font-semibold text-slate-700 block mb-1">Uang dari Pelanggan (Rp)</label>
                             <input type="number" wire:model.live="bayar" min="0" class="w-full rounded-xl border border-slate-300 py-2.5 px-3 text-base sm:text-lg font-bold text-slate-800 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200" placeholder="0">
+                            
+                            <!-- Shortcut Nominal -->
+                            <div class="flex flex-wrap gap-2 mt-2">
+                                <button type="button" wire:click="$set('bayar', {{ $this->grandTotal }})" class="px-2.5 py-1 bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-lg text-xs font-bold hover:bg-emerald-200 transition-colors shadow-sm">Uang Pas</button>
+                                <button type="button" wire:click="$set('bayar', 10000)" class="px-2.5 py-1 bg-slate-50 text-slate-600 border border-slate-200 rounded-lg text-xs font-semibold hover:bg-slate-100 transition-colors shadow-sm">10k</button>
+                                <button type="button" wire:click="$set('bayar', 20000)" class="px-2.5 py-1 bg-slate-50 text-slate-600 border border-slate-200 rounded-lg text-xs font-semibold hover:bg-slate-100 transition-colors shadow-sm">20k</button>
+                                <button type="button" wire:click="$set('bayar', 50000)" class="px-2.5 py-1 bg-slate-50 text-slate-600 border border-slate-200 rounded-lg text-xs font-semibold hover:bg-slate-100 transition-colors shadow-sm">50k</button>
+                                <button type="button" wire:click="$set('bayar', 100000)" class="px-2.5 py-1 bg-slate-50 text-slate-600 border border-slate-200 rounded-lg text-xs font-semibold hover:bg-slate-100 transition-colors shadow-sm">100k</button>
+                            </div>
                         </div>
                         <div>
                             <label class="text-xs font-semibold text-slate-700 block mb-1">Kembalian (Rp)</label>
