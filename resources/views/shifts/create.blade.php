@@ -10,7 +10,7 @@
 </x-slot>
 
 <div class="max-w-2xl bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-    <form method="POST" action="{{ route('shifts.store') }}">
+    <form method="POST" action="{{ route('shifts.store') }}" onsubmit="return confirmForm(this, 'Yakin ingin menyimpan shift ini?', { title: 'Konfirmasi Simpan' })">
         @csrf
         <div class="space-y-4">
             <div>

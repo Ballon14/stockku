@@ -10,7 +10,7 @@
 </x-slot>
 
 <div class="max-w-2xl bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-    <form method="POST" action="{{ route('shifts.update', $shift) }}">
+    <form method="POST" action="{{ route('shifts.update', $shift) }}" onsubmit="return confirmForm(this, 'Yakin ingin memperbarui shift ini?', { title: 'Konfirmasi Update' })">
         @csrf @method('PUT')
         <div class="space-y-4">
             <div>
