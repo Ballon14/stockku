@@ -235,6 +235,7 @@ class PosTerminal extends Component
         session()->put('pos_cart_'.auth()->id(), [
             'cart' => $this->cart,
             'diskon' => $this->diskon,
+            'diskonPersen' => $this->diskonPersen,
             'bayar' => $this->bayar,
             'catatan' => $this->catatan,
             'paymentMethod' => $this->paymentMethod,
@@ -278,6 +279,7 @@ class PosTerminal extends Component
 
         $this->cart = $validated;
         $this->diskon = max(0, (float) ($data['diskon'] ?? 0));
+        $this->diskonPersen = max(0, (float) ($data['diskonPersen'] ?? 0));
         $this->bayar = max(0, (float) ($data['bayar'] ?? 0));
         $this->catatan = (string) ($data['catatan'] ?? '');
         $this->paymentMethod = in_array($data['paymentMethod'] ?? null, ['cash', 'qris'], true) ? $data['paymentMethod'] : 'cash';

@@ -17,53 +17,60 @@ class ReportService
 {
     public function getSalesReport($startDate, $endDate, $userId = null, $productId = null, $paginate = true)
     {
-        $query = Sale::with(['user', 'items.product.category'])
-            ->where('created_at', '>=', $startDate)
+        $itemsQuery = SaleItem::select(
+            'sale_items.product_id',
+            DB::raw('SUM(sale_items.qty) as qty'),
+            DB::raw('SUM(sale_items.subtotal) as subtotal')
+        )
+            ->join('sales', 'sales.id', '=', 'sale_items.sale_id')
+            ->where('sales.created_at', '>=', $startDate)
+            ->where('sales.created_at', '<', Carbon::parse($endDate)->addDay())
+            ->where('sales.status', '!=', 'returned');
+
+        if ($userId) {
+            $itemsQuery->where('sales.user_id', $userId);
+        }
+        if ($productId) {
+            $itemsQuery->where('sale_items.product_id', $productId);
+        }
+
+        $itemsQuery->groupBy('sale_items.product_id');
+
+        $aggregated = $itemsQuery->get();
+
+        // Load product data for the aggregated product IDs
+        $productIds = $aggregated->pluck('product_id');
+        $products = Product::with('category')->whereIn('id', $productIds)->get()->keyBy('id');
+
+        $items = $aggregated->map(function ($row) use ($products) {
+            $product = $products->get($row->product_id);
+
+            return (object) [
+                'product_id' => $row->product_id,
+                'sku' => $product->sku ?? '-',
+                'name' => $product->name ?? '-',
+                'category_name' => $product->category->name ?? '-',
+                'qty' => (int) $row->qty,
+                'subtotal' => (float) $row->subtotal,
+            ];
+        })->sortByDesc('qty')->values();
+
+        $totalRevenue = $items->sum('subtotal');
+        $totalItemsSold = $items->sum('qty');
+
+        // Count distinct transactions via SQL
+        $txQuery = Sale::where('created_at', '>=', $startDate)
             ->where('created_at', '<', Carbon::parse($endDate)->addDay())
             ->where('status', '!=', 'returned');
 
         if ($userId) {
-            $query->where('user_id', $userId);
+            $txQuery->where('user_id', $userId);
+        }
+        if ($productId) {
+            $txQuery->whereHas('items', fn ($q) => $q->where('product_id', $productId));
         }
 
-        $sales = $query->get();
-
-        $items = collect();
-        foreach ($sales as $sale) {
-            foreach ($sale->items as $item) {
-                if ($productId && $item->product_id != $productId) {
-                    continue;
-                }
-
-                $existing = $items->firstWhere('product_id', $item->product_id);
-                if ($existing) {
-                    $existing->qty += $item->qty;
-                    $existing->subtotal += $item->subtotal;
-                } else {
-                    $newItem = (object) [
-                        'product_id' => $item->product_id,
-                        'sku' => $item->product->sku,
-                        'name' => $item->product->name,
-                        'category_name' => $item->product->category->name ?? '-',
-                        'qty' => $item->qty,
-                        'subtotal' => $item->subtotal,
-                    ];
-                    $items->push($newItem);
-                }
-            }
-        }
-
-        $totalRevenue = $items->sum('subtotal');
-        $totalItemsSold = $items->sum('qty');
-        $totalTransactions = $sales->filter(function ($sale) use ($productId) {
-            if (! $productId) {
-                return true;
-            }
-
-            return $sale->items->contains('product_id', $productId);
-        })->count();
-
-        $items = $items->sortByDesc('qty')->values();
+        $totalTransactions = $txQuery->count();
 
         if (! $paginate) {
             return [
