@@ -56,4 +56,56 @@ class Attendance extends Model
 
         return null;
     }
+
+    /**
+     * Apakah karyawan terlambat berdasarkan shift yang dipilih.
+     */
+    public function getIsLateAttribute(): bool
+    {
+        if (! $this->clock_in || ! $this->shift) {
+            return false;
+        }
+
+        $clockIn = Carbon::parse($this->clock_in);
+        $shiftStart = Carbon::parse($this->shift->start_time)
+            ->setDate($clockIn->year, $clockIn->month, $clockIn->day);
+
+        return $clockIn->gt($shiftStart);
+    }
+
+    /**
+     * Berapa menit keterlambatan.
+     */
+    public function getLateMinutesAttribute(): int
+    {
+        if (! $this->is_late) {
+            return 0;
+        }
+
+        $clockIn = Carbon::parse($this->clock_in);
+        $shiftStart = Carbon::parse($this->shift->start_time)
+            ->setDate($clockIn->year, $clockIn->month, $clockIn->day);
+
+        return (int) $clockIn->diffInMinutes($shiftStart);
+    }
+
+    /**
+     * Label keterlambatan yang sudah diformat.
+     */
+    public function getLateLabelAttribute(): ?string
+    {
+        if (! $this->is_late) {
+            return null;
+        }
+
+        $minutes = $this->late_minutes;
+        if ($minutes >= 60) {
+            $hours = intdiv($minutes, 60);
+            $mins = $minutes % 60;
+
+            return "Terlambat {$hours} jam".($mins > 0 ? " {$mins} menit" : '');
+        }
+
+        return "Terlambat {$minutes} menit";
+    }
 }
