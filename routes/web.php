@@ -44,6 +44,7 @@ Route::middleware(['auth', 'ensure-attended'])->group(function () {
     Route::middleware('role:admin')->group(function () {
         Route::resource('categories', CategoryController::class)->except('show');
         Route::resource('products', ProductController::class);
+        Route::resource('shifts', App\Http\Controllers\ShiftController::class)->except('show');
         Route::resource('suppliers', SupplierController::class)->except('show');
         Route::resource('employees', EmployeeController::class)->except('show');
         Route::post('/employees/{employee}/toggle-active', [EmployeeController::class, 'toggleActive'])->name('employees.toggle-active');

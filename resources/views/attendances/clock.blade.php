@@ -64,6 +64,15 @@
                 @if(!$todayAttendance || !$todayAttendance->clock_in)
                 <form method="POST" action="{{ route('attendance.clock-in') }}" onsubmit="return confirmForm(this, 'Anda yakin ingin Clock In sekarang?', { title: 'Clock In', confirmText: 'Ya, Clock In' })">
                     @csrf
+                    <div class="mb-4 text-left">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Pilih Shift</label>
+                        <select name="shift_id" required class="w-full rounded-xl border-slate-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-200">
+                            <option value="">-- Pilih Shift Hari Ini --</option>
+                            @foreach($shifts as $shift)
+                                <option value="{{ $shift->id }}">{{ $shift->name }} ({{ $shift->start_time->format('H:i') }} - {{ $shift->end_time->format('H:i') }})</option>
+                            @endforeach
+                        </select>
+                    </div>
                     <button type="submit" class="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-2xl text-lg font-bold shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
                         CLOCK IN

@@ -39,11 +39,12 @@ class AttendanceController extends Controller
         }
 
         $todayAttendance = $this->attendanceService->getTodayAttendance($employee);
+        $shifts = \App\Models\Shift::orderBy('start_time')->get();
 
-        return view('attendances.clock', compact('todayAttendance'));
+        return view('attendances.clock', compact('todayAttendance', 'shifts'));
     }
 
-    public function clockIn()
+    public function clockIn(\Illuminate\Http\Request $request)
     {
         $user = auth()->user();
         $employee = $user->employee;
@@ -52,7 +53,11 @@ class AttendanceController extends Controller
             return back()->with('error', 'Data karyawan tidak ditemukan.');
         }
 
-        $this->attendanceService->clockIn($employee);
+        $request->validate([
+            'shift_id' => 'required|exists:shifts,id',
+        ]);
+
+        $this->attendanceService->clockIn($employee, $request->shift_id);
         app(ActivityLogger::class)->log('attendance.clock_in', 'Clock-in ('.$employee->nama.').');
 
         return redirect()->route('attendance.clock')->with('success', 'Clock-in berhasil!');

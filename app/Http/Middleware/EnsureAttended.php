@@ -13,7 +13,7 @@ class EnsureAttended
     {
         $user = $request->user();
 
-        if (! $user || ! $user->employee) {
+        if (! $user || ! $user->employee || $user->hasRole('admin')) {
             return $next($request);
         }
 

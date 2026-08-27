@@ -74,6 +74,9 @@
                 <div class="flex items-center gap-4 text-sm font-mono">
                     <span class="text-slate-500">In: <span class="text-slate-700">{{ $att->clock_in ? \Carbon\Carbon::parse($att->clock_in)->format('H:i') : '-' }}</span></span>
                     <span class="text-slate-500">Out: <span class="text-slate-700">{{ $att->clock_out ? \Carbon\Carbon::parse($att->clock_out)->format('H:i') : '-' }}</span></span>
+                    @if($att->shift)
+                    <span class="px-2 py-0.5 rounded text-xs font-semibold bg-indigo-50 text-indigo-700">{{ $att->shift->name }}</span>
+                    @endif
                 </div>
                 @endif
             </div>
@@ -85,6 +88,7 @@
             <tr>
                 <th class="text-left py-3 px-4 font-semibold text-slate-600">Karyawan</th>
                 <th class="text-left py-3 px-4 font-semibold text-slate-600">Jabatan</th>
+                <th class="text-center py-3 px-4 font-semibold text-slate-600">Shift</th>
                 <th class="text-center py-3 px-4 font-semibold text-slate-600">Clock In</th>
                 <th class="text-center py-3 px-4 font-semibold text-slate-600">Clock Out</th>
                 <th class="text-center py-3 px-4 font-semibold text-slate-600">Status</th>
@@ -99,6 +103,13 @@
                     <td class="py-3 px-4 font-medium text-slate-700">{{ $emp->nama }}</td>
                     <td class="py-3 px-4 text-slate-500">{{ $emp->jabatan }}</td>
                     @if($att)
+                        <td class="py-3 px-4 text-center">
+                            @if($att->shift)
+                                <span class="px-2 py-1 rounded text-xs font-semibold bg-indigo-50 text-indigo-700">{{ $att->shift->name }}</span>
+                            @else
+                                <span class="text-slate-400 text-xs">-</span>
+                            @endif
+                        </td>
                         <td class="py-3 px-4 text-center font-mono">{{ $att->clock_in ? \Carbon\Carbon::parse($att->clock_in)->format('H:i') : '-' }}</td>
                         <td class="py-3 px-4 text-center font-mono">{{ $att->clock_out ? \Carbon\Carbon::parse($att->clock_out)->format('H:i') : '-' }}</td>
                         <td class="py-3 px-4 text-center">
@@ -109,6 +120,7 @@
                             </span>
                         </td>
                     @else
+                        <td class="py-3 px-4 text-center text-slate-400 text-xs">-</td>
                         <td class="py-3 px-4 text-center font-mono text-slate-400">-</td>
                         <td class="py-3 px-4 text-center font-mono text-slate-400">-</td>
                         <td class="py-3 px-4 text-center">

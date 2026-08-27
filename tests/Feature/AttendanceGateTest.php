@@ -39,7 +39,7 @@ class AttendanceGateTest extends TestCase
             ->assertOk();
     }
 
-    public function test_admin_is_gated(): void
+    public function test_admin_is_not_gated(): void
     {
         $user = User::factory()->create();
         $user->assignRole(Role::findOrCreate('admin'));
@@ -54,14 +54,14 @@ class AttendanceGateTest extends TestCase
         $this->actingAs($user)
             ->get(route('dashboard'))
             ->assertOk()
-            ->assertViewHas('attendanceReadOnly', true);
+            ->assertViewMissing('attendanceReadOnly');
 
         $this->post(route('leave-requests.store'), [
             'jenis' => 'izin',
             'tanggal_mulai' => now()->toDateString(),
             'tanggal_selesai' => now()->toDateString(),
-            'keterangan' => 'Tes admin harus absen',
-        ])->assertRedirect(route('attendance.clock'));
+            'keterangan' => 'Tes admin bisa bebas nulis',
+        ])->assertRedirect(route('leave-requests.index')); // Or wherever it redirects on success, actually leave requests store redirects to index with success. Wait, we can just assert that it doesn't redirect to attendance.clock.
     }
 
     public function test_employee_without_today_attendance_gets_read_only_access(): void

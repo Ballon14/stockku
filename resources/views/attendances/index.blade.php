@@ -49,6 +49,9 @@
                 <div class="flex items-center gap-4 text-sm font-mono">
                     <span class="text-slate-500">In: <span class="{{ $att->clock_in ? 'text-slate-700' : 'text-slate-400' }}">{{ $att->clock_in ? \Carbon\Carbon::parse($att->clock_in)->format('H:i') : '-' }}</span></span>
                     <span class="text-slate-500">Out: <span class="{{ $att->clock_out ? 'text-slate-700' : 'text-slate-400' }}">{{ $att->clock_out ? \Carbon\Carbon::parse($att->clock_out)->format('H:i') : '-' }}</span></span>
+                    @if($att->shift)
+                    <span class="px-2 py-0.5 rounded text-xs font-semibold bg-indigo-50 text-indigo-700">{{ $att->shift->name }}</span>
+                    @endif
                 </div>
             </div>
             @empty
@@ -62,6 +65,7 @@
             <thead class="bg-slate-50 border-b border-slate-100">
                 <tr>
                     <th class="text-left py-3 px-4 font-semibold text-slate-600">Tanggal</th>
+                    <th class="text-center py-3 px-4 font-semibold text-slate-600">Shift</th>
                     <th class="text-center py-3 px-4 font-semibold text-slate-600">Jam Masuk (Clock In)</th>
                     <th class="text-center py-3 px-4 font-semibold text-slate-600">Jam Keluar (Clock Out)</th>
                     <th class="text-center py-3 px-4 font-semibold text-slate-600">Status</th>
@@ -71,6 +75,13 @@
                 @forelse($attendances as $att)
                 <tr class="border-b border-slate-50 hover:bg-slate-50/50">
                     <td class="py-3 px-4 font-medium text-slate-700">{{ $att->tanggal->translatedFormat('l, d F Y') }}</td>
+                    <td class="py-3 px-4 text-center">
+                        @if($att->shift)
+                            <span class="px-2 py-1 rounded text-xs font-semibold bg-indigo-50 text-indigo-700">{{ $att->shift->name }}</span>
+                        @else
+                            <span class="text-slate-400 text-xs">-</span>
+                        @endif
+                    </td>
                     <td class="py-3 px-4 text-center font-mono {{ $att->clock_in ? 'text-slate-700' : 'text-slate-400' }}">{{ $att->clock_in ? \Carbon\Carbon::parse($att->clock_in)->format('H:i') : '-' }}</td>
                     <td class="py-3 px-4 text-center font-mono {{ $att->clock_out ? 'text-slate-700' : 'text-slate-400' }}">{{ $att->clock_out ? \Carbon\Carbon::parse($att->clock_out)->format('H:i') : '-' }}</td>
                     <td class="py-3 px-4 text-center">
@@ -83,7 +94,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="4" class="py-8 text-center text-slate-400">Tidak ada data absensi untuk bulan ini.</td>
+                    <td colspan="5" class="py-8 text-center text-slate-400">Tidak ada data absensi untuk bulan ini.</td>
                 </tr>
                 @endforelse
             </tbody>

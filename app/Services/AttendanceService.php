@@ -9,7 +9,7 @@ use Carbon\Carbon;
 
 class AttendanceService
 {
-    public function clockIn(Employee $employee): Attendance
+    public function clockIn(Employee $employee, ?int $shiftId = null): Attendance
     {
         $today = Carbon::today()->toDateString();
         $now = Carbon::now()->toTimeString();
@@ -21,6 +21,7 @@ class AttendanceService
         if (! $attendance) {
             return Attendance::create([
                 'employee_id' => $employee->id,
+                'shift_id' => $shiftId,
                 'tanggal' => $today,
                 'clock_in' => $now,
                 'status' => 'hadir',
@@ -29,7 +30,10 @@ class AttendanceService
 
         // Jangan timpa status izin/sakit/cuti yang sudah disetujui
         if (! $attendance->clock_in) {
-            $attendance->update(['clock_in' => $now]);
+            $attendance->update([
+                'clock_in' => $now,
+                'shift_id' => $shiftId ?? $attendance->shift_id,
+            ]);
         }
 
         return $attendance;
@@ -60,7 +64,7 @@ class AttendanceService
 
     public function getEmployeeAttendances(Employee $employee, $month = null, $year = null)
     {
-        $query = Attendance::where('employee_id', $employee->id)
+        $query = Attendance::with('shift')->where('employee_id', $employee->id)
             ->orderBy('tanggal', 'desc');
 
         if ($month && $year) {
@@ -74,7 +78,7 @@ class AttendanceService
 
     public function getAllAttendances($date = null, $month = null, $year = null)
     {
-        $query = Attendance::with('employee')->orderBy('tanggal', 'desc');
+        $query = Attendance::with(['employee', 'shift'])->orderBy('tanggal', 'desc');
 
         if ($date) {
             $query->where('tanggal', $date);
