@@ -60,6 +60,8 @@ class AttendanceController extends Controller
         $this->attendanceService->clockIn($employee, $request->shift_id);
         app(ActivityLogger::class)->log('attendance.clock_in', 'Clock-in ('.$employee->nama.').');
 
+        session()->forget('attendance_notified');
+
         return redirect()->route('attendance.clock')->with('success', 'Clock-in berhasil!');
     }
 
@@ -74,6 +76,8 @@ class AttendanceController extends Controller
 
         $this->attendanceService->clockOut($employee);
         app(ActivityLogger::class)->log('attendance.clock_out', 'Clock-out ('.$employee->nama.').');
+
+        session()->forget('attendance_notified');
 
         return redirect()->route('attendance.clock')->with('success', 'Clock-out berhasil!');
     }

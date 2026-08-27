@@ -46,6 +46,19 @@ class EnsureAttended
         // Mode baca: akses halaman diizinkan dengan penanda mode baca
         view()->share('attendanceReadOnly', true);
 
+        if (! session()->has('attendance_notified')) {
+            $attendance = $user->employee->attendances()
+                ->whereDate('tanggal', now()->toDateString())
+                ->first();
+
+            $msg = $attendance && $attendance->clock_out
+                ? 'Anda sudah clock-out hari ini. Aplikasi sekarang dalam Mode Baca (read-only).'
+                : 'Anda berada dalam Mode Baca karena belum melakukan clock-in. Silakan clock-in untuk mengaktifkan seluruh fitur.';
+                
+            session()->now('warning', $msg);
+            session()->put('attendance_notified', true);
+        }
+
         return $next($request);
     }
 }
