@@ -39,7 +39,7 @@ class AttendanceGateTest extends TestCase
             ->assertOk();
     }
 
-    public function test_admin_is_never_gated(): void
+    public function test_admin_is_gated(): void
     {
         $user = User::factory()->create();
         $user->assignRole(Role::findOrCreate('admin'));
@@ -54,14 +54,14 @@ class AttendanceGateTest extends TestCase
         $this->actingAs($user)
             ->get(route('dashboard'))
             ->assertOk()
-            ->assertViewMissing('attendanceReadOnly');
+            ->assertViewHas('attendanceReadOnly', true);
 
         $this->post(route('leave-requests.store'), [
             'jenis' => 'izin',
             'tanggal_mulai' => now()->toDateString(),
             'tanggal_selesai' => now()->toDateString(),
-            'keterangan' => 'Tes admin bebas',
-        ])->assertRedirect(route('leave-requests.index'));
+            'keterangan' => 'Tes admin harus absen',
+        ])->assertRedirect(route('attendance.clock'));
     }
 
     public function test_employee_without_today_attendance_gets_read_only_access(): void

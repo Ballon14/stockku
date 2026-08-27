@@ -63,8 +63,16 @@ class AccountStatusTest extends TestCase
     public function test_admin_can_toggle_employee_account_status(): void
     {
         $admin = $this->createUserWithRole('admin');
+        $adminEmployee = $this->createEmployeeFor($admin);
         $target = $this->createUserWithRole('kasir');
         $employee = $this->createEmployeeFor($target);
+
+        \App\Models\Attendance::create([
+            'employee_id' => $adminEmployee->id,
+            'tanggal' => now()->toDateString(),
+            'clock_in' => now()->toTimeString(),
+            'status' => 'hadir',
+        ]);
 
         $this->actingAs($admin)
             ->post(route('employees.toggle-active', $employee))
@@ -77,8 +85,16 @@ class AccountStatusTest extends TestCase
     public function test_toggle_reactivates_account(): void
     {
         $admin = $this->createUserWithRole('admin');
+        $adminEmployee = $this->createEmployeeFor($admin);
         $target = $this->createUserWithRole('kasir');
         $employee = $this->createEmployeeFor($target);
+
+        \App\Models\Attendance::create([
+            'employee_id' => $adminEmployee->id,
+            'tanggal' => now()->toDateString(),
+            'clock_in' => now()->toTimeString(),
+            'status' => 'hadir',
+        ]);
 
         $this->actingAs($admin)->post(route('employees.toggle-active', $employee));
         $this->actingAs($admin)->post(route('employees.toggle-active', $employee));
@@ -91,6 +107,13 @@ class AccountStatusTest extends TestCase
     {
         $admin = $this->createUserWithRole('admin');
         $adminEmployee = $this->createEmployeeFor($admin);
+
+        \App\Models\Attendance::create([
+            'employee_id' => $adminEmployee->id,
+            'tanggal' => now()->toDateString(),
+            'clock_in' => now()->toTimeString(),
+            'status' => 'hadir',
+        ]);
 
         $this->actingAs($admin)
             ->post(route('employees.toggle-active', $adminEmployee))
@@ -107,8 +130,16 @@ class AccountStatusTest extends TestCase
         }
 
         $admin = $this->createUserWithRole('admin');
+        $adminEmployee = $this->createEmployeeFor($admin);
         $target = $this->createUserWithRole('kasir');
         $employee = $this->createEmployeeFor($target);
+
+        \App\Models\Attendance::create([
+            'employee_id' => $adminEmployee->id,
+            'tanggal' => now()->toDateString(),
+            'clock_in' => now()->toTimeString(),
+            'status' => 'hadir',
+        ]);
 
         $this->actingAs($target)->get(route('dashboard'));
 

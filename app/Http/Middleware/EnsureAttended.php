@@ -17,11 +17,6 @@ class EnsureAttended
             return $next($request);
         }
 
-        // Owner (admin) bebas tanpa pemblokiran
-        if ($user->hasRole('admin')) {
-            return $next($request);
-        }
-
         $routeName = $request->route()?->getName();
         if ($routeName && (str_starts_with($routeName, 'attendance.') || $routeName === 'logout')) {
             return $next($request);

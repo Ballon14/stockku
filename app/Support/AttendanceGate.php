@@ -10,7 +10,7 @@ class AttendanceGate
 {
     public static function isAttended(User $user): bool
     {
-        if (! $user->employee || $user->hasRole('admin')) {
+        if (! $user->employee) {
             return true;
         }
 
