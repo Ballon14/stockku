@@ -91,9 +91,12 @@ Route::middleware(['auth', 'ensure-attended'])->group(function () {
     Route::post('/leave-requests/{leaveRequest}/approve', [LeaveRequestController::class, 'approve'])->name('leave-requests.approve')->middleware('role:admin|manager');
     Route::post('/leave-requests/{leaveRequest}/reject', [LeaveRequestController::class, 'reject'])->name('leave-requests.reject')->middleware('role:admin|manager');
 
-    // Reports - Admin & Manager
-    Route::middleware('role:admin|manager')->prefix('reports')->group(function () {
+    // Reports - Admin & Manager & Kasir (Kasir only sees their own sales)
+    Route::middleware('role:admin|manager|kasir')->prefix('reports')->group(function () {
         Route::get('/sales', [ReportController::class, 'sales'])->name('reports.sales');
+    });
+
+    Route::middleware('role:admin|manager')->prefix('reports')->group(function () {
         Route::get('/profit-loss', [ReportController::class, 'profitLoss'])->name('reports.profit-loss');
         Route::get('/stock', [ReportController::class, 'stock'])->name('reports.stock');
         Route::get('/attendance', [ReportController::class, 'attendance'])->name('reports.attendance');

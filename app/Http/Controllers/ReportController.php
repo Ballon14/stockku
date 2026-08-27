@@ -22,6 +22,10 @@ class ReportController extends Controller
         $userId = $request->input('user_id');
         $productId = $request->input('product_id');
 
+        if (! auth()->user()->hasRole(['admin', 'manager'])) {
+            $userId = auth()->id();
+        }
+
         $data = $this->reportService->getSalesReport($startDate, $endDate, $userId, $productId);
         $cashiers = User::role(['admin', 'kasir'])->get();
         $products = Product::where('is_active', true)->orderBy('name')->get();

@@ -39,7 +39,6 @@ class RbacTest extends TestCase
         $this->get(route('employees.index'))->assertForbidden();
         $this->get(route('purchases.index'))->assertForbidden();
         $this->get(route('stock.index'))->assertForbidden();
-        $this->get(route('reports.sales'))->assertForbidden();
     }
 
     public function test_kasir_redirected_to_pos_after_login(): void
