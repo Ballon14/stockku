@@ -68,43 +68,49 @@
 
 <!-- Current vs Last Bought Price (Alert) -->
 @if($data['current_vs_last_bought']->isNotEmpty())
-<div class="bg-amber-50 border border-amber-200 rounded-2xl p-5 mb-6">
-    <div class="flex items-center gap-2 mb-3">
-        <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.072 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
-        <h3 class="font-semibold text-amber-800">Harga Beli Saat Ini Berbeda dengan Terakhir Dibeli</h3>
+<div class="bg-white rounded-2xl shadow-lg shadow-amber-500/10 border-l-4 border-l-amber-500 border-y border-r border-slate-100 p-5 mb-8">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+        <div class="flex items-start gap-3">
+            <div class="p-2.5 bg-amber-50 text-amber-600 rounded-xl shrink-0">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.072 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+            </div>
+            <div>
+                <h3 class="font-bold text-slate-800 text-lg tracking-tight">Harga Aktual (Restock) Berbeda dengan Master Data</h3>
+                <p class="text-xs text-slate-500 mt-0.5">Produk berikut baru saja dibeli dengan harga yang berbeda dari harga standar (Master Data) di sistem.</p>
+            </div>
+        </div>
     </div>
-    <p class="text-xs text-amber-700 mb-3">Produk-produk berikut memiliki harga beli di master data yang berbeda dari harga saat terakhir kali direstock/dibeli.</p>
-    <div class="overflow-x-auto">
+    <div class="overflow-x-auto rounded-xl border border-slate-100">
         <table class="w-full text-sm">
-            <thead>
-                <tr class="border-b border-amber-200">
-                    <th class="text-left py-2 px-3 font-semibold text-amber-800 text-xs">Produk</th>
-                    <th class="text-right py-2 px-3 font-semibold text-amber-800 text-xs">Harga Terakhir Dibeli</th>
-                    <th class="text-right py-2 px-3 font-semibold text-amber-800 text-xs">Harga Beli Sekarang</th>
-                    <th class="text-right py-2 px-3 font-semibold text-amber-800 text-xs">Selisih</th>
-                    <th class="text-center py-2 px-3 font-semibold text-amber-800 text-xs">Status</th>
+            <thead class="bg-slate-50">
+                <tr class="border-b border-slate-200">
+                    <th class="text-left py-3 px-4 font-semibold text-slate-600 text-xs">Produk</th>
+                    <th class="text-right py-3 px-4 font-semibold text-slate-600 text-xs">Harga Master (Sistem)</th>
+                    <th class="text-right py-3 px-4 font-semibold text-slate-600 text-xs">Harga Aktual (Restock)</th>
+                    <th class="text-right py-3 px-4 font-semibold text-slate-600 text-xs">Selisih</th>
+                    <th class="text-center py-3 px-4 font-semibold text-slate-600 text-xs">Status</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($data['current_vs_last_bought'] as $item)
-                <tr class="border-b border-amber-100/60">
-                    <td class="py-2 px-3">
-                        <span class="font-medium text-slate-700">{{ $item->product_name }}</span>
-                        <span class="text-xs text-slate-400 font-mono ml-1">{{ $item->product_sku }}</span>
+                <tr class="border-b border-slate-100 hover:bg-slate-50/50 transition-colors">
+                    <td class="py-3 px-4">
+                        <span class="font-semibold text-slate-700 block">{{ $item->product_name }}</span>
+                        <span class="text-xs text-slate-400 font-mono">{{ $item->product_sku }}</span>
                     </td>
-                    <td class="py-2 px-3 text-right text-slate-600">Rp {{ number_format($item->harga_terakhir_dibeli, 0, ',', '.') }}</td>
-                    <td class="py-2 px-3 text-right font-semibold text-slate-800">Rp {{ number_format($item->harga_beli_sekarang, 0, ',', '.') }}</td>
-                    <td class="py-2 px-3 text-right font-bold {{ $item->tipe === 'naik' ? 'text-emerald-600' : 'text-red-600' }}">
+                    <td class="py-3 px-4 text-right text-slate-500">Rp {{ number_format($item->harga_beli_sekarang, 0, ',', '.') }}</td>
+                    <td class="py-3 px-4 text-right font-semibold text-slate-800">Rp {{ number_format($item->harga_terakhir_dibeli, 0, ',', '.') }}</td>
+                    <td class="py-3 px-4 text-right font-bold {{ $item->tipe === 'naik' ? 'text-emerald-600' : 'text-red-600' }}">
                         {{ $item->tipe === 'naik' ? '+' : '' }}Rp {{ number_format($item->selisih, 0, ',', '.') }}
                         <span class="text-xs font-normal">({{ $item->tipe === 'naik' ? '+' : '' }}{{ $item->persen }}%)</span>
                     </td>
-                    <td class="py-2 px-3 text-center">
-                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold {{ $item->tipe === 'naik' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700' }}">
+                    <td class="py-3 px-4 text-center">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold {{ $item->tipe === 'naik' ? 'bg-emerald-100/80 text-emerald-700 border border-emerald-200' : 'bg-red-100/80 text-red-700 border border-red-200' }}">
                             @if($item->tipe === 'naik')
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
                             Naik
                             @else
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
                             Turun
                             @endif
                         </span>

@@ -416,8 +416,8 @@ class ReportService
                 $currentPrice = (float) $product->harga_beli;
 
                 if ($currentPrice !== $lastBoughtPrice) {
-                    $diff = $currentPrice - $lastBoughtPrice;
-                    $pctChange = $lastBoughtPrice > 0 ? ($diff / $lastBoughtPrice) * 100 : 0;
+                    $diff = $lastBoughtPrice - $currentPrice;
+                    $pctChange = $currentPrice > 0 ? ($diff / $currentPrice) * 100 : 0;
 
                     $currentVsLastBought->push((object) [
                         'product_id' => $product->id,

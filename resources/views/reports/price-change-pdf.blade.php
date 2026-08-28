@@ -46,15 +46,15 @@
 
     @if($data['current_vs_last_bought']->isNotEmpty())
     <div class="alert-box">
-        <div class="alert-title">⚠ Harga Beli Saat Ini Berbeda dengan Terakhir Dibeli</div>
-        <div class="alert-text">Produk berikut memiliki harga beli di master data yang berbeda dari harga saat terakhir kali direstock/dibeli.</div>
+        <div class="alert-title">⚠ Harga Aktual (Restock) Berbeda dengan Master Data</div>
+        <div class="alert-text">Produk berikut baru saja dibeli dengan harga yang berbeda dari harga standar (Master Data) di sistem.</div>
         <table>
             <thead>
                 <tr>
                     <th>Produk</th>
                     <th>Kode/SKU</th>
-                    <th class="text-right">Harga Terakhir Dibeli</th>
-                    <th class="text-right">Harga Beli Sekarang</th>
+                    <th class="text-right">Harga Master (Sistem)</th>
+                    <th class="text-right">Harga Aktual (Restock)</th>
                     <th class="text-right">Selisih</th>
                     <th class="text-center">Status</th>
                 </tr>
@@ -64,8 +64,8 @@
                 <tr>
                     <td>{{ $item->product_name }}</td>
                     <td>{{ $item->product_sku }}</td>
-                    <td class="text-right">Rp {{ number_format($item->harga_terakhir_dibeli, 0, ',', '.') }}</td>
-                    <td class="text-right" style="font-weight: bold;">Rp {{ number_format($item->harga_beli_sekarang, 0, ',', '.') }}</td>
+                    <td class="text-right">Rp {{ number_format($item->harga_beli_sekarang, 0, ',', '.') }}</td>
+                    <td class="text-right" style="font-weight: bold;">Rp {{ number_format($item->harga_terakhir_dibeli, 0, ',', '.') }}</td>
                     <td class="text-right {{ $item->tipe === 'naik' ? 'text-naik' : 'text-turun' }}">
                         {{ $item->tipe === 'naik' ? '+' : '' }}Rp {{ number_format($item->selisih, 0, ',', '.') }} ({{ $item->tipe === 'naik' ? '+' : '' }}{{ $item->persen }}%)
                     </td>

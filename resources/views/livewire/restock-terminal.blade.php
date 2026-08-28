@@ -228,6 +228,12 @@
             {{-- Footer: Total & Submit --}}
             @if(count($cart) > 0)
             <div class="border-t border-slate-200 p-4 bg-slate-50/50" x-data="{ showConfirm: false }">
+                <div class="mb-4 bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+                    <label class="flex items-center gap-3 cursor-pointer">
+                        <input type="checkbox" wire:model.live="updateHargaMaster" class="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 transition-all">
+                        <span class="text-sm font-semibold text-slate-700">Update harga beli di Master Data sesuai dengan form ini</span>
+                    </label>
+                </div>
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <p class="text-sm text-slate-500">{{ count($cart) }} item</p>

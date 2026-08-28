@@ -30,6 +30,8 @@ class RestockTerminal extends Component
 
     public $fotoNota;
 
+    public bool $updateHargaMaster = false;
+
     public ?int $lastPurchaseId = null;
 
     public function mount(): void
@@ -40,7 +42,7 @@ class RestockTerminal extends Component
 
     public function updated($name): void
     {
-        if (in_array($name, ['cart', 'supplierId', 'tanggal', 'keterangan'], true)) {
+        if (in_array($name, ['cart', 'supplierId', 'tanggal', 'keterangan', 'updateHargaMaster'], true)) {
             $this->saveCartToSession();
         }
     }
@@ -155,6 +157,7 @@ class RestockTerminal extends Component
         $this->tanggal = date('Y-m-d');
         $this->keterangan = '';
         $this->fotoNota = null;
+        $this->updateHargaMaster = false;
         $this->saveCartToSession();
     }
 
@@ -195,6 +198,7 @@ class RestockTerminal extends Component
                 'product_id' => $item['product_id'],
                 'qty' => $item['qty'],
                 'harga' => $item['harga'],
+                'update_harga_beli' => $this->updateHargaMaster,
             ];
         }
 
@@ -238,6 +242,7 @@ class RestockTerminal extends Component
             'supplierId' => $this->supplierId,
             'tanggal' => $this->tanggal,
             'keterangan' => $this->keterangan,
+            'updateHargaMaster' => $this->updateHargaMaster,
         ]);
     }
 
@@ -278,6 +283,7 @@ class RestockTerminal extends Component
         $this->supplierId = $data['supplierId'] ?? '';
         $this->tanggal = $data['tanggal'] ?? date('Y-m-d');
         $this->keterangan = (string) ($data['keterangan'] ?? '');
+        $this->updateHargaMaster = (bool) ($data['updateHargaMaster'] ?? false);
 
         if (! empty($this->cart)) {
             $this->saveCartToSession();
