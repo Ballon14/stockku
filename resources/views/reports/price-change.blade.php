@@ -139,12 +139,12 @@
                     <p class="font-medium text-slate-700 truncate">{{ $change->product_name }}</p>
                     <p class="font-mono text-xs text-slate-400 mt-0.5">{{ $change->product_sku }} · {{ $change->category_name }}</p>
                 </div>
-                <span class="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold {{ $change->tipe === 'naik' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700' }}">
+                <span class="shrink-0 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold {{ $change->tipe === 'naik' ? 'bg-emerald-100/80 text-emerald-700 border border-emerald-200' : 'bg-red-100/80 text-red-700 border border-red-200' }}">
                     @if($change->tipe === 'naik')
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
                     +{{ $change->persen }}%
                     @else
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
                     {{ $change->persen }}%
                     @endif
                 </span>
@@ -172,8 +172,8 @@
                     <th class="text-left py-3 px-4 font-semibold text-slate-600">Tanggal</th>
                     <th class="text-left py-3 px-4 font-semibold text-slate-600">Produk</th>
                     <th class="text-left py-3 px-4 font-semibold text-slate-600">Kategori</th>
-                    <th class="text-right py-3 px-4 font-semibold text-slate-600">Harga Lama</th>
-                    <th class="text-right py-3 px-4 font-semibold text-slate-600">Harga Baru</th>
+                    <th class="text-right py-3 px-4 font-semibold text-slate-600">Harga Restock Lama</th>
+                    <th class="text-right py-3 px-4 font-semibold text-slate-600">Harga Restock Baru</th>
                     <th class="text-right py-3 px-4 font-semibold text-slate-600">Selisih</th>
                     <th class="text-center py-3 px-4 font-semibold text-slate-600">Status</th>
                     <th class="text-left py-3 px-4 font-semibold text-slate-600">Invoice Pembelian</th>
@@ -182,7 +182,7 @@
             </thead>
             <tbody>
                 @forelse($data['changes'] as $change)
-                <tr class="border-b border-slate-50 hover:bg-slate-50/50">
+                <tr class="border-b border-slate-100 hover:bg-slate-50/50 transition-colors">
                     <td class="py-3 px-4 text-slate-600 whitespace-nowrap">{{ $change->tanggal->format('d/m/Y') }}</td>
                     <td class="py-3 px-4">
                         <span class="font-medium text-slate-700 block">{{ $change->product_name }}</span>
@@ -196,12 +196,12 @@
                         <span class="text-xs font-normal block">({{ $change->tipe === 'naik' ? '+' : '' }}{{ $change->persen }}%)</span>
                     </td>
                     <td class="py-3 px-4 text-center">
-                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold {{ $change->tipe === 'naik' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700' }}">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold {{ $change->tipe === 'naik' ? 'bg-emerald-100/80 text-emerald-700 border border-emerald-200' : 'bg-red-100/80 text-red-700 border border-red-200' }}">
                             @if($change->tipe === 'naik')
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
                             Naik
                             @else
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
                             Turun
                             @endif
                         </span>

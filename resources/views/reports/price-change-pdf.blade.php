@@ -89,8 +89,8 @@
                 <th>Tanggal</th>
                 <th>Produk</th>
                 <th>Kategori</th>
-                <th class="text-right">Harga Lama</th>
-                <th class="text-right">Harga Baru</th>
+                <th class="text-right">Harga Restock Lama</th>
+                <th class="text-right">Harga Restock Baru</th>
                 <th class="text-right">Selisih</th>
                 <th class="text-center">Status</th>
                 <th>Invoice</th>
