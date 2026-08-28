@@ -9,7 +9,7 @@
         <meta name="mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-        <meta name="apple-mobile-web-app-title" content="StockKu">
+        <meta name="apple-mobile-web-app-title" content="{{ config('app.name') }}">
         <link rel="manifest" href="{{ asset('build/manifest.webmanifest') }}">
         <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
         <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
@@ -52,7 +52,7 @@
                     {{ $slot }}
                 </div>
 
-                <p class="mt-6 text-sm text-slate-400/80">© {{ date('Y') }} StockKu — Sistem Manajemen Stok</p>
+                <p class="mt-6 text-sm text-slate-400/80">© {{ date('Y') }} {{ config('app.name') }} — Sistem Manajemen Stok</p>
             </div>
         </div>
     </body>

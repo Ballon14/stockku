@@ -21,7 +21,7 @@
 <body>
     <div class="header">
         <div class="title">LAPORAN PENJUALAN</div>
-        <div class="subtitle">StockKu - Toko Serba Ada</div>
+        <div class="subtitle">{{ config('app.name') }}</div>
         <div class="subtitle">Periode: {{ \Carbon\Carbon::parse($startDate)->format('d/m/Y') }} s/d {{ \Carbon\Carbon::parse($endDate)->format('d/m/Y') }}</div>
         @if(!empty($cashierName))
         <div class="subtitle">Kasir: {{ $cashierName }}</div>

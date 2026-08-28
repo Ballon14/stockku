@@ -20,7 +20,7 @@
 </head>
 <body>
     <div class="center">
-        <div class="logo">StockKu</div>
+        <div class="logo">{{ config('app.name') }}</div>
         <div>Toko Serba Ada</div>
         <div style="font-size: 10px;">Jl. Contoh No. 123, Kota</div>
     </div>

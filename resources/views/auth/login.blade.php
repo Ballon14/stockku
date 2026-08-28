@@ -9,7 +9,7 @@
             Sistem Manajemen Toko
         </div>
         <h2 class="text-2xl font-bold text-slate-800">Selamat Datang Kembali</h2>
-        <p class="mt-1.5 text-sm text-slate-500">Masuk untuk melanjutkan ke StockKu</p>
+        <p class="mt-1.5 text-sm text-slate-500">Masuk untuk melanjutkan ke {{ config('app.name') }}</p>
     </div>
 
     <form method="POST" action="{{ route('login') }}" class="space-y-5">
@@ -80,12 +80,12 @@
                 </span>
                 <div class="min-w-0">
                     <p class="text-sm font-semibold text-slate-700">Gunakan Aplikasi Android?</p>
-                    <p class="text-xs text-slate-500 mt-0.5">Unduh StockKu untuk HP kasir — lebih mudah tanpa membuka browser</p>
+                    <p class="text-xs text-slate-500 mt-0.5">Unduh {{ config('app.name') }} untuk HP kasir — lebih mudah tanpa membuka browser</p>
                 </div>
             </div>
             <a href="{{ route('downloads.apk') }}" class="mt-3 w-full inline-flex justify-center items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white rounded-xl text-sm font-semibold transition-colors">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
-                Unduh APK StockKu
+                Unduh APK {{ config('app.name') }}
             </a>
         </div>
     </div>

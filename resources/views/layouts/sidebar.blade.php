@@ -11,7 +11,7 @@
             <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
         </div>
         <div class="flex-1">
-            <h1 class="text-lg font-bold text-white tracking-tight">StockKu</h1>
+            <h1 class="text-lg font-bold text-white tracking-tight">{{ config('app.name') }}</h1>
             <p class="text-xs text-slate-400">Manajemen Toko</p>
         </div>
         <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg text-slate-400 hover:bg-slate-700/50 hover:text-white transition-colors" title="Tutup menu">

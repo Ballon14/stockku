@@ -9,7 +9,7 @@
         <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
         <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
 
-        <title>{{ config('app.name', 'StockKu') }} - @yield('title', 'Dashboard')</title>
+        <title>{{ config('app.name', 'Toko Makmur Jaya') }} - @yield('title', 'Dashboard')</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
