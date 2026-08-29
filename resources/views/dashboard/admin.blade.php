@@ -12,7 +12,7 @@
 <script type="application/json" id="top-products-data">@json($data['top_products']->map(fn ($item) => ['name' => $item->product?->name ?? 'Produk dihapus', 'total_qty' => (int) $item->total_qty, 'total_sales' => (float) $item->total_sales]))</script>
 
 <!-- Stats Cards -->
-<x-download-apk-banner />
+
 
 @if($data['low_stock_count'] > 0 || ($data['attendance_summary']['tidak_hadir'] ?? 0) > 0)
 <div class="mb-8 rounded-2xl bg-gradient-to-r from-amber-50 to-amber-100 border-2 border-amber-300 shadow-lg shadow-amber-500/20 overflow-hidden">

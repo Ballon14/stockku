@@ -71,22 +71,5 @@
         Akun karyawan dibuat oleh Admin.
     </p>
 
-    <!-- Download APK -->
-    <div class="mt-6 pt-5 border-t border-slate-100">
-        <div class="rounded-xl bg-slate-50 border border-slate-200 p-4">
-            <div class="flex items-center gap-3">
-                <span class="shrink-0 w-9 h-9 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.65-.06-.83.22l-1.88 3.24c-2.86-1.21-6.08-1.21-8.94 0L5.65 5.67c-.19-.29-.58-.38-.87-.2-.28.18-.37.54-.22.83L6.4 9.48C3.3 11.25 1.28 14.44 1 18h22c-.28-3.56-2.3-6.75-5.4-8.52zM7 15.25c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25zm10 0c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25z"/></svg>
-                </span>
-                <div class="min-w-0">
-                    <p class="text-sm font-semibold text-slate-700">Gunakan Aplikasi Android?</p>
-                    <p class="text-xs text-slate-500 mt-0.5">Unduh {{ config('app.name') }} untuk HP kasir — lebih mudah tanpa membuka browser</p>
-                </div>
-            </div>
-            <a href="{{ route('downloads.apk') }}" class="mt-3 w-full inline-flex justify-center items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white rounded-xl text-sm font-semibold transition-colors">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
-                Unduh APK {{ config('app.name') }}
-            </a>
-        </div>
-    </div>
+
 </x-guest-layout>

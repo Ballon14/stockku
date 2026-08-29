@@ -353,15 +353,29 @@ class ReportService
         }
 
         $purchaseItems = $query->get();
+        $productIds = $purchaseItems->pluck('product_id')->unique();
+
+        // Get the most recent purchase before the start date for these products to establish a baseline
+        $previousPurchases = \App\Models\PurchaseItem::select('purchase_items.product_id', 'purchase_items.harga', 'purchases.tanggal', 'purchases.invoice_number')
+            ->join('purchases', 'purchases.id', '=', 'purchase_items.purchase_id')
+            ->where('purchases.status', '!=', 'cancelled')
+            ->where('purchases.tanggal', '<', $startDate)
+            ->whereIn('purchase_items.product_id', $productIds)
+            ->orderBy('purchases.tanggal', 'desc')
+            ->orderBy('purchases.created_at', 'desc')
+            ->get()
+            ->groupBy('product_id')
+            ->map(fn($items) => $items->first());
 
         // Group by product and detect price changes
         $changes = collect();
         $grouped = $purchaseItems->groupBy('product_id');
 
         foreach ($grouped as $prodId => $items) {
-            $prevPrice = null;
-            $prevDate = null;
-            $prevInvoice = null;
+            $prevPurchase = $previousPurchases->get($prodId);
+            $prevPrice = $prevPurchase ? (float) $prevPurchase->harga : null;
+            $prevDate = $prevPurchase ? $prevPurchase->tanggal : null;
+            $prevInvoice = $prevPurchase ? $prevPurchase->invoice_number : null;
 
             foreach ($items as $item) {
                 $currentPrice = (float) $item->harga;

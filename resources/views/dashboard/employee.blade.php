@@ -5,7 +5,6 @@
     <h2 class="text-2xl font-bold text-slate-800">Dashboard</h2>
 </x-slot>
 
-<x-download-apk-banner />
 
 <div class="max-w-2xl mx-auto">
     <!-- Riwayat Absensi Terakhir -->
