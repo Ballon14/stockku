@@ -5,8 +5,9 @@
             <div class="flex">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}">
-                        <x-application-logo class="block h-9 w-auto fill-current text-slate-800" />
+                    <a href="{{ route('dashboard') }}" class="flex items-center gap-2">
+                        <img src="{{ asset('logo.png') }}" alt="Logo" class="block h-10 w-auto rounded-lg bg-slate-900 p-1">
+                        <span class="font-bold text-slate-800 text-lg sm:hidden">{{ config('app.name') }}</span>
                     </a>
                 </div>
 

@@ -7,8 +7,8 @@
 <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out">
     <!-- Logo -->
     <div class="flex items-center gap-3 px-6 py-5 border-b border-slate-700/50">
-        <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30">
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+        <div class="w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden">
+            <img src="{{ asset('logo.png') }}" alt="Logo" class="w-full h-full object-contain">
         </div>
         <div class="flex-1">
             <h1 class="text-lg font-bold text-white tracking-tight">{{ config('app.name') }}</h1>

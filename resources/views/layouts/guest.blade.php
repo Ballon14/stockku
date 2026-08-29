@@ -11,8 +11,8 @@
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
         <meta name="apple-mobile-web-app-title" content="{{ config('app.name') }}">
         <link rel="manifest" href="{{ asset('build/manifest.webmanifest') }}">
-        <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
-        <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+        <link rel="icon" href="{{ asset('logo.png') }}" type="image/png">
+        <link rel="apple-touch-icon" href="{{ asset('logo.png') }}">
 
         <title>{{ config('app.name', 'Laravel') }}</title>
 
@@ -43,8 +43,8 @@
             <!-- Content -->
             <div class="relative z-10 flex flex-col items-center px-4">
                 <a href="/" class="mb-8 block">
-                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-xl shadow-indigo-500/40 ring-1 ring-white/20 flex items-center justify-center transform transition duration-300 hover:scale-105">
-                        <x-application-logo class="w-9 h-9 fill-white" />
+                    <div class="w-20 h-20 rounded-2xl bg-slate-900 shadow-xl shadow-black/20 ring-1 ring-white/20 flex items-center justify-center overflow-hidden transform transition duration-300 hover:scale-105">
+                        <img src="{{ asset('logo.png') }}" alt="Logo" class="w-full h-full object-contain p-2">
                     </div>
                 </a>
 

@@ -6,8 +6,8 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <meta name="theme-color" content="#6366f1">
-        <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
-        <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+        <link rel="icon" href="{{ asset('logo.png') }}" type="image/png">
+        <link rel="apple-touch-icon" href="{{ asset('logo.png') }}">
 
         <title>{{ config('app.name', 'Toko Makmur Jaya') }} - @yield('title', 'Dashboard')</title>
 

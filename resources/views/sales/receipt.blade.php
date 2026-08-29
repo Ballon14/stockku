@@ -20,9 +20,14 @@
 </head>
 <body>
     <div class="center">
-        <div class="logo">{{ config('app.name') }}</div>
-        <div>Toko Serba Ada</div>
-        <div style="font-size: 10px;">Jl. Contoh No. 123, Kota</div>
+        @if(file_exists(public_path('logo.png')))
+        <div style="margin-bottom: 5px;">
+            <img src="{{ asset('logo.png') }}" style="max-height: 40px; filter: invert(1) grayscale(100%); object-fit: contain;">
+        </div>
+        @endif
+        <div class="logo">TOKO MAKMUR</div>
+        <div style="font-size: 10px;">Kaliboto, Kec. Bener, Kabupaten Purworejo, Jawa Tengah</div>
+        <div style="font-size: 10px;">Telp/WA: +62 821-3583-0272</div>
     </div>
     <div class="double-line"></div>
     <table>
