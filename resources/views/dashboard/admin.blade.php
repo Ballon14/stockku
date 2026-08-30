@@ -85,7 +85,7 @@
         </div>
     </div>
 
-    @if(auth()->user()->hasRole(['admin', 'manager']))
+    @if(auth()->user()->hasRole(['admin']))
     <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition-shadow {{ $data['attendance_summary']['tidak_hadir'] > 0 ? 'border-amber-300 shadow-lg shadow-amber-500/20' : '' }}">
         <div class="flex items-center justify-between">
             <div>

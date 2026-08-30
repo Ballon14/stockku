@@ -160,9 +160,6 @@ class ActivityLogTest extends TestCase
 
         $this->get(route('activity-logs.index'))->assertForbidden();
 
-        $this->actingAs($this->createUserWithRole('manager'));
-
-        $this->get(route('activity-logs.index'))->assertForbidden();
     }
 
     public function test_filter_by_action_and_user(): void

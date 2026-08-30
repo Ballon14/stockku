@@ -25,7 +25,7 @@
                             <option value="karyawan" {{ $employee->user->roles->first()?->name == 'karyawan' ? 'selected' : '' }}>Karyawan</option>
                             <option value="kasir" {{ $employee->user->roles->first()?->name == 'kasir' ? 'selected' : '' }}>Kasir</option>
                             <option value="admin" {{ $employee->user->roles->first()?->name == 'admin' ? 'selected' : '' }}>Admin</option>
-                            <option value="manager" {{ $employee->user->roles->first()?->name == 'manager' ? 'selected' : '' }}>Manager</option>
+
                         </select>
                     </div>
                 </div>

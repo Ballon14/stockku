@@ -27,7 +27,7 @@ class DatabaseSeeder extends Seeder
         $adminRole = Role::create(['name' => 'admin']);
         $kasirRole = Role::create(['name' => 'kasir']);
         $karyawanRole = Role::create(['name' => 'karyawan']);
-        $managerRole = Role::create(['name' => 'manager']);
+
 
         // Create Permissions
         $permissions = [
@@ -44,7 +44,7 @@ class DatabaseSeeder extends Seeder
         $adminRole->givePermissionTo(Permission::all());
         $kasirRole->givePermissionTo(['view-pos', 'manage-sales', 'view-sales', 'view-attendance', 'create-leave-request']);
         $karyawanRole->givePermissionTo(['view-attendance', 'create-leave-request']);
-        $managerRole->givePermissionTo(['view-reports', 'view-sales', 'view-attendance']);
+
 
         // Create Users & Employees
         $admin = User::create([
@@ -113,19 +113,7 @@ class DatabaseSeeder extends Seeder
             $staffUsers[] = ['user' => $user, 'employee' => $emp];
         }
 
-        $manager = User::create([
-            'name' => 'Pak Manager',
-            'email' => 'manager@makmurjaya.com',
-            'password' => Hash::make('password'),
-        ]);
-        $manager->assignRole('manager');
-        Employee::create([
-            'user_id' => $manager->id,
-            'nama' => 'Pak Manager',
-            'jabatan' => 'Manager',
-            'no_kontak' => '081234567899',
-            'tanggal_masuk' => '2024-01-01',
-        ]);
+
 
         // Categories
         $categories = [

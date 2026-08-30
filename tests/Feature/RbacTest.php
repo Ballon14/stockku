@@ -14,7 +14,7 @@ class RbacTest extends TestCase
 
     private function createUserWithRole(string $role): User
     {
-        foreach (['admin', 'manager', 'kasir', 'karyawan'] as $roleName) {
+        foreach (['admin', 'kasir', 'karyawan'] as $roleName) {
             Role::findOrCreate($roleName);
         }
 
@@ -63,21 +63,6 @@ class RbacTest extends TestCase
 
         $this->get(route('pos'))->assertOk();
         $this->get(route('sales.index'))->assertOk();
-    }
-
-    public function test_manager_cannot_access_pos(): void
-    {
-        $this->actingAs($this->createUserWithRole('manager'));
-
-        $this->get(route('pos'))->assertForbidden();
-    }
-
-    public function test_manager_can_access_reports(): void
-    {
-        $this->actingAs($this->createUserWithRole('manager'));
-
-        $this->get(route('reports.sales'))->assertOk();
-        $this->get(route('reports.stock'))->assertOk();
     }
 
     public function test_karyawan_can_access_attendance_only(): void

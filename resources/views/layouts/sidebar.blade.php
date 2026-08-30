@@ -147,7 +147,7 @@
         </a>
         @endif
 
-        @if($user->hasRole(['admin', 'manager', 'kasir']))
+        @if($user->hasRole(['admin', 'kasir']))
         <!-- Laporan Section -->
         <div class="pt-4">
             <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Laporan</p>
@@ -158,7 +158,7 @@
             Laporan Penjualan
         </a>
 
-        @if($user->hasRole(['admin', 'manager']))
+        @if($user->hasRole(['admin']))
         <a href="{{ route('reports.profit-loss') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 {{ $currentRoute === 'reports.profit-loss' ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 sidebar-active' : 'text-slate-300 hover:bg-slate-700/50 hover:text-white' }}">
             <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             Laba Rugi

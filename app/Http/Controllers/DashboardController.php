@@ -15,7 +15,7 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->hasRole(['admin', 'manager'])) {
+        if ($user->hasRole(['admin'])) {
             $data = $this->reportService->getDashboardData();
             $data['attendance_summary'] = app(AttendanceService::class)->getTodaySummary();
 

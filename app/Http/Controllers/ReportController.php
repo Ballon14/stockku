@@ -22,7 +22,7 @@ class ReportController extends Controller
         $userId = $request->input('user_id');
         $productId = $request->input('product_id');
 
-        if (! auth()->user()->hasRole(['admin', 'manager'])) {
+        if (! auth()->user()->hasRole(['admin'])) {
             $userId = auth()->id();
         }
 

@@ -1,4 +1,4 @@
-@if(auth()->user()->hasRole(['admin', 'manager']))
+@if(auth()->user()->hasRole(['admin']))
     @include('leave-requests.partials.approve-modal', ['req' => $req])
 @elseif($req->status === 'pending')
     <form method="POST" action="{{ route('leave-requests.cancel', $req) }}" onsubmit="return confirmForm(this, 'Yakin ingin membatalkan pengajuan {{ strtolower($req->jenis_label) }} ini?', { title: 'Batalkan Pengajuan', confirmText: 'Ya, Batalkan', danger: true })">

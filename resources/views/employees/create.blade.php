@@ -26,7 +26,7 @@
                             <option value="karyawan" {{ old('user_role') == 'karyawan' ? 'selected' : '' }}>Karyawan</option>
                             <option value="kasir" {{ old('user_role') == 'kasir' ? 'selected' : '' }}>Kasir</option>
                             <option value="admin" {{ old('user_role') == 'admin' ? 'selected' : '' }}>Admin</option>
-                            <option value="manager" {{ old('user_role') == 'manager' ? 'selected' : '' }}>Manager</option>
+
                         </select>
                     </div>
                 </div>

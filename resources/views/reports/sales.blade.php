@@ -28,7 +28,7 @@
             <label class="text-xs font-medium text-slate-500">Sampai</label>
             <input type="date" name="end_date" value="{{ $endDate }}" class="w-full mt-1 rounded-xl border-slate-200 text-sm focus:border-indigo-500 focus:ring-indigo-200">
         </div>
-        @if(auth()->user()->hasRole(['admin', 'manager']))
+        @if(auth()->user()->hasRole(['admin']))
         <div class="w-48">
             <label class="text-xs font-medium text-slate-500">Kasir</label>
             <select name="user_id" class="w-full mt-1 rounded-xl border-slate-200 text-sm focus:border-indigo-500 focus:ring-indigo-200">
