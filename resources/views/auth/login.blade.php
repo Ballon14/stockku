@@ -2,6 +2,11 @@
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
+    @if ($errors->any())
+        @php session()->now('error', $errors->first()); @endphp
+    @endif
+    <x-flash-notifications />
+
     <!-- Header -->
     <div class="text-center mb-8">
         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-semibold mb-4">
@@ -24,7 +29,6 @@
                 </span>
                 <x-text-input id="email" class="block mt-0 w-full pl-11 py-2.5 transition" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" placeholder="nama@perusahaan.com" />
             </div>
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
         <!-- Password -->
@@ -47,7 +51,6 @@
                                 required autocomplete="current-password"
                                 placeholder="••••••••" />
             </div>
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
 
         <!-- Remember Me -->
