@@ -10,7 +10,8 @@ use Illuminate\Support\Facades\DB;
 class PurchaseService
 {
     public function __construct(
-        protected StockService $stockService
+        protected StockService $stockService,
+        protected PriceChangeService $priceChangeService,
     ) {}
 
     public function createPurchase(int $supplierId, string $tanggal, array $items, ?string $keterangan = null, $fotoNota = null): Purchase
@@ -58,7 +59,10 @@ class PurchaseService
                 }
 
                 if (! empty($item['update_harga_beli'])) {
-                    $product->update(['harga_beli' => $item['harga']]);
+                    $oldPrice = (float) $product->harga_beli;
+                    $newPrice = (float) $item['harga'];
+                    $product->update(['harga_beli' => $newPrice]);
+                    $this->priceChangeService->record($product, $oldPrice, $newPrice, 'purchase', $purchase);
                 }
                 $this->stockService->recordMovement(
                     $product,

@@ -332,124 +332,107 @@ class ReportService
     }
 
     /**
-     * Rekap perubahan harga jual produk.
-     * Membandingkan harga di sale_items antar transaksi untuk mendeteksi kenaikan/penurunan.
+     * Rekap perubahan harga beli produk.
+     * Reads from the dedicated price_change_logs audit trail table.
      */
     public function getPriceChangeReport($startDate, $endDate, $productId = null, $paginate = true)
     {
-        // Get all purchase items within the date range, ordered by product and date
-        $query = \App\Models\PurchaseItem::select('purchase_items.*')
-            ->join('purchases', 'purchases.id', '=', 'purchase_items.purchase_id')
-            ->where('purchases.status', '!=', 'cancelled')
-            ->where('purchases.tanggal', '>=', $startDate)
-            ->where('purchases.tanggal', '<=', $endDate)
-            ->with(['product.category', 'purchase:id,invoice_number,tanggal,user_id', 'purchase.user:id,name'])
-            ->orderBy('purchase_items.product_id')
-            ->orderBy('purchases.tanggal')
-            ->orderBy('purchases.created_at');
+        $query = \App\Models\PriceChangeLog::with(['product.category', 'user'])
+            ->whereDate('created_at', '>=', $startDate)
+            ->whereDate('created_at', '<=', $endDate)
+            ->orderByDesc('created_at');
 
         if ($productId) {
-            $query->where('purchase_items.product_id', $productId);
+            $query->where('product_id', $productId);
         }
 
-        $purchaseItems = $query->get();
-        $productIds = $purchaseItems->pluck('product_id')->unique();
+        $allChanges = $query->get();
 
-        // Get the most recent purchase before the start date for these products to establish a baseline
-        $previousPurchases = \App\Models\PurchaseItem::select('purchase_items.product_id', 'purchase_items.harga', 'purchases.tanggal', 'purchases.invoice_number')
-            ->join('purchases', 'purchases.id', '=', 'purchase_items.purchase_id')
-            ->where('purchases.status', '!=', 'cancelled')
-            ->where('purchases.tanggal', '<', $startDate)
-            ->whereIn('purchase_items.product_id', $productIds)
-            ->orderBy('purchases.tanggal', 'desc')
-            ->orderBy('purchases.created_at', 'desc')
-            ->get()
-            ->groupBy('product_id')
-            ->map(fn($items) => $items->first());
-
-        // Group by product and detect price changes
-        $changes = collect();
-        $grouped = $purchaseItems->groupBy('product_id');
-
-        foreach ($grouped as $prodId => $items) {
-            $prevPurchase = $previousPurchases->get($prodId);
-            $prevPrice = $prevPurchase ? (float) $prevPurchase->harga : null;
-            $prevDate = $prevPurchase ? $prevPurchase->tanggal : null;
-            $prevInvoice = $prevPurchase ? $prevPurchase->invoice_number : null;
-
-            foreach ($items as $item) {
-                $currentPrice = (float) $item->harga;
-
-                if ($prevPrice !== null && $currentPrice !== $prevPrice) {
-                    $diff = $currentPrice - $prevPrice;
-                    $pctChange = $prevPrice > 0 ? ($diff / $prevPrice) * 100 : 0;
-
-                    $changes->push((object) [
-                        'product_id' => $prodId,
-                        'product_name' => $item->product->name ?? '-',
-                        'product_sku' => $item->product->sku ?? '-',
-                        'category_name' => $item->product->category->name ?? '-',
-                        'harga_lama' => $prevPrice,
-                        'harga_baru' => $currentPrice,
-                        'selisih' => $diff,
-                        'persen' => round($pctChange, 1),
-                        'tipe' => $diff > 0 ? 'naik' : 'turun',
-                        'tanggal' => Carbon::parse($item->purchase->tanggal),
-                        'invoice_sebelumnya' => $prevInvoice,
-                        'invoice_perubahan' => $item->purchase->invoice_number,
-                        'pencatat' => $item->purchase->user->name ?? '-',
-                    ]);
-                }
-
-                $prevPrice = $currentPrice;
-                $prevDate = $item->purchase->tanggal;
-                $prevInvoice = $item->purchase->invoice_number;
+        // Build the changes collection with the expected shape for views
+        $changes = $allChanges->map(function ($log) {
+            // Resolve invoice number for purchase-sourced changes
+            $invoiceNumber = null;
+            if ($log->sumber === 'purchase' && $log->reference_type === \App\Models\Purchase::class && $log->reference_id) {
+                $invoiceNumber = \App\Models\Purchase::where('id', $log->reference_id)->value('invoice_number');
             }
-        }
 
-        // Also detect "current price vs last sold price" for products that have changed
-        // since their last sale (current harga_jual differs from last sale price)
-        $productsQuery = Product::where('is_active', true)->with('category');
+            $sumberLabel = match ($log->sumber) {
+                'purchase' => 'Restock',
+                'manual_edit' => 'Edit Produk',
+                default => ucfirst($log->sumber),
+            };
+
+            return (object) [
+                'product_id' => $log->product_id,
+                'product_name' => $log->product->name ?? '-',
+                'product_sku' => $log->product->sku ?? '-',
+                'category_name' => $log->product->category->name ?? '-',
+                'harga_lama' => (float) $log->harga_lama,
+                'harga_baru' => (float) $log->harga_baru,
+                'selisih' => $log->selisih,
+                'persen' => $log->persen,
+                'tipe' => $log->tipe,
+                'tanggal' => Carbon::parse($log->created_at),
+                'sumber' => $sumberLabel,
+                'invoice_perubahan' => $invoiceNumber ?? '-',
+                'pencatat' => $log->user->name ?? '-',
+            ];
+        });
+
+        // Current vs last bought: products where current harga_beli != last purchase price
+        // Only check products that had purchases within the date range
+        $productIdsInRange = \App\Models\PurchaseItem::select('purchase_items.product_id')
+            ->join('purchases', 'purchases.id', '=', 'purchase_items.purchase_id')
+            ->where('purchases.status', '!=', 'cancelled')
+            ->whereDate('purchases.tanggal', '>=', $startDate)
+            ->whereDate('purchases.tanggal', '<=', $endDate)
+            ->distinct()
+            ->pluck('product_id');
+
         if ($productId) {
-            $productsQuery->where('id', $productId);
+            $productIdsInRange = $productIdsInRange->intersect([$productId]);
         }
-        $products = $productsQuery->get();
 
         $currentVsLastBought = collect();
-        foreach ($products as $product) {
-            $lastPurchaseItem = \App\Models\PurchaseItem::select('purchase_items.*')
-                ->join('purchases', 'purchases.id', '=', 'purchase_items.purchase_id')
-                ->where('purchases.status', '!=', 'cancelled')
-                ->where('purchase_items.product_id', $product->id)
-                ->orderByDesc('purchases.tanggal')
-                ->orderByDesc('purchases.created_at')
-                ->first();
 
-            if ($lastPurchaseItem) {
-                $lastBoughtPrice = (float) $lastPurchaseItem->harga;
-                $currentPrice = (float) $product->harga_beli;
+        if ($productIdsInRange->isNotEmpty()) {
+            $products = Product::whereIn('id', $productIdsInRange)
+                ->where('is_active', true)
+                ->with('category')
+                ->get();
 
-                if ($currentPrice !== $lastBoughtPrice) {
-                    $diff = $lastBoughtPrice - $currentPrice;
-                    $pctChange = $currentPrice > 0 ? ($diff / $currentPrice) * 100 : 0;
+            foreach ($products as $product) {
+                $lastPurchaseItem = \App\Models\PurchaseItem::select('purchase_items.*')
+                    ->join('purchases', 'purchases.id', '=', 'purchase_items.purchase_id')
+                    ->where('purchases.status', '!=', 'cancelled')
+                    ->where('purchase_items.product_id', $product->id)
+                    ->orderByDesc('purchases.tanggal')
+                    ->orderByDesc('purchases.created_at')
+                    ->first();
 
-                    $currentVsLastBought->push((object) [
-                        'product_id' => $product->id,
-                        'product_name' => $product->name,
-                        'product_sku' => $product->sku,
-                        'category_name' => $product->category->name ?? '-',
-                        'harga_terakhir_dibeli' => $lastBoughtPrice,
-                        'harga_beli_sekarang' => $currentPrice,
-                        'selisih' => $diff,
-                        'persen' => round($pctChange, 1),
-                        'tipe' => $diff > 0 ? 'naik' : 'turun',
-                    ]);
+                if ($lastPurchaseItem) {
+                    $lastBoughtPrice = (float) $lastPurchaseItem->harga;
+                    $currentPrice = (float) $product->harga_beli;
+
+                    if ($currentPrice !== $lastBoughtPrice) {
+                        $diff = $lastBoughtPrice - $currentPrice;
+                        $pctChange = $currentPrice > 0 ? ($diff / $currentPrice) * 100 : 0;
+
+                        $currentVsLastBought->push((object) [
+                            'product_id' => $product->id,
+                            'product_name' => $product->name,
+                            'product_sku' => $product->sku,
+                            'category_name' => $product->category->name ?? '-',
+                            'harga_terakhir_dibeli' => $lastBoughtPrice,
+                            'harga_beli_sekarang' => $currentPrice,
+                            'selisih' => $diff,
+                            'persen' => round($pctChange, 1),
+                            'tipe' => $diff > 0 ? 'naik' : 'turun',
+                        ]);
+                    }
                 }
             }
         }
-
-        // Sort changes by date descending (newest first)
-        $changes = $changes->sortByDesc('tanggal')->values();
 
         // Summary
         $totalNaik = $changes->where('tipe', 'naik')->count();

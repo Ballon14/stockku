@@ -126,8 +126,8 @@
 <!-- Riwayat Perubahan Harga -->
 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
     <div class="p-4 border-b border-slate-100 bg-slate-50">
-        <h3 class="font-semibold text-slate-700">Riwayat Perubahan Harga Beli (Restock)</h3>
-        <p class="text-xs text-slate-500 mt-0.5">Terdeteksi saat harga beli produk berubah antara dua transaksi pembelian berbeda</p>
+        <h3 class="font-semibold text-slate-700">Riwayat Perubahan Harga Beli</h3>
+        <p class="text-xs text-slate-500 mt-0.5">Semua perubahan harga beli produk, baik dari restock maupun edit manual</p>
     </div>
 
     <!-- Mobile: card list -->
@@ -156,6 +156,7 @@
             </div>
             <div class="flex items-center justify-between text-xs text-slate-400">
                 <span>{{ $change->tanggal->format('d/m/Y') }}</span>
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold {{ $change->sumber === 'Restock' ? 'bg-indigo-100 text-indigo-700' : 'bg-amber-100 text-amber-700' }}">{{ $change->sumber }}</span>
                 <span>{{ $change->pencatat }}</span>
             </div>
         </div>
@@ -176,7 +177,8 @@
                     <th class="text-right py-3 px-4 font-semibold text-slate-600">Harga Restock Baru</th>
                     <th class="text-right py-3 px-4 font-semibold text-slate-600">Selisih</th>
                     <th class="text-center py-3 px-4 font-semibold text-slate-600">Status</th>
-                    <th class="text-left py-3 px-4 font-semibold text-slate-600">Invoice Pembelian</th>
+                    <th class="text-center py-3 px-4 font-semibold text-slate-600">Sumber</th>
+                    <th class="text-left py-3 px-4 font-semibold text-slate-600">Invoice/Ref</th>
                     <th class="text-left py-3 px-4 font-semibold text-slate-600">Pencatat</th>
                 </tr>
             </thead>
@@ -206,12 +208,17 @@
                             @endif
                         </span>
                     </td>
+                    <td class="py-3 px-4 text-center">
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold {{ $change->sumber === 'Restock' ? 'bg-indigo-50 text-indigo-700 border border-indigo-200' : 'bg-amber-50 text-amber-700 border border-amber-200' }}">
+                            {{ $change->sumber }}
+                        </span>
+                    </td>
                     <td class="py-3 px-4 text-xs text-slate-500 whitespace-nowrap">{{ $change->invoice_perubahan }}</td>
                     <td class="py-3 px-4 text-slate-600 text-xs">{{ $change->pencatat }}</td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="9" class="py-8 text-center text-slate-400">Tidak ada perubahan harga pada periode ini.</td>
+                    <td colspan="10" class="py-8 text-center text-slate-400">Tidak ada perubahan harga pada periode ini.</td>
                 </tr>
                 @endforelse
             </tbody>

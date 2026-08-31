@@ -37,7 +37,7 @@
             <div class="subtitle" style="font-size: 11px; margin-bottom: 2px;">Kaliboto, Kec. Bener, Kabupaten Purworejo, Jawa Tengah, Indonesia</div>
             <div class="subtitle" style="font-size: 11px; margin-bottom: 15px;">Telp/WA: +62 821-3583-0272</div>
             
-            <div class="title" style="font-size: 16px; border-top: 1px dashed #ccc; padding-top: 15px; margin-top: 10px;">REKAP PERUBAHAN HARGA BELI (RESTOCK)</div>
+            <div class="title" style="font-size: 16px; border-top: 1px dashed #ccc; padding-top: 15px; margin-top: 10px;">REKAP PERUBAHAN HARGA BELI</div>
             <div class="subtitle">Periode: {{ \Carbon\Carbon::parse($startDate)->format('d/m/Y') }} s/d {{ \Carbon\Carbon::parse($endDate)->format('d/m/Y') }}</div>
         </div>
     </div>
@@ -90,7 +90,7 @@
     </div>
     @endif
 
-    <h3>Riwayat Perubahan Harga Beli (Restock)</h3>
+    <h3>Riwayat Perubahan Harga Beli</h3>
     <table>
         <thead>
             <tr>
@@ -102,7 +102,8 @@
                 <th class="text-right">Harga Restock Baru</th>
                 <th class="text-right">Selisih</th>
                 <th class="text-center">Status</th>
-                <th>Invoice</th>
+                <th class="text-center">Sumber</th>
+                <th>Invoice/Ref</th>
                 <th>Pencatat</th>
             </tr>
         </thead>
@@ -127,12 +128,13 @@
                         {{ $change->tipe === 'naik' ? '↑ Naik' : '↓ Turun' }}
                     </span>
                 </td>
+                <td class="text-center" style="font-size: 10px;">{{ $change->sumber }}</td>
                 <td style="font-size: 10px; white-space: nowrap;">{{ $change->invoice_perubahan }}</td>
                 <td>{{ $change->pencatat }}</td>
             </tr>
             @empty
             <tr>
-                <td colspan="10" class="text-center" style="padding: 20px; color: #999;">Tidak ada perubahan harga pada periode ini.</td>
+                <td colspan="11" class="text-center" style="padding: 20px; color: #999;">Tidak ada perubahan harga pada periode ini.</td>
             </tr>
             @endforelse
         </tbody>

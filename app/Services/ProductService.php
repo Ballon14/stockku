@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Storage;
 
 class ProductService
 {
+    public function __construct(
+        protected PriceChangeService $priceChangeService,
+    ) {}
     public function getAll($search = null, $categoryId = null)
     {
         $query = Product::with('category');
@@ -46,7 +49,16 @@ class ProductService
             $data['foto'] = $foto->store('products', 'public');
         }
 
+        // Detect harga_beli change before updating
+        $oldHargaBeli = (float) $product->harga_beli;
+
         $product->update($data);
+
+        // Log price change if harga_beli actually changed
+        if (isset($data['harga_beli'])) {
+            $newHargaBeli = (float) $data['harga_beli'];
+            $this->priceChangeService->record($product, $oldHargaBeli, $newHargaBeli, 'manual_edit');
+        }
 
         return $product;
     }
