@@ -128,7 +128,7 @@
                         </span>
                     </td>
                     <td class="py-3 px-4 text-center">
-                        <form method="POST" action="{{ route('reports.sync-master-price') }}" class="inline" onsubmit="return confirmForm(this, 'Update harga beli &quot;{{ $item->product_name }}&quot; dari Rp {{ number_format($item->harga_beli_sekarang, 0, \',\', \'.\') }} → Rp {{ number_format($item->harga_terakhir_dibeli, 0, \',\', \'.\') }}?', { title: 'Update Harga Master', confirmText: 'Ya, Update' })">
+                        <form method="POST" action="{{ route('reports.sync-master-price') }}" class="inline" onsubmit="return confirmForm(this, 'Update harga beli &quot;{{ $item->product_name }}&quot; dari Rp {{ number_format($item->harga_beli_sekarang, 0, ',', '.') }} → Rp {{ number_format($item->harga_terakhir_dibeli, 0, ',', '.') }}?', { title: 'Update Harga Master', confirmText: 'Ya, Update' })">
                             @csrf
                             <input type="hidden" name="product_ids[]" value="{{ $item->product_id }}">
                             <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-semibold hover:bg-indigo-100 hover:border-indigo-300 transition-all" title="Update harga master ke harga restock">
