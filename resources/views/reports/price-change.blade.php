@@ -42,27 +42,27 @@
 
 <!-- Summary Cards -->
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-    <div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-5">
-        <p class="text-xs font-medium text-indigo-600 mb-1">Total Perubahan</p>
-        <p class="text-2xl font-bold text-indigo-900">{{ $data['summary']['total_changes'] }}</p>
+    <div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-6">
+        <p class="text-sm font-medium text-indigo-700 mb-1">Total Perubahan</p>
+        <p class="text-3xl font-bold text-indigo-900">{{ $data['summary']['total_changes'] }}</p>
     </div>
-    <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-5">
+    <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-6">
         <div class="flex items-center gap-1.5 mb-1">
             <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
-            <p class="text-xs font-medium text-emerald-600">Harga Naik</p>
+            <p class="text-sm font-medium text-emerald-700">Harga Naik</p>
         </div>
-        <p class="text-2xl font-bold text-emerald-900">{{ $data['summary']['total_naik'] }}</p>
+        <p class="text-3xl font-bold text-emerald-900">{{ $data['summary']['total_naik'] }}</p>
     </div>
-    <div class="bg-red-50 border border-red-100 rounded-2xl p-5">
+    <div class="bg-red-50 border border-red-100 rounded-2xl p-6">
         <div class="flex items-center gap-1.5 mb-1">
             <svg class="w-3.5 h-3.5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
-            <p class="text-xs font-medium text-red-600">Harga Turun</p>
+            <p class="text-sm font-medium text-red-700">Harga Turun</p>
         </div>
-        <p class="text-2xl font-bold text-red-900">{{ $data['summary']['total_turun'] }}</p>
+        <p class="text-3xl font-bold text-red-900">{{ $data['summary']['total_turun'] }}</p>
     </div>
-    <div class="bg-purple-50 border border-purple-100 rounded-2xl p-5">
-        <p class="text-xs font-medium text-purple-600 mb-1">Produk Terpengaruh</p>
-        <p class="text-2xl font-bold text-purple-900">{{ $data['summary']['products_affected'] }}</p>
+    <div class="bg-purple-50 border border-purple-100 rounded-2xl p-6">
+        <p class="text-sm font-medium text-purple-700 mb-1">Produk Terpengaruh</p>
+        <p class="text-3xl font-bold text-purple-900">{{ $data['summary']['products_affected'] }}</p>
     </div>
 </div>
 
@@ -105,9 +105,9 @@
             </thead>
             <tbody>
                 @foreach($data['current_vs_last_bought'] as $item)
-                <tr class="border-b border-slate-100 hover:bg-slate-50/50 transition-colors">
+                <tr class="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
                     <td class="py-3 px-4">
-                        <span class="font-semibold text-slate-700 block">{{ $item->product_name }}</span>
+                        <span class="font-medium text-slate-700 block">{{ $item->product_name }}</span>
                         <span class="text-xs text-slate-400 font-mono">{{ $item->product_sku }}</span>
                     </td>
                     <td class="py-3 px-4 text-right text-slate-500">Rp {{ number_format($item->harga_beli_sekarang, 0, ',', '.') }}</td>
@@ -179,13 +179,20 @@
             </div>
             <div class="flex items-center justify-between text-xs text-slate-400">
                 <span>{{ $change->tanggal->format('d/m/Y') }}</span>
-                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold {{ $change->sumber === 'Restock' ? 'bg-indigo-100 text-indigo-700' : ($change->sumber === 'Sync Master' ? 'bg-teal-100 text-teal-700' : 'bg-amber-100 text-amber-700') }}">{{ $change->sumber }}</span>
+                @php
+                    $badgeClass = match($change->sumber) {
+                        'Restock' => 'bg-indigo-100 text-indigo-700',
+                        'Sync Master' => 'bg-teal-100 text-teal-700',
+                        default => 'bg-amber-100 text-amber-700',
+                    };
+                @endphp
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold {{ $badgeClass }}">{{ $change->sumber }}</span>
                 <span>{{ $change->pencatat }}</span>
             </div>
             @if($change->purchase_id)
             <div class="mt-1.5">
                 <a href="{{ route('purchases.show', $change->purchase_id) }}" class="inline-flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-800 font-medium hover:underline transition-colors">
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                     {{ $change->invoice_perubahan }}
                 </a>
             </div>
@@ -199,7 +206,7 @@
     <!-- Desktop: table -->
     <div class="hidden md:block overflow-x-auto">
         <table class="w-full text-sm">
-            <thead class="bg-white border-b border-slate-100">
+            <thead class="bg-slate-50 border-b border-slate-100">
                 <tr>
                     <th class="text-left py-3 px-4 font-semibold text-slate-600">Tanggal</th>
                     <th class="text-left py-3 px-4 font-semibold text-slate-600">Produk</th>
@@ -215,7 +222,7 @@
             </thead>
             <tbody>
                 @forelse($data['changes'] as $change)
-                <tr class="border-b border-slate-100 hover:bg-slate-50/50 transition-colors">
+                <tr class="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
                     <td class="py-3 px-4 text-slate-600 whitespace-nowrap">{{ $change->tanggal->format('d/m/Y') }}</td>
                     <td class="py-3 px-4">
                         <span class="font-medium text-slate-700 block">{{ $change->product_name }}</span>
@@ -240,13 +247,23 @@
                         </span>
                     </td>
                     <td class="py-3 px-4 text-center">
-                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold {{ $change->sumber === 'Restock' ? 'bg-indigo-50 text-indigo-700 border border-indigo-200' : ($change->sumber === 'Sync Master' ? 'bg-teal-50 text-teal-700 border border-teal-200' : 'bg-amber-50 text-amber-700 border border-amber-200') }}">
+                        @php
+                            $badgeClass = match($change->sumber) {
+                                'Restock' => 'bg-indigo-50 text-indigo-700 border border-indigo-200',
+                                'Sync Master' => 'bg-teal-50 text-teal-700 border border-teal-200',
+                                default => 'bg-amber-50 text-amber-700 border border-amber-200',
+                            };
+                        @endphp
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold {{ $badgeClass }}">
                             {{ $change->sumber }}
                         </span>
                     </td>
                     <td class="py-3 px-4 text-xs whitespace-nowrap">
                         @if($change->purchase_id)
-                            <a href="{{ route('purchases.show', $change->purchase_id) }}" class="text-indigo-600 hover:text-indigo-800 font-medium hover:underline transition-colors">{{ $change->invoice_perubahan }}</a>
+                            <a href="{{ route('purchases.show', $change->purchase_id) }}" class="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-800 font-medium hover:underline transition-colors">
+                                <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                {{ $change->invoice_perubahan }}
+                            </a>
                         @else
                             <span class="text-slate-400">{{ $change->invoice_perubahan }}</span>
                         @endif
@@ -261,8 +278,6 @@
             </tbody>
         </table>
     </div>
-    <div class="p-4 border-t border-slate-100">
-        {{ $data['changes']->links() }}
-    </div>
+    <div class="px-4 py-3 border-t border-slate-100">{{ $data['changes']->appends(request()->query())->links() }}</div>
 </div>
 </x-app-layout>
