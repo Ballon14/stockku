@@ -79,6 +79,17 @@
                 <p class="text-xs text-slate-500 mt-0.5">Produk berikut baru saja dibeli dengan harga yang berbeda dari harga standar (Master Data) di sistem.</p>
             </div>
         </div>
+        {{-- Bulk sync button --}}
+        <form method="POST" action="{{ route('reports.sync-master-price') }}" id="bulk-sync-form" onsubmit="return confirmForm(this, 'Update harga beli {{ $data['current_vs_last_bought']->count() }} produk ke harga restock terakhir?', { title: 'Sync Semua Harga', confirmText: 'Ya, Update Semua' })">
+            @csrf
+            @foreach($data['current_vs_last_bought'] as $item)
+                <input type="hidden" name="product_ids[]" value="{{ $item->product_id }}">
+            @endforeach
+            <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-500 to-indigo-600 text-white rounded-xl text-sm font-semibold shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 transition-all whitespace-nowrap">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                Sync Semua ({{ $data['current_vs_last_bought']->count() }})
+            </button>
+        </form>
     </div>
     <div class="overflow-x-auto rounded-xl border border-slate-100">
         <table class="w-full text-sm">
@@ -89,6 +100,7 @@
                     <th class="text-right py-3 px-4 font-semibold text-slate-600 text-xs">Harga Aktual (Restock)</th>
                     <th class="text-right py-3 px-4 font-semibold text-slate-600 text-xs">Selisih</th>
                     <th class="text-center py-3 px-4 font-semibold text-slate-600 text-xs">Status</th>
+                    <th class="text-center py-3 px-4 font-semibold text-slate-600 text-xs">Aksi</th>
                 </tr>
             </thead>
             <tbody>
@@ -115,6 +127,16 @@
                             @endif
                         </span>
                     </td>
+                    <td class="py-3 px-4 text-center">
+                        <form method="POST" action="{{ route('reports.sync-master-price') }}" class="inline" onsubmit="return confirmForm(this, 'Update harga beli &quot;{{ $item->product_name }}&quot; dari Rp {{ number_format($item->harga_beli_sekarang, 0, \'.\', \'.\') }} → Rp {{ number_format($item->harga_terakhir_dibeli, 0, \'.\', \'.\') }}?', { title: 'Update Harga Master', confirmText: 'Ya, Update' })">
+                            @csrf
+                            <input type="hidden" name="product_ids[]" value="{{ $item->product_id }}">
+                            <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-semibold hover:bg-indigo-100 hover:border-indigo-300 transition-all" title="Update harga master ke harga restock">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                Sync
+                            </button>
+                        </form>
+                    </td>
                 </tr>
                 @endforeach
             </tbody>
@@ -122,6 +144,7 @@
     </div>
 </div>
 @endif
+
 
 <!-- Riwayat Perubahan Harga -->
 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">

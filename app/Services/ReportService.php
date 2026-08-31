@@ -359,6 +359,7 @@ class ReportService
             $sumberLabel = match ($log->sumber) {
                 'purchase' => 'Restock',
                 'manual_edit' => 'Edit Produk',
+                'sync_master' => 'Sync Master',
                 default => ucfirst($log->sumber),
             };
 

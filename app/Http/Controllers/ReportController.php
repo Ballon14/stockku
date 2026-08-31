@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Employee;
 use App\Models\Product;
+use App\Models\PurchaseItem;
 use App\Models\User;
+use App\Services\ActivityLogger;
+use App\Services\PriceChangeService;
 use App\Services\ReportService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -12,7 +15,8 @@ use Illuminate\Http\Request;
 class ReportController extends Controller
 {
     public function __construct(
-        protected ReportService $reportService
+        protected ReportService $reportService,
+        protected PriceChangeService $priceChangeService,
     ) {}
 
     public function sales(Request $request)
@@ -125,5 +129,55 @@ class ReportController extends Controller
         $data = $this->reportService->getPriceChangeReport($startDate, $endDate, $productId, true);
 
         return view('reports.price-change', compact('data', 'startDate', 'endDate', 'productId', 'products'));
+    }
+
+    public function syncMasterPrice(Request $request)
+    {
+        $request->validate([
+            'product_ids' => 'required|array|min:1',
+            'product_ids.*' => 'exists:products,id',
+        ]);
+
+        $productIds = $request->input('product_ids');
+        $products = Product::whereIn('id', $productIds)->get();
+        $updated = 0;
+
+        foreach ($products as $product) {
+            // Get last purchase price for this product
+            $lastPurchaseItem = PurchaseItem::select('purchase_items.*')
+                ->join('purchases', 'purchases.id', '=', 'purchase_items.purchase_id')
+                ->where('purchases.status', '!=', 'cancelled')
+                ->where('purchase_items.product_id', $product->id)
+                ->orderByDesc('purchases.tanggal')
+                ->orderByDesc('purchases.created_at')
+                ->first();
+
+            if (! $lastPurchaseItem) {
+                continue;
+            }
+
+            $lastBoughtPrice = (float) $lastPurchaseItem->harga;
+            $oldPrice = (float) $product->harga_beli;
+
+            if ($oldPrice === $lastBoughtPrice) {
+                continue;
+            }
+
+            $product->update(['harga_beli' => $lastBoughtPrice]);
+            $this->priceChangeService->record($product, $oldPrice, $lastBoughtPrice, 'sync_master');
+
+            app(ActivityLogger::class)->log(
+                'product.sync_price',
+                'Harga beli "'.$product->name.'" disinkronkan dari Rp '.number_format($oldPrice, 0, ',', '.').' → Rp '.number_format($lastBoughtPrice, 0, ',', '.').'.'
+            );
+
+            $updated++;
+        }
+
+        $message = $updated > 0
+            ? $updated.' produk berhasil disinkronkan ke harga restock terakhir.'
+            : 'Tidak ada produk yang perlu disinkronkan.';
+
+        return redirect()->back()->with('success', $message);
     }
 }
