@@ -367,8 +367,10 @@ class ReportService
         $mapLog = function ($log) {
             // Invoice number via eager-loaded reference — no extra query
             $invoiceNumber = null;
+            $purchaseId = null;
             if (in_array($log->sumber, ['purchase', 'sync_master']) && $log->reference_type === \App\Models\Purchase::class && $log->reference) {
                 $invoiceNumber = $log->reference->invoice_number;
+                $purchaseId = $log->reference->id;
             }
 
             $sumberLabel = match ($log->sumber) {
@@ -391,6 +393,7 @@ class ReportService
                 'tanggal' => Carbon::parse($log->created_at),
                 'sumber' => $sumberLabel,
                 'invoice_perubahan' => $invoiceNumber ?? '-',
+                'purchase_id' => $purchaseId,
                 'pencatat' => $log->user->name ?? '-',
             ];
         };
