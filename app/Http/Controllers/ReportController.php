@@ -165,8 +165,10 @@ class ReportController extends Controller
                     continue;
                 }
 
+                $purchase = \App\Models\Purchase::find($lastPurchaseItem->purchase_id);
+
                 $product->update(['harga_beli' => $lastBoughtPrice]);
-                $this->priceChangeService->record($product, $oldPrice, $lastBoughtPrice, 'sync_master');
+                $this->priceChangeService->record($product, $oldPrice, $lastBoughtPrice, 'sync_master', $purchase);
 
                 app(ActivityLogger::class)->log(
                     'product.sync_price',

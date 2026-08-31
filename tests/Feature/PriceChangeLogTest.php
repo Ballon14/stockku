@@ -287,7 +287,7 @@ class PriceChangeLogTest extends TestCase
         $supplier = Supplier::create(['name' => 'Supplier Sync', 'code' => 'SUP-'.uniqid(), 'phone' => '081234567890']);
 
         // Create a purchase with a different price (no update_harga_beli)
-        app(PurchaseService::class)->createPurchase(
+        $purchase = app(PurchaseService::class)->createPurchase(
             $supplier->id,
             now()->toDateString(),
             [
@@ -314,12 +314,14 @@ class PriceChangeLogTest extends TestCase
         // Master price should now be 4000
         $this->assertSame(4000, (int) $product->fresh()->harga_beli);
 
-        // A price change log with sumber 'sync_master' should exist
+        // A price change log with sumber 'sync_master' should exist with purchase reference
         $this->assertDatabaseHas('price_change_logs', [
             'product_id' => $product->id,
             'harga_lama' => 3000,
             'harga_baru' => 4000,
             'sumber' => 'sync_master',
+            'reference_type' => Purchase::class,
+            'reference_id' => $purchase->id,
             'user_id' => $user->id,
         ]);
     }

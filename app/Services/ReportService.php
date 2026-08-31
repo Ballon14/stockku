@@ -367,7 +367,7 @@ class ReportService
         $mapLog = function ($log) {
             // Invoice number via eager-loaded reference — no extra query
             $invoiceNumber = null;
-            if ($log->sumber === 'purchase' && $log->reference_type === \App\Models\Purchase::class && $log->reference) {
+            if (in_array($log->sumber, ['purchase', 'sync_master']) && $log->reference_type === \App\Models\Purchase::class && $log->reference) {
                 $invoiceNumber = $log->reference->invoice_number;
             }
 
