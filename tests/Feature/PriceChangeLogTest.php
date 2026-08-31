@@ -279,4 +279,109 @@ class PriceChangeLogTest extends TestCase
         $this->assertSame(-25.0, $logDown->persen);
         $this->assertSame('turun', $logDown->tipe);
     }
+
+    public function test_sync_master_price_updates_product_and_creates_log(): void
+    {
+        $user = $this->adminUser();
+        $product = $this->createProduct(['harga_beli' => 3000]);
+        $supplier = Supplier::create(['name' => 'Supplier Sync', 'code' => 'SUP-'.uniqid(), 'phone' => '081234567890']);
+
+        // Create a purchase with a different price (no update_harga_beli)
+        app(PurchaseService::class)->createPurchase(
+            $supplier->id,
+            now()->toDateString(),
+            [
+                [
+                    'product_id' => $product->id,
+                    'qty' => 5,
+                    'harga' => 4000,
+                    'update_harga_beli' => false,
+                ],
+            ],
+        );
+
+        // Master price should still be 3000
+        $this->assertSame(3000, (int) $product->fresh()->harga_beli);
+
+        // Now sync via controller
+        $response = $this->post(route('reports.sync-master-price'), [
+            'product_ids' => [$product->id],
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+
+        // Master price should now be 4000
+        $this->assertSame(4000, (int) $product->fresh()->harga_beli);
+
+        // A price change log with sumber 'sync_master' should exist
+        $this->assertDatabaseHas('price_change_logs', [
+            'product_id' => $product->id,
+            'harga_lama' => 3000,
+            'harga_baru' => 4000,
+            'sumber' => 'sync_master',
+            'user_id' => $user->id,
+        ]);
+    }
+
+    public function test_sync_master_price_skips_when_already_synced(): void
+    {
+        $this->adminUser();
+        $product = $this->createProduct(['harga_beli' => 4000]);
+        $supplier = Supplier::create(['name' => 'Supplier Skip', 'code' => 'SUP-'.uniqid(), 'phone' => '081234567890']);
+
+        // Create a purchase with same price as master
+        app(PurchaseService::class)->createPurchase(
+            $supplier->id,
+            now()->toDateString(),
+            [
+                [
+                    'product_id' => $product->id,
+                    'qty' => 5,
+                    'harga' => 4000,
+                    'update_harga_beli' => false,
+                ],
+            ],
+        );
+
+        $response = $this->post(route('reports.sync-master-price'), [
+            'product_ids' => [$product->id],
+        ]);
+
+        $response->assertRedirect();
+
+        // No sync_master log should be created since prices match
+        $this->assertDatabaseMissing('price_change_logs', [
+            'product_id' => $product->id,
+            'sumber' => 'sync_master',
+        ]);
+    }
+
+    public function test_kasir_cannot_access_price_change_report(): void
+    {
+        Role::findOrCreate('kasir');
+        $kasir = User::factory()->create();
+        $kasir->assignRole('kasir');
+        $this->actingAs($kasir);
+
+        $response = $this->get(route('reports.price-change'));
+
+        $response->assertForbidden();
+    }
+
+    public function test_kasir_cannot_sync_master_price(): void
+    {
+        Role::findOrCreate('kasir');
+        $kasir = User::factory()->create();
+        $kasir->assignRole('kasir');
+        $this->actingAs($kasir);
+
+        $product = $this->createProduct();
+
+        $response = $this->post(route('reports.sync-master-price'), [
+            'product_ids' => [$product->id],
+        ]);
+
+        $response->assertForbidden();
+    }
 }

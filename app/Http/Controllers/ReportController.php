@@ -139,40 +139,43 @@ class ReportController extends Controller
         ]);
 
         $productIds = $request->input('product_ids');
-        $products = Product::whereIn('id', $productIds)->get();
         $updated = 0;
 
-        foreach ($products as $product) {
-            // Get last purchase price for this product
-            $lastPurchaseItem = PurchaseItem::select('purchase_items.*')
-                ->join('purchases', 'purchases.id', '=', 'purchase_items.purchase_id')
-                ->where('purchases.status', '!=', 'cancelled')
-                ->where('purchase_items.product_id', $product->id)
-                ->orderByDesc('purchases.tanggal')
-                ->orderByDesc('purchases.created_at')
-                ->first();
+        \Illuminate\Support\Facades\DB::transaction(function () use ($productIds, &$updated) {
+            $products = Product::whereIn('id', $productIds)->lockForUpdate()->get();
 
-            if (! $lastPurchaseItem) {
-                continue;
+            foreach ($products as $product) {
+                // Get last purchase price for this product
+                $lastPurchaseItem = PurchaseItem::select('purchase_items.*')
+                    ->join('purchases', 'purchases.id', '=', 'purchase_items.purchase_id')
+                    ->where('purchases.status', '!=', 'cancelled')
+                    ->where('purchase_items.product_id', $product->id)
+                    ->orderByDesc('purchases.tanggal')
+                    ->orderByDesc('purchases.created_at')
+                    ->first();
+
+                if (! $lastPurchaseItem) {
+                    continue;
+                }
+
+                $lastBoughtPrice = (float) $lastPurchaseItem->harga;
+                $oldPrice = (float) $product->harga_beli;
+
+                if ($oldPrice === $lastBoughtPrice) {
+                    continue;
+                }
+
+                $product->update(['harga_beli' => $lastBoughtPrice]);
+                $this->priceChangeService->record($product, $oldPrice, $lastBoughtPrice, 'sync_master');
+
+                app(ActivityLogger::class)->log(
+                    'product.sync_price',
+                    'Harga beli "'.$product->name.'" disinkronkan dari Rp '.number_format($oldPrice, 0, ',', '.').' → Rp '.number_format($lastBoughtPrice, 0, ',', '.').'.'
+                );
+
+                $updated++;
             }
-
-            $lastBoughtPrice = (float) $lastPurchaseItem->harga;
-            $oldPrice = (float) $product->harga_beli;
-
-            if ($oldPrice === $lastBoughtPrice) {
-                continue;
-            }
-
-            $product->update(['harga_beli' => $lastBoughtPrice]);
-            $this->priceChangeService->record($product, $oldPrice, $lastBoughtPrice, 'sync_master');
-
-            app(ActivityLogger::class)->log(
-                'product.sync_price',
-                'Harga beli "'.$product->name.'" disinkronkan dari Rp '.number_format($oldPrice, 0, ',', '.').' → Rp '.number_format($lastBoughtPrice, 0, ',', '.').'.'
-            );
-
-            $updated++;
-        }
+        });
 
         $message = $updated > 0
             ? $updated.' produk berhasil disinkronkan ke harga restock terakhir.'

@@ -179,7 +179,7 @@
             </div>
             <div class="flex items-center justify-between text-xs text-slate-400">
                 <span>{{ $change->tanggal->format('d/m/Y') }}</span>
-                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold {{ $change->sumber === 'Restock' ? 'bg-indigo-100 text-indigo-700' : 'bg-amber-100 text-amber-700' }}">{{ $change->sumber }}</span>
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold {{ $change->sumber === 'Restock' ? 'bg-indigo-100 text-indigo-700' : ($change->sumber === 'Sync Master' ? 'bg-teal-100 text-teal-700' : 'bg-amber-100 text-amber-700') }}">{{ $change->sumber }}</span>
                 <span>{{ $change->pencatat }}</span>
             </div>
         </div>
@@ -196,8 +196,8 @@
                     <th class="text-left py-3 px-4 font-semibold text-slate-600">Tanggal</th>
                     <th class="text-left py-3 px-4 font-semibold text-slate-600">Produk</th>
                     <th class="text-left py-3 px-4 font-semibold text-slate-600">Kategori</th>
-                    <th class="text-right py-3 px-4 font-semibold text-slate-600">Harga Restock Lama</th>
-                    <th class="text-right py-3 px-4 font-semibold text-slate-600">Harga Restock Baru</th>
+                    <th class="text-right py-3 px-4 font-semibold text-slate-600">Harga Beli Lama</th>
+                    <th class="text-right py-3 px-4 font-semibold text-slate-600">Harga Beli Baru</th>
                     <th class="text-right py-3 px-4 font-semibold text-slate-600">Selisih</th>
                     <th class="text-center py-3 px-4 font-semibold text-slate-600">Status</th>
                     <th class="text-center py-3 px-4 font-semibold text-slate-600">Sumber</th>
@@ -232,7 +232,7 @@
                         </span>
                     </td>
                     <td class="py-3 px-4 text-center">
-                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold {{ $change->sumber === 'Restock' ? 'bg-indigo-50 text-indigo-700 border border-indigo-200' : 'bg-amber-50 text-amber-700 border border-amber-200' }}">
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold {{ $change->sumber === 'Restock' ? 'bg-indigo-50 text-indigo-700 border border-indigo-200' : ($change->sumber === 'Sync Master' ? 'bg-teal-50 text-teal-700 border border-teal-200' : 'bg-amber-50 text-amber-700 border border-amber-200') }}">
                             {{ $change->sumber }}
                         </span>
                     </td>

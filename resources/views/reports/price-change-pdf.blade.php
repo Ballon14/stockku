@@ -98,8 +98,8 @@
                 <th>Tanggal</th>
                 <th>Produk</th>
                 <th>Kategori</th>
-                <th class="text-right">Harga Restock Lama</th>
-                <th class="text-right">Harga Restock Baru</th>
+                <th class="text-right">Harga Beli Lama</th>
+                <th class="text-right">Harga Beli Baru</th>
                 <th class="text-right">Selisih</th>
                 <th class="text-center">Status</th>
                 <th class="text-center">Sumber</th>

@@ -337,23 +337,38 @@ class ReportService
      */
     public function getPriceChangeReport($startDate, $endDate, $productId = null, $paginate = true)
     {
-        $query = \App\Models\PriceChangeLog::with(['product.category', 'user'])
+        // Eager load reference (morphTo) to avoid N+1 on invoice lookup
+        $baseQuery = \App\Models\PriceChangeLog::with(['product.category', 'user', 'reference'])
             ->whereDate('created_at', '>=', $startDate)
             ->whereDate('created_at', '<=', $endDate)
             ->orderByDesc('created_at');
 
         if ($productId) {
-            $query->where('product_id', $productId);
+            $baseQuery->where('product_id', $productId);
         }
 
-        $allChanges = $query->get();
+        // Summary always needs full count (unpaginated)
+        $summaryQuery = (clone $baseQuery);
+        $summaryRows = $summaryQuery->get(['id', 'product_id', 'harga_lama', 'harga_baru']);
 
-        // Build the changes collection with the expected shape for views
-        $changes = $allChanges->map(function ($log) {
-            // Resolve invoice number for purchase-sourced changes
+        $totalNaik = $summaryRows->filter(fn ($r) => (float) $r->harga_baru >= (float) $r->harga_lama)->count();
+        $totalTurun = $summaryRows->count() - $totalNaik;
+        $totalChanges = $summaryRows->count();
+        $productsAffected = $summaryRows->pluck('product_id')->unique()->count();
+
+        $summary = [
+            'total_changes' => $totalChanges,
+            'total_naik' => $totalNaik,
+            'total_turun' => $totalTurun,
+            'products_affected' => $productsAffected,
+        ];
+
+        // Transform helper
+        $mapLog = function ($log) {
+            // Invoice number via eager-loaded reference — no extra query
             $invoiceNumber = null;
-            if ($log->sumber === 'purchase' && $log->reference_type === \App\Models\Purchase::class && $log->reference_id) {
-                $invoiceNumber = \App\Models\Purchase::where('id', $log->reference_id)->value('invoice_number');
+            if ($log->sumber === 'purchase' && $log->reference_type === \App\Models\Purchase::class && $log->reference) {
+                $invoiceNumber = $log->reference->invoice_number;
             }
 
             $sumberLabel = match ($log->sumber) {
@@ -378,10 +393,39 @@ class ReportService
                 'invoice_perubahan' => $invoiceNumber ?? '-',
                 'pencatat' => $log->user->name ?? '-',
             ];
-        });
+        };
 
-        // Current vs last bought: products where current harga_beli != last purchase price
-        // Only check products that had purchases within the date range
+        if (! $paginate) {
+            // PDF export — fetch all
+            $changes = $baseQuery->get()->map($mapLog);
+
+            return [
+                'summary' => $summary,
+                'changes' => $changes,
+                'current_vs_last_bought' => $this->buildCurrentVsLastBought($startDate, $endDate, $productId),
+            ];
+        }
+
+        // Paginated: use DB-level pagination, then map only the current page
+        $perPage = 20;
+        $paginatedLogs = $baseQuery->paginate($perPage);
+
+        $paginatedLogs->getCollection()->transform($mapLog);
+
+        return [
+            'summary' => $summary,
+            'changes' => $paginatedLogs,
+            'current_vs_last_bought' => $this->buildCurrentVsLastBought($startDate, $endDate, $productId),
+        ];
+    }
+
+    /**
+     * Build the "current vs last bought" comparison data.
+     * Uses a single batch query to get the latest purchase price per product,
+     * avoiding N+1 queries.
+     */
+    private function buildCurrentVsLastBought($startDate, $endDate, $productId = null)
+    {
         $productIdsInRange = \App\Models\PurchaseItem::select('purchase_items.product_id')
             ->join('purchases', 'purchases.id', '=', 'purchase_items.purchase_id')
             ->where('purchases.status', '!=', 'cancelled')
@@ -396,81 +440,71 @@ class ReportService
 
         $currentVsLastBought = collect();
 
-        if ($productIdsInRange->isNotEmpty()) {
-            $products = Product::whereIn('id', $productIdsInRange)
-                ->where('is_active', true)
-                ->with('category')
-                ->get();
+        if ($productIdsInRange->isEmpty()) {
+            return $currentVsLastBought;
+        }
 
-            foreach ($products as $product) {
-                $lastPurchaseItem = \App\Models\PurchaseItem::select('purchase_items.*')
-                    ->join('purchases', 'purchases.id', '=', 'purchase_items.purchase_id')
-                    ->where('purchases.status', '!=', 'cancelled')
-                    ->where('purchase_items.product_id', $product->id)
-                    ->orderByDesc('purchases.tanggal')
-                    ->orderByDesc('purchases.created_at')
-                    ->first();
+        $products = Product::whereIn('id', $productIdsInRange)
+            ->where('is_active', true)
+            ->with('category')
+            ->get();
 
-                if ($lastPurchaseItem) {
-                    $lastBoughtPrice = (float) $lastPurchaseItem->harga;
-                    $currentPrice = (float) $product->harga_beli;
+        if ($products->isEmpty()) {
+            return $currentVsLastBought;
+        }
 
-                    if ($currentPrice !== $lastBoughtPrice) {
-                        $diff = $lastBoughtPrice - $currentPrice;
-                        $pctChange = $currentPrice > 0 ? ($diff / $currentPrice) * 100 : 0;
-
-                        $currentVsLastBought->push((object) [
-                            'product_id' => $product->id,
-                            'product_name' => $product->name,
-                            'product_sku' => $product->sku,
-                            'category_name' => $product->category->name ?? '-',
-                            'harga_terakhir_dibeli' => $lastBoughtPrice,
-                            'harga_beli_sekarang' => $currentPrice,
-                            'selisih' => $diff,
-                            'persen' => round($pctChange, 1),
-                            'tipe' => $diff > 0 ? 'naik' : 'turun',
-                        ]);
-                    }
+        // Batch query: get latest purchase price per product in one query
+        // Using a subquery to find the max purchase date per product, then joining back
+        $latestPrices = DB::table('purchase_items')
+            ->select('purchase_items.product_id', 'purchase_items.harga')
+            ->join('purchases', 'purchases.id', '=', 'purchase_items.purchase_id')
+            ->where('purchases.status', '!=', 'cancelled')
+            ->whereIn('purchase_items.product_id', $products->pluck('id'))
+            ->joinSub(
+                DB::table('purchase_items as pi2')
+                    ->select('pi2.product_id', DB::raw('MAX(CONCAT(p2.tanggal, " ", p2.created_at)) as max_key'))
+                    ->join('purchases as p2', 'p2.id', '=', 'pi2.purchase_id')
+                    ->where('p2.status', '!=', 'cancelled')
+                    ->whereIn('pi2.product_id', $products->pluck('id'))
+                    ->groupBy('pi2.product_id'),
+                'latest',
+                function ($join) {
+                    $join->on('purchase_items.product_id', '=', 'latest.product_id')
+                        ->whereRaw('CONCAT(purchases.tanggal, " ", purchases.created_at) = latest.max_key');
                 }
+            )
+            ->get()
+            ->keyBy('product_id');
+
+        foreach ($products as $product) {
+            $latest = $latestPrices->get($product->id);
+            if (! $latest) {
+                continue;
             }
+
+            $lastBoughtPrice = (float) $latest->harga;
+            $currentPrice = (float) $product->harga_beli;
+
+            if ($currentPrice === $lastBoughtPrice) {
+                continue;
+            }
+
+            $diff = $lastBoughtPrice - $currentPrice;
+            $pctChange = $currentPrice > 0 ? round(($diff / $currentPrice) * 100, 1) : 0;
+
+            $currentVsLastBought->push((object) [
+                'product_id' => $product->id,
+                'product_name' => $product->name,
+                'product_sku' => $product->sku,
+                'category_name' => $product->category->name ?? '-',
+                'harga_terakhir_dibeli' => $lastBoughtPrice,
+                'harga_beli_sekarang' => $currentPrice,
+                'selisih' => $diff,
+                'persen' => $pctChange,
+                'tipe' => $diff > 0 ? 'naik' : 'turun',
+            ]);
         }
 
-        // Summary
-        $totalNaik = $changes->where('tipe', 'naik')->count();
-        $totalTurun = $changes->where('tipe', 'turun')->count();
-        $totalChanges = $changes->count();
-        $productsAffected = $changes->pluck('product_id')->unique()->count();
-
-        $summary = [
-            'total_changes' => $totalChanges,
-            'total_naik' => $totalNaik,
-            'total_turun' => $totalTurun,
-            'products_affected' => $productsAffected,
-        ];
-
-        if (! $paginate) {
-            return [
-                'summary' => $summary,
-                'changes' => $changes,
-                'current_vs_last_bought' => $currentVsLastBought,
-            ];
-        }
-
-        $perPage = 20;
-        $page = (int) request('page', 1);
-
-        $paginated = new LengthAwarePaginator(
-            $changes->forPage($page, $perPage)->values(),
-            $changes->count(),
-            $perPage,
-            $page,
-            ['path' => request()->url(), 'query' => request()->query()]
-        );
-
-        return [
-            'summary' => $summary,
-            'changes' => $paginated,
-            'current_vs_last_bought' => $currentVsLastBought,
-        ];
+        return $currentVsLastBought;
     }
 }
