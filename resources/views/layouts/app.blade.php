@@ -6,8 +6,13 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <meta name="theme-color" content="#6366f1">
-        <link rel="icon" href="{{ asset('logo.png') }}" type="image/png">
-        <link rel="apple-touch-icon" href="{{ asset('logo.png') }}">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="apple-mobile-web-app-title" content="StockKu">
+        <link rel="manifest" href="{{ asset('build/manifest.webmanifest') }}">
+        <link rel="icon" href="{{ asset('icons/icon.svg') }}" type="image/svg+xml">
+        <link rel="apple-touch-icon" href="{{ asset('icons/apple-touch-icon.png') }}">
 
         <title>{{ config('app.name', 'Toko Makmur Jaya') }} - @yield('title', 'Dashboard')</title>
 

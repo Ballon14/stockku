@@ -15,10 +15,6 @@ if (livewireAlpine) {
     Alpine.start();
 }
 
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.getRegistrations().then(function(registrations) {
-        for (let registration of registrations) {
-            registration.unregister();
-        }
-    });
-}
+import { registerSW } from 'virtual:pwa-register';
+
+registerSW({ immediate: true });
