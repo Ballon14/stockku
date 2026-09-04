@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Services\SaleService;
 use App\Support\AttendanceGate;
 use Illuminate\Validation\ValidationException;
+use Livewire\Attributes\Computed;
 use Livewire\Component;
 
 class PosTerminal extends Component
@@ -199,22 +200,26 @@ class PosTerminal extends Component
         $this->saveCartToSession();
     }
 
-    public function getSubtotalProperty(): float
+    #[Computed]
+    public function subtotal(): float
     {
         return array_sum(array_column($this->cart, 'subtotal'));
     }
 
-    public function getGrandTotalProperty(): float
+    #[Computed]
+    public function grandTotal(): float
     {
         return max(0, $this->subtotal - (float) $this->diskon);
     }
 
-    public function getKembalianProperty(): float
+    #[Computed]
+    public function kembalian(): float
     {
         return max(0, (float) $this->bayar - $this->grandTotal);
     }
 
-    public function getQrisCodeProperty(): string
+    #[Computed]
+    public function qrisCode(): string
     {
         return (string) config('stockku.qris_code', '');
     }
