@@ -22,7 +22,10 @@
                 </div>
                 <form method="POST" action="{{ route('categories.toggle-active', $category) }}" class="shrink-0" onsubmit="return confirmForm(this, 'Ubah status kategori ini?')">
                     @csrf
-                    <button type="submit" class="px-2 py-0.5 rounded-full text-xs font-semibold hover:shadow-sm transition-all {{ $category->is_active ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' : 'bg-red-100 text-red-700 hover:bg-red-200' }}">
+                    <button type="submit" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold shadow-sm border {{ $category->is_active ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300' : 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100 hover:border-red-300' }} transition-all focus:outline-none focus:ring-2 focus:ring-offset-1 {{ $category->is_active ? 'focus:ring-emerald-500' : 'focus:ring-red-500' }}" title="Klik untuk mengubah status">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                        </svg>
                         {{ $category->is_active ? 'Aktif' : 'Nonaktif' }}
                     </button>
                 </form>
@@ -66,7 +69,10 @@
                 <td class="py-3 px-4 text-center">
                     <form method="POST" action="{{ route('categories.toggle-active', $category) }}" class="inline-block" onsubmit="return confirmForm(this, 'Ubah status kategori ini?')">
                         @csrf
-                        <button type="submit" class="px-2 py-0.5 rounded-full text-xs font-semibold hover:shadow-sm transition-all {{ $category->is_active ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' : 'bg-red-100 text-red-700 hover:bg-red-200' }}">
+                        <button type="submit" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold shadow-sm border {{ $category->is_active ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300' : 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100 hover:border-red-300' }} transition-all focus:outline-none focus:ring-2 focus:ring-offset-1 {{ $category->is_active ? 'focus:ring-emerald-500' : 'focus:ring-red-500' }}" title="Klik untuk mengubah status">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                            </svg>
                             {{ $category->is_active ? 'Aktif' : 'Nonaktif' }}
                         </button>
                     </form>
