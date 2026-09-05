@@ -28,14 +28,11 @@ class EmployeeController extends Controller
 
     public function store(EmployeeRequest $request)
     {
-        $userData = null;
-        if ($request->input('create_account')) {
-            $userData = [
-                'email' => $request->input('user_email'),
-                'password' => $request->input('user_password'),
-                'role' => $request->input('user_role'),
-            ];
-        }
+        $userData = [
+            'email' => $request->input('user_email'),
+            'password' => $request->input('user_password'),
+            'role' => $request->input('user_role'),
+        ];
 
         $employee = $this->employeeService->store($request->only([
             'nama', 'jabatan', 'no_kontak', 'email', 'alamat', 'tanggal_masuk', 'is_active',
@@ -55,14 +52,11 @@ class EmployeeController extends Controller
 
     public function update(EmployeeRequest $request, Employee $employee)
     {
-        $userData = null;
-        if ($request->input('create_account')) {
-            $userData = [
-                'email' => $request->input('user_email'),
-                'password' => $request->input('user_password'),
-                'role' => $request->input('user_role'),
-            ];
-        }
+        $userData = [
+            'email' => $request->input('user_email'),
+            'password' => $request->input('user_password'),
+            'role' => $request->input('user_role'),
+        ];
 
         $this->employeeService->update($employee, $request->only([
             'nama', 'jabatan', 'no_kontak', 'email', 'alamat', 'tanggal_masuk', 'is_active',

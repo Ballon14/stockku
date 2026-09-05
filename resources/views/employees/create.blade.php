@@ -14,19 +14,18 @@
                 </div>
                 <div><label class="block text-sm font-medium text-slate-700 mb-1">Alamat</label><textarea name="alamat" rows="2" class="w-full rounded-xl border-slate-200 text-sm">{{ old('alamat') }}</textarea></div>
                 <hr class="border-slate-200">
-                <div class="flex items-center gap-2">
-                    <input type="checkbox" name="create_account" value="1" id="create_account" {{ old('create_account') ? 'checked' : '' }} class="rounded border-slate-300 text-indigo-600" onchange="document.getElementById('account-fields').classList.toggle('hidden')">
-                    <label for="create_account" class="text-sm font-medium text-slate-700">Buatkan akun login</label>
+                <div class="mb-2">
+                    <h3 class="text-sm font-semibold text-slate-800">Akun Login (Wajib)</h3>
+                    <p class="text-xs text-slate-500">Setiap karyawan wajib memiliki akun untuk mengakses sistem dan absensi.</p>
                 </div>
-                <div id="account-fields" class="{{ old('create_account') ? '' : 'hidden' }} space-y-4 bg-slate-50 p-4 rounded-xl">
-                    <div><label class="block text-sm font-medium text-slate-700 mb-1">Email Akun</label><input type="email" name="user_email" value="{{ old('user_email') }}" class="w-full rounded-xl border-slate-200 text-sm">@error('user_email')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror</div>
-                    <div><label class="block text-sm font-medium text-slate-700 mb-1">Password</label><input type="password" name="user_password" class="w-full rounded-xl border-slate-200 text-sm">@error('user_password')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror</div>
-                    <div><label class="block text-sm font-medium text-slate-700 mb-1">Role</label>
-                        <select name="user_role" class="w-full rounded-xl border-slate-200 text-sm">
+                <div id="account-fields" class="space-y-4 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                    <div><label class="block text-sm font-medium text-slate-700 mb-1">Email Akun <span class="text-red-500">*</span></label><input type="email" name="user_email" value="{{ old('user_email') }}" class="w-full rounded-xl border-slate-200 text-sm" required>@error('user_email')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror</div>
+                    <div><label class="block text-sm font-medium text-slate-700 mb-1">Password <span class="text-red-500">*</span></label><input type="password" name="user_password" class="w-full rounded-xl border-slate-200 text-sm" required>@error('user_password')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror</div>
+                    <div><label class="block text-sm font-medium text-slate-700 mb-1">Role <span class="text-red-500">*</span></label>
+                        <select name="user_role" class="w-full rounded-xl border-slate-200 text-sm" required>
                             <option value="karyawan" {{ old('user_role') == 'karyawan' ? 'selected' : '' }}>Karyawan</option>
                             <option value="kasir" {{ old('user_role') == 'kasir' ? 'selected' : '' }}>Kasir</option>
                             <option value="admin" {{ old('user_role') == 'admin' ? 'selected' : '' }}>Admin</option>
-
                         </select>
                     </div>
                 </div>

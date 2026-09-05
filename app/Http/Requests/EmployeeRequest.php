@@ -21,19 +21,17 @@ class EmployeeRequest extends FormRequest
             'alamat' => 'nullable|string|max:1000',
             'tanggal_masuk' => 'required|date',
             'is_active' => 'boolean',
-            'create_account' => 'boolean',
         ];
 
-        if ($this->input('create_account')) {
-            $userId = $this->route('employee')?->user_id;
-            $rules['user_email'] = 'required|email|unique:users,email,'.$userId;
-            $rules['user_role'] = 'required|in:admin,kasir,karyawan';
+        $employee = $this->route('employee');
+        $userId = $employee?->user_id;
+        $rules['user_email'] = 'required|email|unique:users,email,'.$userId;
+        $rules['user_role'] = 'required|in:admin,kasir,karyawan';
 
-            if (! $this->route('employee')) {
-                $rules['user_password'] = 'required|string|min:8';
-            } else {
-                $rules['user_password'] = 'nullable|string|min:8';
-            }
+        if (! $employee || ! $employee->user_id) {
+            $rules['user_password'] = 'required|string|min:8';
+        } else {
+            $rules['user_password'] = 'nullable|string|min:8';
         }
 
         return $rules;
