@@ -11,8 +11,8 @@
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
         <meta name="apple-mobile-web-app-title" content="StockKu">
         <link rel="manifest" href="{{ asset('build/manifest.webmanifest') }}">
-        <link rel="icon" href="{{ asset('icons/icon.svg') }}" type="image/svg+xml">
-        <link rel="apple-touch-icon" href="{{ asset('icons/apple-touch-icon.png') }}">
+        <link rel="icon" href="{{ asset('logo.png') }}" type="image/png">
+        <link rel="apple-touch-icon" href="{{ asset('logo.png') }}">
 
         <title>{{ config('app.name', 'Toko Makmur Jaya') }} - @yield('title', 'Dashboard')</title>
 
