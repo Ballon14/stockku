@@ -34,6 +34,7 @@ Route::middleware(['auth', 'ensure-attended'])->group(function () {
     // Master Data - Admin only
     Route::middleware('role:admin')->group(function () {
         Route::resource('categories', CategoryController::class)->except('show');
+        Route::post('/categories/{category}/toggle-active', [CategoryController::class, 'toggleActive'])->name('categories.toggle-active');
         Route::resource('products', ProductController::class);
         Route::resource('shifts', App\Http\Controllers\ShiftController::class)->except('show');
         Route::resource('suppliers', SupplierController::class)->except('show');

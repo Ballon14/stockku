@@ -57,4 +57,15 @@ class CategoryController extends Controller
 
         return redirect()->route('categories.index')->with('success', 'Kategori berhasil dihapus.');
     }
+
+    public function toggleActive(Category $category)
+    {
+        $newStatus = ! $category->is_active;
+        $category->update(['is_active' => $newStatus]);
+
+        $status = $newStatus ? 'diaktifkan' : 'dinonaktifkan';
+        app(ActivityLogger::class)->log('category.toggle_active', 'Kategori "'.$category->name.'" '.$status.'.');
+
+        return back()->with('success', 'Kategori "'.$category->name.'" berhasil '.$status.'.');
+    }
 }

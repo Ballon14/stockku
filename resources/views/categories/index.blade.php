@@ -20,7 +20,12 @@
                     <p class="font-medium text-slate-700 truncate">{{ $category->name }}</p>
                     <p class="text-xs text-slate-400 mt-0.5">{{ Str::limit($category->description, 60) }}</p>
                 </div>
-                <span class="shrink-0 px-2 py-0.5 rounded-full text-xs font-semibold {{ $category->is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700' }}">{{ $category->is_active ? 'Aktif' : 'Nonaktif' }}</span>
+                <form method="POST" action="{{ route('categories.toggle-active', $category) }}" class="shrink-0" onsubmit="return confirmForm(this, 'Ubah status kategori ini?')">
+                    @csrf
+                    <button type="submit" class="px-2 py-0.5 rounded-full text-xs font-semibold hover:shadow-sm transition-all {{ $category->is_active ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' : 'bg-red-100 text-red-700 hover:bg-red-200' }}">
+                        {{ $category->is_active ? 'Aktif' : 'Nonaktif' }}
+                    </button>
+                </form>
             </div>
             <div class="flex items-center justify-between">
                 <span class="text-xs text-slate-500"><span class="bg-indigo-100 text-indigo-700 text-xs font-bold px-2 py-0.5 rounded-full">{{ $category->products_count }}</span> produk</span>
@@ -59,7 +64,12 @@
                 <td class="py-3 px-4 text-slate-500">{{ Str::limit($category->description, 50) }}</td>
                 <td class="py-3 px-4 text-center"><span class="bg-indigo-100 text-indigo-700 text-xs font-bold px-2 py-0.5 rounded-full">{{ $category->products_count }}</span></td>
                 <td class="py-3 px-4 text-center">
-                    <span class="px-2 py-0.5 rounded-full text-xs font-semibold {{ $category->is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700' }}">{{ $category->is_active ? 'Aktif' : 'Nonaktif' }}</span>
+                    <form method="POST" action="{{ route('categories.toggle-active', $category) }}" class="inline-block" onsubmit="return confirmForm(this, 'Ubah status kategori ini?')">
+                        @csrf
+                        <button type="submit" class="px-2 py-0.5 rounded-full text-xs font-semibold hover:shadow-sm transition-all {{ $category->is_active ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' : 'bg-red-100 text-red-700 hover:bg-red-200' }}">
+                            {{ $category->is_active ? 'Aktif' : 'Nonaktif' }}
+                        </button>
+                    </form>
                 </td>
                 <td class="py-3 px-4 text-center">
                     <div class="flex items-center justify-center gap-1">
