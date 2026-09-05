@@ -32,9 +32,9 @@ class SaleService
             $preparedItems = [];
 
             foreach ($items as $item) {
-                $product = Product::query()->lockForUpdate()->find($item['product_id']);
+                $product = Product::with('category')->lockForUpdate()->find($item['product_id']);
 
-                if (! $product || ! $product->is_active) {
+                if (! $product || ! $product->is_active || ! $product->category?->is_active) {
                     throw ValidationException::withMessages(['items' => 'Produk tidak ditemukan atau tidak aktif.']);
                 }
 

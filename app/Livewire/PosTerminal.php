@@ -104,6 +104,7 @@ class PosTerminal extends Component
     private function findByCode(string $code): ?Product
     {
         return Product::where('is_active', true)
+            ->whereHas('category', fn($q) => $q->where('is_active', true))
             ->where(function ($query) use ($code) {
                 $query->where('barcode', $code)
                     ->orWhereRaw('LOWER(sku) = ?', [mb_strtolower($code)]);
@@ -262,9 +263,9 @@ class PosTerminal extends Component
         $validated = [];
 
         foreach ($data['cart'] as $key => $item) {
-            $product = Product::find($item['product_id'] ?? null);
+            $product = Product::with('category')->find($item['product_id'] ?? null);
 
-            if (! $product || ! $product->is_active || $product->stok <= 0) {
+            if (! $product || ! $product->is_active || ! $product->category?->is_active || $product->stok <= 0) {
                 continue;
             }
 
@@ -340,7 +341,9 @@ class PosTerminal extends Component
 
     public function render()
     {
-        $query = Product::where('is_active', true)->where('stok', '>', 0);
+        $query = Product::where('is_active', true)
+            ->whereHas('category', fn($q) => $q->where('is_active', true))
+            ->where('stok', '>', 0);
 
         if (strlen($this->search) > 0) {
             $query->where(function ($q) {
