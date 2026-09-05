@@ -13,8 +13,8 @@ export default defineConfig({
             injectRegister: 'auto',
             includeAssets: ['favicon.ico'],
             manifest: {
-                name: 'StockKu - POS & Inventory',
-                short_name: 'StockKu',
+                name: 'Toko Makmur',
+                short_name: 'Toko Makmur',
                 description: 'Manajemen Toko & Kasir Modern',
                 lang: 'id',
                 start_url: '/',
@@ -23,9 +23,9 @@ export default defineConfig({
                 background_color: '#0f172a',
                 theme_color: '#6366f1',
                 icons: [
-                    { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
-                    { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' },
-                    { src: '/icons/icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+                    { src: '/logo.png', sizes: '192x192', type: 'image/png' },
+                    { src: '/logo.png', sizes: '512x512', type: 'image/png' },
+                    { src: '/logo.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' },
                 ],
             },
             workbox: {
