@@ -16,6 +16,12 @@ class AttendanceGateTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        config()->set('app.attendance_enabled', true);
+    }
+
     private function createEmployeeUser(): User
     {
         $user = User::factory()->create();

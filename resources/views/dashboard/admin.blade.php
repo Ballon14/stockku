@@ -14,7 +14,7 @@
 <!-- Stats Cards -->
 
 
-@if($data['low_stock_count'] > 0 || ($data['attendance_summary']['tidak_hadir'] ?? 0) > 0)
+@if($data['low_stock_count'] > 0 || (config('app.attendance_enabled') && ($data['attendance_summary']['tidak_hadir'] ?? 0) > 0))
 <div class="mb-8 rounded-2xl bg-gradient-to-r from-amber-50 to-amber-100 border-2 border-amber-300 shadow-lg shadow-amber-500/20 overflow-hidden">
     <div class="p-5">
         <div class="flex items-center gap-3 mb-4">
@@ -41,7 +41,7 @@
                 </a>
             </div>
             @endif
-            @if(($data['attendance_summary']['tidak_hadir'] ?? 0) > 0)
+            @if(config('app.attendance_enabled') && ($data['attendance_summary']['tidak_hadir'] ?? 0) > 0)
             <div class="flex flex-wrap items-center gap-3 bg-white/80 rounded-xl border border-amber-200 p-4">
                 <span class="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center shrink-0">
                     <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -85,7 +85,7 @@
         </div>
     </div>
 
-    @if(auth()->user()->hasRole(['admin']))
+    @if(config('app.attendance_enabled') && auth()->user()->hasRole(['admin']))
     <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition-shadow {{ $data['attendance_summary']['tidak_hadir'] > 0 ? 'border-amber-300 shadow-lg shadow-amber-500/20' : '' }}">
         <div class="flex items-center justify-between">
             <div>

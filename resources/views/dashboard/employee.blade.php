@@ -7,6 +7,7 @@
 
 
 <div class="max-w-2xl mx-auto">
+    @if(config('app.attendance_enabled'))
     <!-- Riwayat Absensi Terakhir -->
     <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
         <h3 class="text-lg font-semibold text-slate-800 mb-4">Riwayat Absensi Terakhir</h3>
@@ -31,5 +32,11 @@
             @endforelse
         </div>
     </div>
+    @else
+    <!-- Attendance disabled -->
+    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 text-center">
+        <p class="text-sm text-slate-500">Selamat datang, {{ auth()->user()->name }}!</p>
+    </div>
+    @endif
 </div>
 </x-app-layout>

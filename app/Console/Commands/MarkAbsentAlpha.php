@@ -16,6 +16,12 @@ class MarkAbsentAlpha extends Command
 
     public function handle(): int
     {
+        if (! config('app.attendance_enabled')) {
+            $this->info('Fitur absensi dinonaktifkan (ATTENDANCE_ENABLED=false). Tidak ada yang diproses.');
+
+            return self::SUCCESS;
+        }
+
         $date = $this->option('date')
             ? Carbon::parse($this->option('date'))->toDateString()
             : Carbon::yesterday()->toDateString();

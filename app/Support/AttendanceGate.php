@@ -10,6 +10,10 @@ class AttendanceGate
 {
     public static function isAttended(User $user): bool
     {
+        if (! config('app.attendance_enabled')) {
+            return true;
+        }
+
         if (! $user->employee || $user->hasRole('admin')) {
             return true;
         }

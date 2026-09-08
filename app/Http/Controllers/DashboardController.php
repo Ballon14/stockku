@@ -17,7 +17,9 @@ class DashboardController extends Controller
 
         if ($user->hasRole(['admin'])) {
             $data = $this->reportService->getDashboardData();
-            $data['attendance_summary'] = app(AttendanceService::class)->getTodaySummary();
+            $data['attendance_summary'] = config('app.attendance_enabled')
+                ? app(AttendanceService::class)->getTodaySummary()
+                : ['total' => 0, 'hadir' => 0, 'berizin' => 0, 'tidak_hadir' => 0];
 
             return view('dashboard.admin', compact('data'));
         }
@@ -33,7 +35,7 @@ class DashboardController extends Controller
         $todayAttendance = null;
         $recentAttendances = collect();
 
-        if ($employee) {
+        if ($employee && config('app.attendance_enabled')) {
             $todayAttendance = app(AttendanceService::class)->getTodayAttendance($employee);
             $recentAttendances = $employee->attendances()->latest('tanggal')->limit(7)->get();
         }

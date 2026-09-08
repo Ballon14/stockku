@@ -11,6 +11,10 @@ class EnsureAttended
 {
     public function handle(Request $request, Closure $next): Response
     {
+        if (! config('app.attendance_enabled')) {
+            return $next($request);
+        }
+
         $user = $request->user();
 
         if (! $user || ! $user->employee || $user->hasRole('admin')) {

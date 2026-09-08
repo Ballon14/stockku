@@ -69,6 +69,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Attendance Feature Toggle
+    |--------------------------------------------------------------------------
+    |
+    | Aktifkan/nonaktifkan fitur absensi (clock-in/out, attendance gate,
+    | mark-alpha). Set ATTENDANCE_ENABLED=false di .env untuk menonaktifkan.
+    |
+    */
+
+    'attendance_enabled' => (bool) env('ATTENDANCE_ENABLED', true),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Locale Configuration
     |--------------------------------------------------------------------------
     |
