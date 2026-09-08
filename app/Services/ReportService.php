@@ -157,7 +157,13 @@ class ReportService
 
     public function getAttendanceReport($startDate, $endDate, $employeeId = null, $paginate = true)
     {
-        $query = Employee::where('is_active', true)->orderBy('nama');
+        $query = Employee::where('is_active', true)
+            ->whereHas('user', function ($q) {
+                $q->whereDoesntHave('roles', function ($r) {
+                    $r->where('name', 'admin');
+                });
+            })
+            ->orderBy('nama');
 
         if ($employeeId) {
             $query->where('id', $employeeId);

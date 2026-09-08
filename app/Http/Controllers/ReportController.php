@@ -94,7 +94,14 @@ class ReportController extends Controller
         $employeeId = $request->input('employee_id');
 
         $data = $this->reportService->getAttendanceReport($startDate, $endDate, $employeeId, $request->input('export') !== 'pdf');
-        $employees = Employee::where('is_active', true)->orderBy('nama')->get();
+        $employees = Employee::where('is_active', true)
+            ->whereHas('user', function ($q) {
+                $q->whereDoesntHave('roles', function ($r) {
+                    $r->where('name', 'admin');
+                });
+            })
+            ->orderBy('nama')
+            ->get();
 
         if ($request->input('export') === 'pdf') {
             $pdf = Pdf::loadView('reports.attendance-pdf', compact('data', 'startDate', 'endDate'));

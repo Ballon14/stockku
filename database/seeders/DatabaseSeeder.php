@@ -232,8 +232,12 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        // Create sample attendances
-        $allEmployees = Employee::all();
+        // Create sample attendances (exclude admin — admin is exempt from attendance)
+        $allEmployees = Employee::whereHas('user', function ($q) {
+            $q->whereDoesntHave('roles', function ($r) {
+                $r->where('name', 'admin');
+            });
+        })->get();
         for ($day = 5; $day >= 0; $day--) {
             $date = Carbon::now()->subDays($day);
             if ($date->isWeekend()) {
