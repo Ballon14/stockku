@@ -61,6 +61,11 @@ Route::middleware(['auth', 'ensure-attended'])->group(function () {
         // Attendance Admin
         Route::get('/attendance/admin', [AttendanceController::class, 'adminIndex'])->name('attendance.admin');
 
+        // Settings
+        Route::get('/settings/database', [\App\Http\Controllers\SettingController::class, 'databaseIndex'])->name('settings.database');
+        Route::get('/settings/database/backup', [\App\Http\Controllers\SettingController::class, 'backupDatabase'])->name('settings.database.backup');
+        Route::post('/settings/database/restore', [\App\Http\Controllers\SettingController::class, 'restoreDatabase'])->name('settings.database.restore');
+
         // Activity Logs
         Route::get('/activity-logs', [ActivityLogController::class, 'index'])->name('activity-logs.index');
     });
