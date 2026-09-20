@@ -52,6 +52,12 @@ class SettingController extends Controller
         $command = "{$mysqldumpPath} --user={$username} {$passwordArg} --host={$host} --port={$port} {$database} > \"{$path}\" 2>&1";
 
         try {
+            // Fix Windows 10106 (WSAEPROVIDERFAILEDINIT) error
+            if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                putenv('SystemRoot=C:\Windows');
+                putenv('WINDIR=C:\Windows');
+            }
+
             exec($command, $output, $returnVar);
 
             if ($returnVar !== 0) {
