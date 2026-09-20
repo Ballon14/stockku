@@ -26,59 +26,103 @@
                 <div x-show="showImport" x-transition.scale.origin.bottom class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
                     <form action="{{ route('products.import') }}" method="POST" enctype="multipart/form-data">
                         @csrf
-                        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                            <div class="sm:flex sm:items-start">
-                                <div class="mx-auto shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100 sm:mx-0 sm:h-12 sm:w-12 border-4 border-indigo-50">
-                                    <svg class="h-5 w-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                        <div class="bg-white">
+                            <div class="p-6 sm:p-8">
+                                <div class="flex items-center justify-between mb-6">
+                                    <div class="flex items-center gap-4">
+                                        <div class="flex items-center justify-center h-12 w-12 rounded-2xl bg-indigo-50 text-indigo-600">
+                                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-xl font-bold text-slate-800" id="modal-title">Import Data Produk</h3>
+                                            <p class="text-sm text-slate-500 mt-0.5">Unggah file CSV untuk menambahkan banyak produk sekaligus.</p>
+                                        </div>
+                                    </div>
+                                    <button type="button" @click="showImport = false" class="text-slate-400 hover:text-slate-500 transition-colors focus:outline-none">
+                                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                    </button>
                                 </div>
-                                <div class="mt-4 text-center sm:mt-0 sm:ml-5 sm:text-left w-full">
-                                    <h3 class="text-xl font-bold text-slate-800 mb-1" id="modal-title">Import Data Produk</h3>
-                                    <p class="text-sm text-slate-500 mb-4">Unggah file CSV Anda dengan format urutan kolom berikut:</p>
 
-                                    <div class="flex flex-wrap gap-1.5 mb-4">
-                                        <span class="px-2 py-1 bg-slate-100 text-slate-600 text-xs font-mono rounded-lg border border-slate-200">Nama Produk</span>
-                                        <span class="px-2 py-1 bg-slate-100 text-slate-600 text-xs font-mono rounded-lg border border-slate-200">Kategori</span>
-                                        <span class="px-2 py-1 bg-slate-100 text-slate-600 text-xs font-mono rounded-lg border border-slate-200">Harga Beli</span>
-                                        <span class="px-2 py-1 bg-slate-100 text-slate-600 text-xs font-mono rounded-lg border border-slate-200">Harga Jual</span>
-                                        <span class="px-2 py-1 bg-slate-100 text-slate-600 text-xs font-mono rounded-lg border border-slate-200">Stok</span>
-                                        <span class="px-2 py-1 bg-slate-100 text-slate-600 text-xs font-mono rounded-lg border border-slate-200">Min Stok</span>
-                                        <span class="px-2 py-1 bg-slate-100 text-slate-600 text-xs font-mono rounded-lg border border-slate-200">Satuan</span>
-                                    </div>
-
-                                    <div class="bg-amber-50/80 border border-amber-200 rounded-xl p-3 flex items-start gap-2.5 mb-5">
-                                        <svg class="w-4 h-4 text-amber-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                        <p class="text-xs text-amber-700 leading-relaxed">SKU akan dibuat otomatis berdasarkan kategori (Misal: MKN-0001). Jangan masukkan kolom SKU atau Barcode di file CSV.</p>
-                                    </div>
-
-                                    <div class="mb-5">
-                                        <label class="block text-sm font-semibold text-slate-700 mb-2">Pilih File CSV</label>
-                                        <div class="relative group">
-                                            <input type="file" name="file" accept=".csv" required class="block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 border border-slate-200 rounded-xl cursor-pointer bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all">
+                                <div class="space-y-6">
+                                    <!-- Area Drag and Drop -->
+                                    <div x-data="{ fileName: '', isDragging: false }">
+                                        <div class="relative group" 
+                                             @dragover.prevent="isDragging = true" 
+                                             @dragleave.prevent="isDragging = false" 
+                                             @drop.prevent="isDragging = false; fileName = $event.dataTransfer.files[0].name; $refs.fileInput.files = $event.dataTransfer.files">
+                                            
+                                            <label class="flex justify-center w-full h-32 px-4 transition bg-white border-2 border-slate-300 border-dashed rounded-2xl appearance-none cursor-pointer hover:border-indigo-400 focus:outline-none"
+                                                   :class="{ 'border-indigo-500 bg-indigo-50': isDragging }">
+                                                <span class="flex items-center space-x-2">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-slate-400 group-hover:text-indigo-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                                    </svg>
+                                                    <span class="font-medium text-slate-500 group-hover:text-indigo-600 transition-colors">
+                                                        <span x-text="fileName ? fileName : 'Klik pilih file CSV atau drag ke sini'"></span>
+                                                    </span>
+                                                </span>
+                                                <input x-ref="fileInput" type="file" name="file" accept=".csv" class="hidden" required @change="fileName = $event.target.files[0].name">
+                                            </label>
                                         </div>
                                     </div>
 
-                                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
-                                        <p class="text-sm font-semibold text-slate-700 mb-1">Unduh Template Kosong</p>
-                                        <p class="text-xs text-slate-500 mb-3">Pilih kategori untuk mengisi nama kategori secara otomatis pada template.</p>
-                                        <div class="flex items-center gap-2">
-                                            <select id="template-category" class="text-sm rounded-xl border-slate-300 py-2 focus:ring-indigo-500 focus:border-indigo-500 flex-1 bg-white shadow-sm">
-                                                <option value="">Semua Kategori (Umum)</option>
-                                                @foreach($categories as $cat)
-                                                    <option value="{{ $cat->name }}">{{ $cat->name }}</option>
-                                                @endforeach
-                                            </select>
-                                            <button type="button" onclick="window.location.href='{{ route('products.template') }}?category=' + encodeURIComponent(document.getElementById('template-category').value)" class="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-white border border-slate-300 text-slate-700 text-sm font-semibold rounded-xl shadow-sm hover:bg-slate-50 hover:text-indigo-600 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                                                Unduh
-                                            </button>
+                                    <!-- Informasi Kolom & Template -->
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                                            <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">Kolom Wajib (Berurutan)</h4>
+                                            <div class="flex flex-wrap gap-1.5">
+                                                <span class="px-2 py-1 bg-white text-slate-600 text-[10px] font-semibold rounded-md border border-slate-200 shadow-sm">Nama Produk</span>
+                                                <span class="px-2 py-1 bg-white text-slate-600 text-[10px] font-semibold rounded-md border border-slate-200 shadow-sm">Kategori</span>
+                                                <span class="px-2 py-1 bg-white text-slate-600 text-[10px] font-semibold rounded-md border border-slate-200 shadow-sm">Harga Beli</span>
+                                                <span class="px-2 py-1 bg-white text-slate-600 text-[10px] font-semibold rounded-md border border-slate-200 shadow-sm">Harga Jual</span>
+                                                <span class="px-2 py-1 bg-white text-slate-600 text-[10px] font-semibold rounded-md border border-slate-200 shadow-sm">Stok</span>
+                                                <span class="px-2 py-1 bg-white text-slate-600 text-[10px] font-semibold rounded-md border border-slate-200 shadow-sm">Min Stok</span>
+                                                <span class="px-2 py-1 bg-white text-slate-600 text-[10px] font-semibold rounded-md border border-slate-200 shadow-sm">Satuan</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 flex flex-col justify-between">
+                                            <div>
+                                                <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Unduh Template</h4>
+                                                <p class="text-[11px] text-slate-500 mb-2">Pilih kategori untuk autofill nama kategori.</p>
+                                            </div>
+                                            <div class="flex gap-2">
+                                                <select id="template-category" class="text-xs rounded-lg border-slate-300 py-1.5 focus:ring-indigo-500 focus:border-indigo-500 flex-1 bg-white shadow-sm">
+                                                    <option value="">Semua (Umum)</option>
+                                                    @foreach($categories as $cat)
+                                                        <option value="{{ $cat->name }}">{{ $cat->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                                <button type="button" onclick="window.location.href='{{ route('products.template') }}?category=' + encodeURIComponent(document.getElementById('template-category').value)" class="px-3 py-1.5 bg-white border border-slate-300 text-slate-700 text-xs font-semibold rounded-lg shadow-sm hover:bg-slate-50 hover:text-indigo-600 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                                    Unduh
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Warning Alert -->
+                                    <div class="bg-amber-50/80 rounded-xl p-3 flex gap-3 border border-amber-200">
+                                        <div class="flex-shrink-0 mt-0.5">
+                                            <svg class="h-4 w-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs text-amber-800 leading-relaxed">
+                                                <strong class="font-semibold">Perhatian:</strong> SKU akan dibuat otomatis oleh sistem (Misal: MKN-0001). Jangan masukkan kolom SKU atau Barcode di dalam file CSV agar proses berhasil.
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="bg-slate-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-slate-100">
-                            <button type="submit" class="w-full inline-flex justify-center rounded-xl border border-transparent shadow-sm px-6 py-2 bg-indigo-600 text-base font-semibold text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm transition-colors">Import Sekarang</button>
-                            <button type="button" @click="showImport = false" class="mt-3 w-full inline-flex justify-center rounded-xl border border-slate-300 shadow-sm px-6 py-2 bg-white text-base font-semibold text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transition-colors">Batal</button>
+                        <div class="bg-slate-50/80 backdrop-blur px-6 py-4 border-t border-slate-100 flex items-center justify-end gap-3 rounded-b-2xl">
+                            <button type="button" @click="showImport = false" class="inline-flex justify-center items-center px-4 py-2 bg-white border border-slate-300 text-sm font-semibold rounded-xl text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shadow-sm transition-all">
+                                Batal
+                            </button>
+                            <button type="submit" class="inline-flex justify-center items-center px-6 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 border border-transparent rounded-xl text-sm font-semibold text-white hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shadow-md shadow-indigo-500/30 transition-all">
+                                Import Data
+                            </button>
                         </div>
                     </form>
                 </div>
