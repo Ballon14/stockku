@@ -18,9 +18,7 @@ class RestockTerminal extends Component
 
     public array $cart = [];
 
-    public string $barcode = '';
 
-    public ?string $barcodeError = null;
 
     public $supplierId = '';
 
@@ -47,26 +45,7 @@ class RestockTerminal extends Component
         }
     }
 
-    public function addByBarcode(?string $code = null): void
-    {
-        $code = trim((string) ($code ?? $this->barcode));
-        $this->barcode = '';
 
-        if ($code === '') {
-            return;
-        }
-
-        $product = $this->findByCode($code);
-
-        if (! $product) {
-            $this->barcodeError = "Barcode/SKU \"{$code}\" tidak ditemukan.";
-
-            return;
-        }
-
-        $this->barcodeError = null;
-        $this->addToCart($product->id);
-    }
 
     public function addBySearchEnter(): void
     {

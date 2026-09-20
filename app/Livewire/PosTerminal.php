@@ -29,9 +29,7 @@ class PosTerminal extends Component
 
     public ?int $lastSaleId = null;
 
-    public string $barcode = '';
 
-    public ?string $barcodeError = null;
 
     public function mount(): void
     {
@@ -62,26 +60,7 @@ class PosTerminal extends Component
         // Triggered reactively
     }
 
-    public function addByBarcode(?string $code = null): void
-    {
-        $code = trim((string) ($code ?? $this->barcode));
-        $this->barcode = '';
 
-        if ($code === '') {
-            return;
-        }
-
-        $product = $this->findByCode($code);
-
-        if (! $product) {
-            $this->barcodeError = "Barcode/SKU \"{$code}\" tidak ditemukan.";
-
-            return;
-        }
-
-        $this->barcodeError = null;
-        $this->addToCart($product->id);
-    }
 
     public function addBySearchEnter(): void
     {
