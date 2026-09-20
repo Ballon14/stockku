@@ -35,6 +35,8 @@ Route::middleware(['auth', 'ensure-attended'])->group(function () {
     Route::middleware('role:admin')->group(function () {
         Route::resource('categories', CategoryController::class)->except('show');
         Route::post('/categories/{category}/toggle-active', [CategoryController::class, 'toggleActive'])->name('categories.toggle-active');
+        Route::get('/products/export', [ProductController::class, 'exportCsv'])->name('products.export');
+        Route::post('/products/import', [ProductController::class, 'importCsv'])->name('products.import');
         Route::resource('products', ProductController::class);
         Route::resource('shifts', App\Http\Controllers\ShiftController::class)->except('show');
         Route::resource('suppliers', SupplierController::class)->except('show');
