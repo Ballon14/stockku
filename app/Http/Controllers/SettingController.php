@@ -49,14 +49,15 @@ class SettingController extends Controller
         }
 
         $passwordArg = empty($password) ? '' : "--password={$password}";
-        $command = "{$mysqldumpPath} --user={$username} {$passwordArg} --host={$host} --port={$port} {$database} > \"{$path}\"";
+        $command = "{$mysqldumpPath} --user={$username} {$passwordArg} --host={$host} --port={$port} {$database} > \"{$path}\" 2>&1";
 
         try {
-            $result = Process::run($command);
+            exec($command, $output, $returnVar);
 
-            if ($result->failed()) {
-                Log::error('Backup failed: ' . $result->errorOutput());
-                return back()->with('error', 'Gagal membackup database. Pastikan mysqldump tersedia di sistem Anda. Pesan: ' . $result->errorOutput());
+            if ($returnVar !== 0) {
+                $errorMsg = implode("\n", $output);
+                Log::error('Backup failed: ' . $errorMsg);
+                return back()->with('error', 'Gagal membackup database. Pastikan mysqldump tersedia di sistem Anda. Pesan: ' . $errorMsg);
             }
 
             if (File::exists($path) && filesize($path) > 0) {
