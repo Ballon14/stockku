@@ -20,16 +20,11 @@ class SettingController extends Controller
     }
 
     /**
-     * Jalankan proses ekspor/backup database ke file .sql
+     * Jalankan proses ekspor/backup database ke file .sql (Pure PHP)
      */
     public function backupDatabase()
     {
         $database = env('DB_DATABASE');
-        $username = env('DB_USERNAME', 'root');
-        $password = env('DB_PASSWORD', '');
-        $host = env('DB_HOST', '127.0.0.1');
-        $port = env('DB_PORT', '3306');
-
         $filename = 'backup_' . $database . '_' . date('Y-m-d_H-i-s') . '.sql';
         $path = storage_path('app/private/' . $filename);
 
@@ -38,33 +33,62 @@ class SettingController extends Controller
             File::makeDirectory(storage_path('app/private'), 0755, true);
         }
 
-        // Susun perintah mysqldump.
-        // Catatan: Gunakan path mysqldump secara spesifik jika berada di windows (XAMPP).
-        // Kita berasumsi mysqldump bisa diakses secara global, atau fallback ke path XAMPP umum.
-        $mysqldumpPath = 'mysqldump';
-        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-            if (File::exists('C:\xampp\mysql\bin\mysqldump.exe')) {
-                $mysqldumpPath = '"C:\xampp\mysql\bin\mysqldump.exe"';
-            }
-        }
-
-        $passwordArg = empty($password) ? '' : "--password={$password}";
-        $command = "{$mysqldumpPath} --user={$username} {$passwordArg} --host={$host} --port={$port} {$database} > \"{$path}\" 2>&1";
-
         try {
-            // Fix Windows 10106 (WSAEPROVIDERFAILEDINIT) error
-            if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-                putenv('SystemRoot=C:\Windows');
-                putenv('WINDIR=C:\Windows');
+            // Kita akan menggunakan Pure PHP untuk membackup database agar terhindar dari isu mysqldump TCP/IP Windows
+            $tables = DB::select('SHOW TABLES');
+            $tablesProperty = "Tables_in_{$database}";
+
+            $sqlScript = "-- Database Backup\n";
+            $sqlScript .= "-- Waktu: " . date('Y-m-d H:i:s') . "\n";
+            $sqlScript .= "-- Database: {$database}\n\n";
+            $sqlScript .= "SET FOREIGN_KEY_CHECKS=0;\n\n";
+
+            foreach ($tables as $table) {
+                // PDO mengembalikan objek dengan properti dinamis (nama db) atau bentuk array tergantung fetch mode
+                $tableName = (array)$table;
+                $tableName = array_values($tableName)[0];
+
+                $sqlScript .= "--\n-- Struktur tabel untuk `{$tableName}`\n--\n";
+                $sqlScript .= "DROP TABLE IF EXISTS `{$tableName}`;\n";
+                
+                $createTable = DB::select("SHOW CREATE TABLE `{$tableName}`");
+                $createTableProperty = 'Create Table';
+                $createTableStmt = $createTable[0]->$createTableProperty ?? ((array)$createTable[0])['Create Table'];
+                $sqlScript .= $createTableStmt . ";\n\n";
+
+                $sqlScript .= "--\n-- Data untuk tabel `{$tableName}`\n--\n";
+                $rows = DB::table($tableName)->get();
+
+                if ($rows->count() > 0) {
+                    // Agar efisien, kita batch per 100 baris jika jumlahnya banyak
+                    foreach ($rows->chunk(100) as $chunk) {
+                        $inserts = [];
+                        foreach ($chunk as $row) {
+                            $row = (array)$row;
+                            $values = [];
+                            foreach ($row as $value) {
+                                if (is_null($value)) {
+                                    $values[] = 'NULL';
+                                } else {
+                                    // Escape string
+                                    $value = addslashes($value);
+                                    // Bersihkan line breaks
+                                    $value = str_replace(["\n", "\r"], ["\\n", "\\r"], $value);
+                                    $values[] = "'{$value}'";
+                                }
+                            }
+                            $inserts[] = "(" . implode(', ', $values) . ")";
+                        }
+                        $sqlScript .= "INSERT INTO `{$tableName}` VALUES " . implode(", ", $inserts) . ";\n";
+                    }
+                }
+                $sqlScript .= "\n\n";
             }
 
-            exec($command, $output, $returnVar);
+            $sqlScript .= "SET FOREIGN_KEY_CHECKS=1;\n";
 
-            if ($returnVar !== 0) {
-                $errorMsg = implode("\n", $output);
-                Log::error('Backup failed: ' . $errorMsg);
-                return back()->with('error', 'Gagal membackup database. Pastikan mysqldump tersedia di sistem Anda. Pesan: ' . $errorMsg);
-            }
+            // Tulis file ke storage
+            File::put($path, $sqlScript);
 
             if (File::exists($path) && filesize($path) > 0) {
                 return response()->download($path, $filename)->deleteFileAfterSend(true);
@@ -74,7 +98,7 @@ class SettingController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Exception on backup: ' . $e->getMessage());
-            return back()->with('error', 'Terjadi kesalahan sistem: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan sistem saat membuat backup: ' . $e->getMessage());
         }
     }
 
