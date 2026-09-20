@@ -195,4 +195,40 @@ class ProductController extends Controller
             fclose($handle);
         }
     }
+
+    public function downloadTemplate(\Illuminate\Http\Request $request)
+    {
+        $categoryName = $request->query('category', '');
+        $filename = "template_produk" . ($categoryName ? "_" . \Illuminate\Support\Str::slug($categoryName) : "") . ".csv";
+
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$filename",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+
+        $columns = ['Nama Produk', 'Kategori', 'Harga Beli', 'Harga Jual', 'Stok', 'Min Stok', 'Satuan'];
+
+        $callback = function() use($columns, $categoryName) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+
+            $sampleRow = [
+                'Contoh Produk (Hapus Baris Ini)',
+                $categoryName ?: 'Nama Kategori',
+                '10000',
+                '15000',
+                '50',
+                '10',
+                'pcs'
+            ];
+            fputcsv($file, $sampleRow);
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
 }

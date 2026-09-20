@@ -35,11 +35,25 @@
                                     <h3 class="text-lg leading-6 font-medium text-slate-900" id="modal-title">Import Data Produk</h3>
                                     <div class="mt-2 text-sm text-slate-500">
                                         <p class="mb-2">Unggah file CSV Anda. Kolom yang dibutuhkan (urutan harus sama):</p>
-                                        <code class="block bg-slate-50 p-2 rounded text-xs overflow-x-auto whitespace-nowrap border border-slate-200">Nama Produk, Kategori, Harga Beli, Harga Jual, Stok, Min Stok, Satuan</code>
+                                        <code class="block bg-slate-50 p-2 rounded text-xs whitespace-normal break-words border border-slate-200">Nama Produk, Kategori, Harga Beli, Harga Jual, Stok, Min Stok, Satuan</code>
                                         <p class="mt-2 text-xs text-amber-600 bg-amber-50 p-2 rounded-lg border border-amber-200">SKU akan dibuat otomatis berdasarkan kategori (Misal: MKN-0001). Jangan masukkan kolom SKU/Barcode di dalam file CSV.</p>
                                     </div>
                                     <div class="mt-4">
                                         <input type="file" name="file" accept=".csv" required class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                                    </div>
+                                    <div class="mt-4 pt-4 border-t border-slate-100">
+                                        <p class="text-sm font-medium text-slate-700 mb-2">Unduh Template Kosong:</p>
+                                        <div class="flex gap-2">
+                                            <select id="template-category" class="text-sm rounded-xl border-slate-200 py-2 focus:ring-indigo-500 focus:border-indigo-500 flex-1">
+                                                <option value="">Semua Kategori (Umum)</option>
+                                                @foreach($categories as $cat)
+                                                    <option value="{{ $cat->name }}">{{ $cat->name }}</option>
+                                                @endforeach
+                                            </select>
+                                            <button type="button" onclick="window.location.href='{{ route('products.template') }}?category=' + encodeURIComponent(document.getElementById('template-category').value)" class="px-4 py-2 bg-white border border-slate-300 text-slate-700 text-sm font-medium rounded-xl hover:bg-slate-50 transition-colors">
+                                                Unduh
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
