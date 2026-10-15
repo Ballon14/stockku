@@ -138,18 +138,18 @@ class DatabaseSeeder extends Seeder
 
         // Products
         $products = [
-            ['category_id' => $catModels[0]->id, 'name' => 'Indomie Goreng', 'sku' => 'MKN-001', 'barcode' => '8886008101053', 'harga_beli' => 2500, 'harga_jual' => 3500, 'stok' => 100, 'min_stok' => 20, 'satuan' => 'pcs'],
-            ['category_id' => $catModels[0]->id, 'name' => 'Chitato Original 68g', 'sku' => 'MKN-002', 'barcode' => '8886467100014', 'harga_beli' => 8000, 'harga_jual' => 11000, 'stok' => 50, 'min_stok' => 10, 'satuan' => 'pcs'],
-            ['category_id' => $catModels[0]->id, 'name' => 'Roti Sari Roti Tawar', 'sku' => 'MKN-003', 'barcode' => '8992801888001', 'harga_beli' => 12000, 'harga_jual' => 15000, 'stok' => 30, 'min_stok' => 5, 'satuan' => 'pcs'],
-            ['category_id' => $catModels[1]->id, 'name' => 'Aqua 600ml', 'sku' => 'MNM-001', 'barcode' => '8886008101237', 'harga_beli' => 2000, 'harga_jual' => 3000, 'stok' => 200, 'min_stok' => 50, 'satuan' => 'botol'],
-            ['category_id' => $catModels[1]->id, 'name' => 'Teh Pucuk Harum 350ml', 'sku' => 'MNM-002', 'barcode' => '8996001600146', 'harga_beli' => 2500, 'harga_jual' => 4000, 'stok' => 80, 'min_stok' => 20, 'satuan' => 'botol'],
-            ['category_id' => $catModels[1]->id, 'name' => 'Coca Cola 390ml', 'sku' => 'MNM-003', 'barcode' => '5000112602333', 'harga_beli' => 4000, 'harga_jual' => 6000, 'stok' => 60, 'min_stok' => 15, 'satuan' => 'botol'],
-            ['category_id' => $catModels[2]->id, 'name' => 'Sabun Cuci Sunlight 800ml', 'sku' => 'KBR-001', 'barcode' => '8999999527679', 'harga_beli' => 10000, 'harga_jual' => 14000, 'stok' => 40, 'min_stok' => 10, 'satuan' => 'botol'],
-            ['category_id' => $catModels[2]->id, 'name' => 'Pewangi So Klin 900ml', 'sku' => 'KBR-002', 'barcode' => '8998866602136', 'harga_beli' => 12000, 'harga_jual' => 16000, 'stok' => 35, 'min_stok' => 8, 'satuan' => 'botol'],
-            ['category_id' => $catModels[3]->id, 'name' => 'Beras Premium 5kg', 'sku' => 'SMB-001', 'barcode' => '8991102220019', 'harga_beli' => 55000, 'harga_jual' => 65000, 'stok' => 25, 'min_stok' => 5, 'satuan' => 'karung'],
-            ['category_id' => $catModels[3]->id, 'name' => 'Gula Pasir 1kg', 'sku' => 'SMB-002', 'barcode' => '8991102330015', 'harga_beli' => 12000, 'harga_jual' => 15000, 'stok' => 40, 'min_stok' => 10, 'satuan' => 'kg'],
-            ['category_id' => $catModels[3]->id, 'name' => 'Minyak Goreng Bimoli 2L', 'sku' => 'SMB-003', 'barcode' => '8991102440012', 'harga_beli' => 28000, 'harga_jual' => 34000, 'stok' => 20, 'min_stok' => 5, 'satuan' => 'botol'],
-            ['category_id' => $catModels[4]->id, 'name' => 'Pulpen Standard AE7', 'sku' => 'ATK-001', 'barcode' => '8992858112002', 'harga_beli' => 2000, 'harga_jual' => 3500, 'stok' => 3, 'min_stok' => 10, 'satuan' => 'pcs'],
+            ['category_id' => $catModels[0]->id, 'name' => 'Indomie Goreng', 'sku' => 'MKN-001', 'harga_beli' => 2500, 'harga_jual' => 3500, 'stok' => 100, 'min_stok' => 20, 'satuan' => 'pcs'],
+            ['category_id' => $catModels[0]->id, 'name' => 'Chitato Original 68g', 'sku' => 'MKN-002', 'harga_beli' => 8000, 'harga_jual' => 11000, 'stok' => 50, 'min_stok' => 10, 'satuan' => 'pcs'],
+            ['category_id' => $catModels[0]->id, 'name' => 'Roti Sari Roti Tawar', 'sku' => 'MKN-003', 'harga_beli' => 12000, 'harga_jual' => 15000, 'stok' => 30, 'min_stok' => 5, 'satuan' => 'pcs'],
+            ['category_id' => $catModels[1]->id, 'name' => 'Aqua 600ml', 'sku' => 'MNM-001', 'harga_beli' => 2000, 'harga_jual' => 3000, 'stok' => 200, 'min_stok' => 50, 'satuan' => 'botol'],
+            ['category_id' => $catModels[1]->id, 'name' => 'Teh Pucuk Harum 350ml', 'sku' => 'MNM-002', 'harga_beli' => 2500, 'harga_jual' => 4000, 'stok' => 80, 'min_stok' => 20, 'satuan' => 'botol'],
+            ['category_id' => $catModels[1]->id, 'name' => 'Coca Cola 390ml', 'sku' => 'MNM-003', 'harga_beli' => 4000, 'harga_jual' => 6000, 'stok' => 60, 'min_stok' => 15, 'satuan' => 'botol'],
+            ['category_id' => $catModels[2]->id, 'name' => 'Sabun Cuci Sunlight 800ml', 'sku' => 'KBR-001', 'harga_beli' => 10000, 'harga_jual' => 14000, 'stok' => 40, 'min_stok' => 10, 'satuan' => 'botol'],
+            ['category_id' => $catModels[2]->id, 'name' => 'Pewangi So Klin 900ml', 'sku' => 'KBR-002', 'harga_beli' => 12000, 'harga_jual' => 16000, 'stok' => 35, 'min_stok' => 8, 'satuan' => 'botol'],
+            ['category_id' => $catModels[3]->id, 'name' => 'Beras Premium 5kg', 'sku' => 'SMB-001', 'harga_beli' => 55000, 'harga_jual' => 65000, 'stok' => 25, 'min_stok' => 5, 'satuan' => 'karung'],
+            ['category_id' => $catModels[3]->id, 'name' => 'Gula Pasir 1kg', 'sku' => 'SMB-002', 'harga_beli' => 12000, 'harga_jual' => 15000, 'stok' => 40, 'min_stok' => 10, 'satuan' => 'kg'],
+            ['category_id' => $catModels[3]->id, 'name' => 'Minyak Goreng Bimoli 2L', 'sku' => 'SMB-003', 'harga_beli' => 28000, 'harga_jual' => 34000, 'stok' => 20, 'min_stok' => 5, 'satuan' => 'botol'],
+            ['category_id' => $catModels[4]->id, 'name' => 'Pulpen Standard AE7', 'sku' => 'ATK-001', 'harga_beli' => 2000, 'harga_jual' => 3500, 'stok' => 3, 'min_stok' => 10, 'satuan' => 'pcs'],
         ];
 
         $productModels = [];

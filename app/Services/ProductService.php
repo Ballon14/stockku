@@ -3,8 +3,6 @@
 namespace App\Services;
 
 use App\Models\Product;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 
 class ProductService
 {
@@ -18,8 +16,7 @@ class ProductService
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('sku', 'like', "%{$search}%")
-                    ->orWhere('barcode', 'like', "%{$search}%");
+                    ->orWhere('sku', 'like', "%{$search}%");
             });
         }
 
@@ -30,25 +27,13 @@ class ProductService
         return $query->latest()->paginate(15);
     }
 
-    public function store(array $data, ?UploadedFile $foto = null): Product
+    public function store(array $data): Product
     {
-        if ($foto) {
-            $data['foto'] = $foto->store('products', 'public');
-        }
-
         return Product::create($data);
     }
 
-    public function update(Product $product, array $data, ?UploadedFile $foto = null): Product
+    public function update(Product $product, array $data): Product
     {
-        if ($foto) {
-            // Delete old foto
-            if ($product->foto) {
-                Storage::disk('public')->delete($product->foto);
-            }
-            $data['foto'] = $foto->store('products', 'public');
-        }
-
         // Detect harga_beli change before updating
         $oldHargaBeli = (float) $product->harga_beli;
 
@@ -69,10 +54,6 @@ class ProductService
             throw new \RuntimeException('Produk tidak dapat dihapus karena memiliki riwayat transaksi.');
         }
 
-        if ($product->foto) {
-            Storage::disk('public')->delete($product->foto);
-        }
-
         return $product->delete();
     }
 
@@ -90,8 +71,7 @@ class ProductService
             ->where('stok', '>', 0)
             ->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('sku', 'like', "%{$search}%")
-                    ->orWhere('barcode', $search);
+                    ->orWhere('sku', 'like', "%{$search}%");
             })
             ->limit(10)
             ->get();

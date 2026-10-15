@@ -68,10 +68,7 @@ class RestockTerminal extends Component
     private function findByCode(string $code): ?Product
     {
         return Product::where('is_active', true)
-            ->where(function ($query) use ($code) {
-                $query->where('barcode', $code)
-                    ->orWhereRaw('LOWER(sku) = ?', [mb_strtolower($code)]);
-            })
+            ->whereRaw('LOWER(sku) = ?', [mb_strtolower($code)])
             ->first();
     }
 
@@ -277,7 +274,6 @@ class RestockTerminal extends Component
             $query->where(function ($q) {
                 $q->where('name', 'like', '%'.$this->search.'%')
                     ->orWhere('sku', 'like', '%'.$this->search.'%')
-                    ->orWhere('barcode', $this->search)
                     ->orWhereHas('category', function ($qCategory) {
                         $qCategory->where('name', 'like', '%'.$this->search.'%');
                     });

@@ -205,7 +205,7 @@
                             <div class="bg-amber-50/80 rounded-xl p-3 flex gap-3 border border-amber-200">
                                 <svg class="h-4 w-4 text-amber-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                 <p class="text-xs text-amber-800 leading-relaxed">
-                                    <strong class="font-semibold">Perhatian:</strong> SKU dibuat otomatis oleh sistem (misal <span class="font-mono">MKN-0001</span>). Jangan sertakan kolom SKU atau Barcode di dalam file CSV agar proses berhasil.
+                                    <strong class="font-semibold">Perhatian:</strong> SKU dibuat otomatis oleh sistem (misal <span class="font-mono">MKN-0001</span>). Jangan sertakan kolom SKU di dalam file CSV agar proses berhasil.
                                 </p>
                             </div>
                         </div>
@@ -330,7 +330,7 @@
         <form method="GET" class="flex flex-wrap gap-3 items-end">
             <div class="flex-1 min-w-[200px]">
                 <label class="text-xs font-medium text-slate-500">Cari</label>
-                <input type="text" name="search" value="{{ $search }}" placeholder="Nama / SKU / Barcode"
+                <input type="text" name="search" value="{{ $search }}" placeholder="Nama / SKU"
                     class="w-full mt-1 rounded-xl border-slate-200 text-sm focus:border-indigo-500 focus:ring-indigo-200">
             </div>
             <div class="w-48">
@@ -357,18 +357,12 @@
             @forelse($products as $product)
                 <div class="p-4">
                     <div class="flex items-center gap-3 mb-3">
-                        @if ($product->foto)
-                            <img src="{{ asset('storage/' . $product->foto) }}"
-                                class="w-11 h-11 rounded-lg object-cover shrink-0" alt="">
-                        @else
-                            <div class="w-11 h-11 rounded-lg bg-slate-100 flex items-center justify-center shrink-0">
-                                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                                </svg>
-                            </div>
-                        @endif
+                        <div class="w-11 h-11 rounded-lg bg-slate-100 flex items-center justify-center shrink-0">
+                            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                            </svg>
+                        </div>
                         <div class="flex-1 min-w-0">
                             <p class="font-medium text-slate-700 truncate">{{ $product->name }}</p>
                             <p class="font-mono text-xs text-slate-400 mt-0.5">{{ $product->sku }} ·
@@ -438,19 +432,13 @@
                             <td class="py-3 px-4 text-slate-500">{{ $products->firstItem() + $i }}</td>
                             <td class="py-3 px-4">
                                 <div class="flex items-center gap-3">
-                                    @if ($product->foto)
-                                        <img src="{{ asset('storage/' . $product->foto) }}"
-                                            class="w-10 h-10 rounded-lg object-cover" alt="">
-                                    @else
-                                        <div
-                                            class="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
-                                            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                                            </svg>
-                                        </div>
-                                    @endif
+                                    <div class="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
+                                        <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                        </svg>
+                                    </div>
                                     <span class="font-medium text-slate-700">{{ $product->name }}</span>
                                 </div>
                             </td>

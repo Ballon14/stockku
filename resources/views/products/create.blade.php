@@ -3,7 +3,7 @@
 <x-slot name="header"><h2 class="text-2xl font-bold text-slate-800">Tambah Produk</h2></x-slot>
 <div class="max-w-2xl">
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-        <form method="POST" action="{{ route('products.store') }}" enctype="multipart/form-data">
+        <form method="POST" action="{{ route('products.store') }}">
             @csrf
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="md:col-span-2">
@@ -17,11 +17,6 @@
                     @error('sku') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Barcode</label>
-                    <input type="text" name="barcode" value="{{ old('barcode') }}" class="w-full rounded-xl border-slate-200 text-sm focus:border-indigo-500 focus:ring-indigo-200">
-                    @error('barcode') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
-                </div>
-                <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">Kategori <span class="text-red-500">*</span></label>
                     <select name="category_id" class="w-full rounded-xl border-slate-200 text-sm focus:border-indigo-500 focus:ring-indigo-200" required>
                         <option value="">Pilih...</option>
@@ -30,10 +25,6 @@
                         @endforeach
                     </select>
                     @error('category_id') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Satuan <span class="text-red-500">*</span></label>
-                    <input type="text" name="satuan" value="{{ old('satuan', 'pcs') }}" class="w-full rounded-xl border-slate-200 text-sm focus:border-indigo-500 focus:ring-indigo-200" required>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">Harga Beli <span class="text-red-500">*</span></label>
@@ -50,13 +41,12 @@
                     <input type="number" name="stok" value="{{ old('stok', 0) }}" min="0" class="w-full rounded-xl border-slate-200 text-sm focus:border-indigo-500 focus:ring-indigo-200" required>
                 </div>
                 <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Satuan <span class="text-red-500">*</span></label>
+                    <input type="text" name="satuan" value="{{ old('satuan', 'pcs') }}" class="w-full rounded-xl border-slate-200 text-sm focus:border-indigo-500 focus:ring-indigo-200" required>
+                </div>
+                <div class="md:col-span-2">
                     <label class="block text-sm font-medium text-slate-700 mb-1">Minimum Stok <span class="text-red-500">*</span></label>
                     <input type="number" name="min_stok" value="{{ old('min_stok', 5) }}" min="0" class="w-full rounded-xl border-slate-200 text-sm focus:border-indigo-500 focus:ring-indigo-200" required>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Foto Produk</label>
-                    <input type="file" name="foto" accept="image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
-                    @error('foto') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div class="md:col-span-2">
                     <label class="block text-sm font-medium text-slate-700 mb-1">Deskripsi</label>

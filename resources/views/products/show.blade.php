@@ -3,12 +3,8 @@
 <x-slot name="header"><h2 class="text-2xl font-bold text-slate-800">{{ $product->name }}</h2></x-slot>
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-        @if($product->foto)
-        <img src="{{ asset('storage/' . $product->foto) }}" class="w-full h-48 rounded-xl object-cover mb-4">
-        @endif
         <div class="space-y-3 text-sm">
             <div class="flex justify-between"><span class="text-slate-500">SKU</span><span class="font-mono font-medium text-slate-700">{{ $product->sku }}</span></div>
-            <div class="flex justify-between"><span class="text-slate-500">Barcode</span><span class="font-mono text-slate-700">{{ $product->barcode ?? '-' }}</span></div>
             <div class="flex justify-between"><span class="text-slate-500">Kategori</span><span class="text-slate-700">{{ $product->category->name }}</span></div>
             <div class="flex justify-between"><span class="text-slate-500">Satuan</span><span class="text-slate-700">{{ $product->satuan }}</span></div>
             <hr class="border-slate-100">

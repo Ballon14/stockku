@@ -14,15 +14,15 @@ class PosTerminalTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function makeProduct(?string $barcode = null): Product
+    private function makeProduct(?string $sku = null): Product
     {
         $category = Category::create(['name' => 'Kategori Tes', 'slug' => 'kategori-'.uniqid()]);
+        $sku = $sku ?? 'BC-'.uniqid();
 
         return Product::create([
             'category_id' => $category->id,
-            'name' => 'Produk Barcode',
-            'sku' => 'BC-'.uniqid(),
-            'barcode' => $barcode,
+            'name' => 'Produk SKU',
+            'sku' => $sku,
             'harga_beli' => 3000,
             'harga_jual' => 5000,
             'stok' => 10,
@@ -38,10 +38,10 @@ class PosTerminalTest extends TestCase
     {
         $user = User::create(['name' => 'Kasir', 'email' => 'kasir-pos8@stockku.com', 'password' => 'password']);
         $this->actingAs($user);
-        $product = $this->makeProduct(barcode: '8990001112223');
+        $product = $this->makeProduct(sku: 'SKU-TEST-001');
 
         Livewire::test(PosTerminal::class)
-            ->set('search', '8990001112223')
+            ->set('search', 'SKU-TEST-001')
             ->call('addBySearchEnter')
             ->assertSet('search', '')
             ->assertCount('cart', 1)

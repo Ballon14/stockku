@@ -3,7 +3,7 @@
 <x-slot name="header"><h2 class="text-2xl font-bold text-slate-800">Edit Produk</h2></x-slot>
 <div class="max-w-2xl">
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-        <form method="POST" action="{{ route('products.update', $product) }}" enctype="multipart/form-data">
+        <form method="POST" action="{{ route('products.update', $product) }}">
             @csrf @method('PUT')
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="md:col-span-2">
@@ -17,20 +17,12 @@
                     @error('sku') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Barcode</label>
-                    <input type="text" name="barcode" value="{{ old('barcode', $product->barcode) }}" class="w-full rounded-xl border-slate-200 text-sm">
-                </div>
-                <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">Kategori <span class="text-red-500">*</span></label>
                     <select name="category_id" class="w-full rounded-xl border-slate-200 text-sm" required>
                         @foreach($categories as $cat)
                         <option value="{{ $cat->id }}" {{ old('category_id', $product->category_id) == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
                         @endforeach
                     </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Satuan</label>
-                    <input type="text" name="satuan" value="{{ old('satuan', $product->satuan) }}" class="w-full rounded-xl border-slate-200 text-sm" required>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">Harga Beli</label>
@@ -48,15 +40,12 @@
                     <p class="text-xs text-slate-400 mt-1">Stok hanya berubah lewat transaksi (penjualan, pembelian, retur, penyesuaian).</p>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Minimum Stok</label>
-                    <input type="number" name="min_stok" value="{{ old('min_stok', $product->min_stok) }}" min="0" class="w-full rounded-xl border-slate-200 text-sm" required>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Satuan</label>
+                    <input type="text" name="satuan" value="{{ old('satuan', $product->satuan) }}" class="w-full rounded-xl border-slate-200 text-sm" required>
                 </div>
                 <div class="md:col-span-2">
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Foto Produk</label>
-                    @if($product->foto)
-                    <div class="mb-2"><img src="{{ asset('storage/' . $product->foto) }}" class="w-20 h-20 rounded-lg object-cover"></div>
-                    @endif
-                    <input type="file" name="foto" accept="image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700">
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Minimum Stok</label>
+                    <input type="number" name="min_stok" value="{{ old('min_stok', $product->min_stok) }}" min="0" class="w-full rounded-xl border-slate-200 text-sm" required>
                 </div>
                 <div class="md:col-span-2">
                     <label class="block text-sm font-medium text-slate-700 mb-1">Deskripsi</label>

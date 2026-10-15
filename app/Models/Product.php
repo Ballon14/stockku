@@ -12,13 +12,11 @@ class Product extends Model
         'category_id',
         'name',
         'sku',
-        'barcode',
         'harga_beli',
         'harga_jual',
         'stok',
         'min_stok',
         'satuan',
-        'foto',
         'deskripsi',
         'is_active',
     ];
@@ -54,14 +52,5 @@ class Product extends Model
     public function isLowStock(): bool
     {
         return $this->stok <= $this->min_stok;
-    }
-
-    public function getFotoUrlAttribute(): ?string
-    {
-        if ($this->foto) {
-            return asset('storage/'.$this->foto);
-        }
-
-        return null;
     }
 }

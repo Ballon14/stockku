@@ -36,10 +36,7 @@ class ProductController extends Controller
 
     public function store(ProductRequest $request)
     {
-        $product = $this->productService->store(
-            $request->validated(),
-            $request->file('foto')
-        );
+        $product = $this->productService->store($request->validated());
         app(ActivityLogger::class)->log('product.create', 'Produk "'.$product->name.'" (SKU: '.$product->sku.') ditambahkan.');
 
         return redirect()->route('products.index')->with('success', 'Produk berhasil ditambahkan.');
@@ -62,11 +59,7 @@ class ProductController extends Controller
 
     public function update(ProductRequest $request, Product $product)
     {
-        $this->productService->update(
-            $product,
-            $request->validated(),
-            $request->file('foto')
-        );
+        $this->productService->update($product, $request->validated());
         app(ActivityLogger::class)->log('product.update', 'Produk "'.$product->name.'" (SKU: '.$product->sku.') diperbarui.');
 
         return redirect()->route('products.index')->with('success', 'Produk berhasil diperbarui.');
