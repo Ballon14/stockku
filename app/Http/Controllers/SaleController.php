@@ -36,7 +36,7 @@ class SaleController extends Controller
             abort(403);
         }
 
-        $sale->load(['items.product', 'user', 'returns.items']);
+        $sale->load(['items.product', 'user', 'returns.items.product', 'returns.processedBy']);
 
         return view('sales.show', compact('sale'));
     }
