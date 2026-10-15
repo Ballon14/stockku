@@ -11,11 +11,13 @@ class PurchaseItem extends Model
         'purchase_id',
         'product_id',
         'qty',
+        'returned_qty',
         'harga',
         'subtotal',
     ];
 
     protected $casts = [
+        'returned_qty' => 'integer',
         'harga' => 'decimal:2',
         'subtotal' => 'decimal:2',
     ];

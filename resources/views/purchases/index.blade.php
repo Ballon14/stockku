@@ -1,12 +1,21 @@
 <x-app-layout>
-@section('title', 'Pembelian (Restock)')
+@section('title', 'Pembelian (Barang Masuk)')
 <x-slot name="header">
     <div class="flex flex-wrap items-center justify-between gap-3">
-        <h2 class="text-2xl font-bold text-slate-800">Pembelian (Restock)</h2>
-        <a href="{{ route('purchases.create') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl text-sm font-semibold shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 transition-all">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
-            Catat Pembelian Baru
-        </a>
+        <div>
+            <h2 class="text-2xl font-bold text-slate-800">Pembelian (Barang Masuk)</h2>
+            <p class="text-xs text-slate-500">Pencatatan pembelian stok barang masuk dari supplier</p>
+        </div>
+        <div class="flex items-center gap-2">
+            <a href="{{ route('purchase-returns.index') }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-xl text-sm font-semibold hover:bg-slate-50 transition-all shadow-sm">
+                <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z"/></svg>
+                Retur Pembelian
+            </a>
+            <a href="{{ route('purchases.create') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl text-sm font-semibold shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                Catat Pembelian Baru
+            </a>
+        </div>
     </div>
 </x-slot>
 
@@ -45,11 +54,23 @@
                     <p class="font-mono text-xs font-medium text-indigo-600">{{ $purchase->invoice_number }}</p>
                     <p class="text-xs text-slate-400 mt-0.5">{{ \Carbon\Carbon::parse($purchase->tanggal)->format('d/m/Y') }} · {{ $purchase->user->name }}</p>
                 </div>
-                <a href="{{ route('purchases.show', $purchase) }}" class="shrink-0 p-1.5 rounded-lg text-slate-400 hover:bg-indigo-50 hover:text-indigo-600" title="Detail"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></a>
+                <div class="flex items-center gap-1">
+                    @if($purchase->status !== 'returned' && $purchase->items->contains(fn($i) => ($i->qty - $i->returned_qty) > 0))
+                    <a href="{{ route('purchase-returns.create', $purchase) }}" class="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50" title="Retur ke Supplier"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3"/></svg></a>
+                    @endif
+                    <a href="{{ route('purchases.show', $purchase) }}" class="shrink-0 p-1.5 rounded-lg text-slate-400 hover:bg-indigo-50 hover:text-indigo-600" title="Detail"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></a>
+                </div>
             </div>
             <div class="flex items-center justify-between">
                 <p class="text-xs text-slate-500 truncate">Supplier: <span class="text-slate-700 font-medium">{{ $purchase->supplier->name }}</span></p>
-                <p class="font-bold text-slate-800 shrink-0 ml-3">Rp {{ number_format($purchase->total, 0, ',', '.') }}</p>
+                <div class="text-right ml-3">
+                    <p class="font-bold text-slate-800">Rp {{ number_format($purchase->total, 0, ',', '.') }}</p>
+                    @if($purchase->status === 'returned')
+                    <span class="inline-block mt-0.5 text-[10px] font-semibold text-rose-700 bg-rose-50 px-1.5 py-0.5 rounded">Diretur Penuh</span>
+                    @elseif($purchase->status === 'partial_return')
+                    <span class="inline-block mt-0.5 text-[10px] font-semibold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded">Retur Sebagian</span>
+                    @endif
+                </div>
             </div>
         </div>
         @empty
@@ -66,6 +87,7 @@
                     <th class="text-left py-3 px-4 font-semibold text-slate-600">Tanggal</th>
                     <th class="text-left py-3 px-4 font-semibold text-slate-600">Supplier</th>
                     <th class="text-left py-3 px-4 font-semibold text-slate-600">Dicatat Oleh</th>
+                    <th class="text-center py-3 px-4 font-semibold text-slate-600">Status</th>
                     <th class="text-right py-3 px-4 font-semibold text-slate-600">Total Pembelian</th>
                     <th class="text-center py-3 px-4 font-semibold text-slate-600">Aksi</th>
                 </tr>
@@ -77,18 +99,34 @@
                         <span class="font-mono text-xs font-medium text-indigo-600 block">{{ $purchase->invoice_number }}</span>
                     </td>
                     <td class="py-3 px-4 text-slate-600">{{ \Carbon\Carbon::parse($purchase->tanggal)->format('d/m/Y') }}</td>
-                    <td class="py-3 px-4 text-slate-600">{{ $purchase->supplier->name }}</td>
+                    <td class="py-3 px-4 text-slate-700 font-medium">{{ $purchase->supplier->name }}</td>
                     <td class="py-3 px-4 text-slate-600">{{ $purchase->user->name }}</td>
-                    <td class="py-3 px-4 text-right font-semibold text-slate-700">Rp {{ number_format($purchase->total, 0, ',', '.') }}</td>
                     <td class="py-3 px-4 text-center">
-                        <a href="{{ route('purchases.show', $purchase) }}" class="inline-flex p-1.5 rounded-lg text-slate-400 hover:bg-indigo-50 hover:text-indigo-600 transition-colors" title="Detail">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                        </a>
+                        @if($purchase->status === 'returned')
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">Diretur Penuh</span>
+                        @elseif($purchase->status === 'partial_return')
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">Retur Sebagian</span>
+                        @else
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">Diterima</span>
+                        @endif
+                    </td>
+                    <td class="py-3 px-4 text-right font-semibold text-slate-800">Rp {{ number_format($purchase->total, 0, ',', '.') }}</td>
+                    <td class="py-3 px-4 text-center">
+                        <div class="flex items-center justify-center gap-1">
+                            <a href="{{ route('purchases.show', $purchase) }}" class="inline-flex p-1.5 rounded-lg text-slate-400 hover:bg-indigo-50 hover:text-indigo-600 transition-colors" title="Lihat Detail">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            </a>
+                            @if($purchase->status !== 'returned' && $purchase->items->contains(fn($i) => ($i->qty - $i->returned_qty) > 0))
+                            <a href="{{ route('purchase-returns.create', $purchase) }}" class="inline-flex p-1.5 rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-colors" title="Retur ke Supplier">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3"/></svg>
+                            </a>
+                            @endif
+                        </div>
                     </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="6" class="py-8 text-center text-slate-400">Belum ada catatan pembelian.</td>
+                    <td colspan="7" class="py-8 text-center text-slate-400">Belum ada catatan pembelian.</td>
                 </tr>
                 @endforelse
             </tbody>

@@ -9,6 +9,7 @@ use App\Http\Controllers\LeaveRequestController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\PurchaseReturnController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\SaleReturnController;
@@ -44,8 +45,14 @@ Route::middleware(['auth', 'ensure-attended'])->group(function () {
         Route::resource('employees', EmployeeController::class)->except('show');
         Route::post('/employees/{employee}/toggle-active', [EmployeeController::class, 'toggleActive'])->name('employees.toggle-active');
 
-        // Purchases
+        // Purchases (Barang Masuk)
         Route::resource('purchases', PurchaseController::class)->only(['index', 'create', 'store', 'show']);
+
+        // Purchase Returns (Retur Pembelian ke Supplier)
+        Route::get('/purchase-returns', [PurchaseReturnController::class, 'index'])->name('purchase-returns.index');
+        Route::get('/purchases/{purchase}/returns/create', [PurchaseReturnController::class, 'create'])->name('purchase-returns.create');
+        Route::post('/purchases/{purchase}/returns', [PurchaseReturnController::class, 'store'])->name('purchase-returns.store');
+        Route::get('/purchase-returns/{purchaseReturn}', [PurchaseReturnController::class, 'show'])->name('purchase-returns.show');
 
         // Stock
         Route::get('/stock', [StockController::class, 'index'])->name('stock.index');

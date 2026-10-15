@@ -75,6 +75,18 @@
             <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Transaksi</p>
         </div>
 
+        @if($user->hasRole('admin'))
+        <a href="{{ route('purchases.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 {{ Str::startsWith($currentRoute, 'purchases') ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 sidebar-active' : 'text-slate-300 hover:bg-slate-700/50 hover:text-white' }}">
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+            Pembelian (Barang Masuk)
+        </a>
+
+        <a href="{{ route('purchase-returns.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 {{ Str::startsWith($currentRoute, 'purchase-returns') ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 sidebar-active' : 'text-slate-300 hover:bg-slate-700/50 hover:text-white' }}">
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z"/></svg>
+            Retur Pembelian
+        </a>
+        @endif
+
         <a href="{{ route('sales.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 {{ Str::startsWith($currentRoute, 'sales') ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 sidebar-active' : 'text-slate-300 hover:bg-slate-700/50 hover:text-white' }}">
             <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"/></svg>
             Riwayat Penjualan
@@ -84,11 +96,6 @@
         <a href="{{ route('sale-returns.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 {{ Str::startsWith($currentRoute, 'sale-returns') ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 sidebar-active' : 'text-slate-300 hover:bg-slate-700/50 hover:text-white' }}">
             <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z"/></svg>
             Retur Penjualan
-        </a>
-
-        <a href="{{ route('purchases.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 {{ Str::startsWith($currentRoute, 'purchases') ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 sidebar-active' : 'text-slate-300 hover:bg-slate-700/50 hover:text-white' }}">
-            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
-            Pembelian
         </a>
         @endif
 

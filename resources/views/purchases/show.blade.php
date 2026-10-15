@@ -1,12 +1,23 @@
 <x-app-layout>
-@section('title', 'Detail Pembelian')
+@section('title', 'Detail Pembelian (Barang Masuk)')
 <x-slot name="header">
-    <div class="flex items-center justify-between">
-        <h2 class="text-2xl font-bold text-slate-800">Detail Pembelian</h2>
-        <a href="{{ route('purchases.index') }}" class="hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl text-sm font-semibold hover:bg-slate-50 hover:text-slate-900 transition-all shadow-sm">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-            Kembali
-        </a>
+    <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+            <h2 class="text-2xl font-bold text-slate-800">Detail Pembelian (Barang Masuk)</h2>
+            <p class="text-xs text-slate-500">Pencatatan faktur barang masuk dari supplier</p>
+        </div>
+        <div class="flex items-center gap-2">
+            @if($purchase->status !== 'returned' && $purchase->items->contains(fn($i) => ($i->qty - $i->returned_qty) > 0))
+            <a href="{{ route('purchase-returns.create', $purchase) }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-rose-600 to-amber-600 text-white rounded-xl text-sm font-semibold shadow-lg shadow-rose-500/20 hover:shadow-rose-500/40 transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z"/></svg>
+                Retur ke Supplier
+            </a>
+            @endif
+            <a href="{{ route('purchases.index') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl text-sm font-semibold hover:bg-slate-50 hover:text-slate-900 transition-all shadow-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                Kembali
+            </a>
+        </div>
     </div>
 </x-slot>
 
@@ -25,9 +36,21 @@
                         <p class="text-white font-bold font-mono text-xl mt-0.5">{{ $purchase->invoice_number }}</p>
                     </div>
                 </div>
-                <span class="px-4 py-1.5 rounded-full text-sm font-bold bg-emerald-400/20 text-emerald-100 border border-emerald-400/30 backdrop-blur-sm">
-                    ✓ Diterima
-                </span>
+                <div>
+                    @if($purchase->status === 'returned')
+                    <span class="px-4 py-1.5 rounded-full text-sm font-bold bg-rose-400/20 text-rose-100 border border-rose-400/30 backdrop-blur-sm">
+                        ⟲ Diretur Penuh
+                    </span>
+                    @elseif($purchase->status === 'partial_return')
+                    <span class="px-4 py-1.5 rounded-full text-sm font-bold bg-amber-400/20 text-amber-100 border border-amber-400/30 backdrop-blur-sm">
+                        ⟲ Retur Sebagian
+                    </span>
+                    @else
+                    <span class="px-4 py-1.5 rounded-full text-sm font-bold bg-emerald-400/20 text-emerald-100 border border-emerald-400/30 backdrop-blur-sm">
+                        ✓ Diterima
+                    </span>
+                    @endif
+                </div>
             </div>
         </div>
 
@@ -102,6 +125,7 @@
         {{-- Mobile: card list --}}
         <div class="md:hidden divide-y divide-slate-100">
             @foreach($purchase->items as $item)
+            @php $sisa = $item->qty - $item->returned_qty; @endphp
             <div class="p-4 bg-white">
                 <div class="flex items-start justify-between gap-3 mb-2">
                     <div class="min-w-0">
@@ -112,8 +136,14 @@
                     </div>
                     <p class="text-sm font-bold text-indigo-600 shrink-0">Rp {{ number_format($item->subtotal, 0, ',', '.') }}</p>
                 </div>
-                <div class="flex items-center gap-2 text-xs text-slate-600 bg-slate-50 px-2 py-1 rounded-lg w-fit">
-                    <span class="font-medium text-slate-800">{{ $item->qty }}</span> <span>× Rp {{ number_format($item->harga, 0, ',', '.') }}</span>
+                <div class="flex flex-wrap items-center gap-2 text-xs text-slate-600 bg-slate-50 p-2 rounded-lg">
+                    <span>Qty Beli: <strong class="text-slate-800">{{ $item->qty }}</strong></span>
+                    <span>·</span>
+                    <span>Diretur: <strong class="{{ $item->returned_qty > 0 ? 'text-rose-600' : 'text-slate-500' }}">{{ $item->returned_qty }}</strong></span>
+                    <span>·</span>
+                    <span>Sisa: <strong class="text-indigo-600">{{ $sisa }}</strong></span>
+                    <span>·</span>
+                    <span>× Rp {{ number_format($item->harga, 0, ',', '.') }}</span>
                 </div>
             </div>
             @endforeach
@@ -129,13 +159,16 @@
                 <thead class="bg-slate-50 border-b border-slate-100">
                     <tr>
                         <th class="text-left py-3.5 px-6 font-semibold text-slate-600">Produk</th>
-                        <th class="text-center py-3.5 px-4 font-semibold text-slate-600 w-24">Qty</th>
-                        <th class="text-right py-3.5 px-6 font-semibold text-slate-600 w-48">Harga Beli Satuan</th>
-                        <th class="text-right py-3.5 px-6 font-semibold text-slate-600 w-48">Subtotal</th>
+                        <th class="text-center py-3.5 px-3 font-semibold text-slate-600 w-24">Qty Beli</th>
+                        <th class="text-center py-3.5 px-3 font-semibold text-slate-600 w-24">Diretur</th>
+                        <th class="text-center py-3.5 px-3 font-semibold text-slate-600 w-24">Sisa</th>
+                        <th class="text-right py-3.5 px-6 font-semibold text-slate-600 w-44">Harga Beli Satuan</th>
+                        <th class="text-right py-3.5 px-6 font-semibold text-slate-600 w-44">Subtotal</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-50">
                     @foreach($purchase->items as $item)
+                    @php $sisa = $item->qty - $item->returned_qty; @endphp
                     <tr class="hover:bg-slate-50/50 transition-colors">
                         <td class="py-4 px-6">
                             <p class="font-semibold text-slate-800">{{ $item->product ? $item->product->name : 'Produk Dihapus' }}</p>
@@ -143,8 +176,14 @@
                             <p class="text-xs text-slate-500 font-mono mt-0.5">{{ $item->product->sku }}</p>
                             @endif
                         </td>
-                        <td class="py-4 px-4 text-center">
-                            <span class="inline-flex items-center justify-center w-10 h-7 rounded-lg bg-indigo-50 text-indigo-700 font-bold text-sm border border-indigo-100">{{ $item->qty }}</span>
+                        <td class="py-4 px-3 text-center">
+                            <span class="inline-flex items-center justify-center px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-semibold text-xs">{{ $item->qty }}</span>
+                        </td>
+                        <td class="py-4 px-3 text-center">
+                            <span class="inline-flex items-center justify-center px-2.5 py-1 rounded-lg {{ $item->returned_qty > 0 ? 'bg-rose-50 text-rose-700 font-bold border border-rose-100' : 'text-slate-400' }} text-xs">{{ $item->returned_qty }}</span>
+                        </td>
+                        <td class="py-4 px-3 text-center">
+                            <span class="inline-flex items-center justify-center px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 font-bold text-xs border border-indigo-100">{{ $sisa }}</span>
                         </td>
                         <td class="py-4 px-6 text-right font-medium text-slate-600">Rp {{ number_format($item->harga, 0, ',', '.') }}</td>
                         <td class="py-4 px-6 text-right font-bold text-slate-800">Rp {{ number_format($item->subtotal, 0, ',', '.') }}</td>
@@ -158,6 +197,49 @@
             </div>
         </div>
     </div>
+
+    {{-- Riwayat Retur Pembelian Card (jika ada) --}}
+    @if($purchase->returns && $purchase->returns->count() > 0)
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden mb-6">
+        <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-rose-50/40">
+            <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                <svg class="w-5 h-5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z"/></svg>
+                Riwayat Retur Pembelian ke Supplier
+            </h3>
+            <span class="text-xs font-bold text-rose-700 bg-rose-100 px-2.5 py-1 rounded-lg">{{ $purchase->returns->count() }} kali retur</span>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-slate-50 border-b border-slate-100">
+                    <tr>
+                        <th class="text-left py-3 px-6 font-semibold text-slate-600">No. Retur</th>
+                        <th class="text-left py-3 px-4 font-semibold text-slate-600">Tanggal</th>
+                        <th class="text-right py-3 px-4 font-semibold text-slate-600">Total Nilai</th>
+                        <th class="text-left py-3 px-6 font-semibold text-slate-600">Alasan</th>
+                        <th class="text-left py-3 px-4 font-semibold text-slate-600">Diproses Oleh</th>
+                        <th class="text-center py-3 px-4 font-semibold text-slate-600">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-50">
+                    @foreach($purchase->returns as $ret)
+                    <tr class="hover:bg-slate-50/50">
+                        <td class="py-3 px-6 font-mono text-xs font-bold text-rose-600">{{ $ret->return_number }}</td>
+                        <td class="py-3 px-4 text-slate-600">{{ \Carbon\Carbon::parse($ret->tanggal)->format('d/m/Y') }}</td>
+                        <td class="py-3 px-4 text-right font-bold text-rose-600">Rp {{ number_format($ret->total_nilai, 0, ',', '.') }}</td>
+                        <td class="py-3 px-6 text-slate-500 max-w-xs truncate">{{ Str::limit($ret->alasan, 35) }}</td>
+                        <td class="py-3 px-4 text-slate-600">{{ $ret->processedBy ? $ret->processedBy->name : '-' }}</td>
+                        <td class="py-3 px-4 text-center">
+                            <a href="{{ route('purchase-returns.show', $ret) }}" class="inline-flex p-1.5 rounded-lg text-slate-400 hover:bg-indigo-50 hover:text-indigo-600" title="Detail">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            </a>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+    @endif
 
     <div class="sm:hidden pb-6">
         <a href="{{ route('purchases.index') }}" class="flex items-center justify-center gap-2 w-full px-4 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl text-sm font-semibold shadow-sm">

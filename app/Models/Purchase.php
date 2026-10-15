@@ -39,6 +39,11 @@ class Purchase extends Model
         return $this->hasMany(PurchaseItem::class);
     }
 
+    public function returns(): HasMany
+    {
+        return $this->hasMany(PurchaseReturn::class);
+    }
+
     public static function generateInvoiceNumber(): string
     {
         $prefix = 'PUR-'.date('Ymd');
