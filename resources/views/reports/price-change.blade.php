@@ -1,16 +1,15 @@
 <x-app-layout>
-@section('title', 'Rekap Perubahan Harga')
+@section('title', 'Rekap Perubahan Harga Beli')
 <x-slot name="header">
     <div class="flex flex-wrap items-center justify-between gap-3">
         <div>
-            <h2 class="text-xl sm:text-2xl font-bold text-slate-800">Rekap Perubahan Harga</h2>
-            <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Monitoring pergerakan harga beli dan harga jual produk dalam satu laporan terpadu.</p>
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-800">Rekap Perubahan Harga Beli</h2>
+            <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Pantau pergerakan harga beli dari supplier, perbandingannya dengan harga jual ke customer, dan estimasi margin.</p>
         </div>
         <form method="GET" action="{{ route('reports.price-change') }}" target="_blank">
             <input type="hidden" name="start_date" value="{{ $startDate }}">
             <input type="hidden" name="end_date" value="{{ $endDate }}">
             <input type="hidden" name="product_id" value="{{ $productId }}">
-            <input type="hidden" name="tipe_harga" value="{{ $tipeHarga }}">
             <input type="hidden" name="export" value="pdf">
             <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl text-sm font-semibold shadow-lg shadow-red-500/30 hover:shadow-red-500/50 transition-all">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
@@ -20,9 +19,9 @@
     </div>
 </x-slot>
 
-<!-- Filter & Quick Tabs -->
+<!-- Filter -->
 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 mb-6">
-    <form method="GET" class="flex flex-wrap gap-3 items-end mb-4">
+    <form method="GET" class="flex flex-wrap gap-3 items-end">
         <div>
             <label class="text-xs font-medium text-slate-500">Dari</label>
             <input type="date" name="start_date" value="{{ $startDate }}" class="w-full mt-1 rounded-xl border-slate-200 text-sm focus:border-indigo-500 focus:ring-indigo-200">
@@ -40,35 +39,8 @@
                 @endforeach
             </select>
         </div>
-        <div class="min-w-[170px]">
-            <label class="text-xs font-medium text-slate-500">Tipe Harga</label>
-            <select name="tipe_harga" class="w-full mt-1 rounded-xl border-slate-200 text-sm focus:border-indigo-500 focus:ring-indigo-200">
-                <option value="" {{ empty($tipeHarga) || $tipeHarga === 'all' ? 'selected' : '' }}>Semua Tipe (Beli & Jual)</option>
-                <option value="beli" {{ $tipeHarga === 'beli' ? 'selected' : '' }}>Harga Beli Saja</option>
-                <option value="jual" {{ $tipeHarga === 'jual' ? 'selected' : '' }}>Harga Jual Saja</option>
-            </select>
-        </div>
         <button type="submit" class="px-5 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-semibold hover:bg-indigo-700 transition-colors shadow-sm">Tampilkan</button>
     </form>
-
-    <!-- Quick Filter Pills -->
-    <div class="flex items-center gap-2 pt-3 border-t border-slate-100 overflow-x-auto text-xs">
-        <span class="text-slate-400 font-medium whitespace-nowrap">Filter Cepat:</span>
-        <a href="{{ route('reports.price-change', array_merge(request()->except('page'), ['tipe_harga' => ''])) }}"
-           class="px-3 py-1.5 rounded-lg font-medium transition-all whitespace-nowrap {{ empty($tipeHarga) || $tipeHarga === 'all' ? 'bg-slate-800 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }}">
-            Semua ({{ $data['summary']['total_changes'] }})
-        </a>
-        <a href="{{ route('reports.price-change', array_merge(request()->except('page'), ['tipe_harga' => 'beli'])) }}"
-           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all whitespace-nowrap {{ $tipeHarga === 'beli' ? 'bg-indigo-600 text-white shadow-sm' : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100' }}">
-            <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
-            Harga Beli ({{ $data['summary']['total_beli'] ?? 0 }})
-        </a>
-        <a href="{{ route('reports.price-change', array_merge(request()->except('page'), ['tipe_harga' => 'jual'])) }}"
-           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all whitespace-nowrap {{ $tipeHarga === 'jual' ? 'bg-sky-600 text-white shadow-sm' : 'bg-sky-50 text-sky-700 hover:bg-sky-100' }}">
-            <span class="w-2 h-2 rounded-full bg-sky-400"></span>
-            Harga Jual ({{ $data['summary']['total_jual'] ?? 0 }})
-        </a>
-    </div>
 </div>
 
 <!-- Summary Cards -->
@@ -76,11 +48,7 @@
     <div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-5">
         <p class="text-sm font-medium text-indigo-700 mb-1">Total Perubahan</p>
         <p class="text-3xl font-bold text-indigo-900">{{ $data['summary']['total_changes'] }}</p>
-        <div class="flex items-center gap-2 mt-2 text-xs text-indigo-600 font-medium">
-            <span>{{ $data['summary']['total_beli'] ?? 0 }} Beli</span>
-            <span>·</span>
-            <span>{{ $data['summary']['total_jual'] ?? 0 }} Jual</span>
-        </div>
+        <p class="text-xs text-indigo-600 mt-2">Log perubahan harga beli</p>
     </div>
     <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-5">
         <div class="flex items-center gap-1.5 mb-1">
@@ -88,7 +56,7 @@
             <p class="text-sm font-medium text-emerald-700">Harga Naik</p>
         </div>
         <p class="text-3xl font-bold text-emerald-900">{{ $data['summary']['total_naik'] }}</p>
-        <p class="text-xs text-emerald-600 mt-2">Kenaikan harga pada periode ini</p>
+        <p class="text-xs text-emerald-600 mt-2">Kenaikan modal dari supplier</p>
     </div>
     <div class="bg-red-50 border border-red-100 rounded-2xl p-5">
         <div class="flex items-center gap-1.5 mb-1">
@@ -96,7 +64,7 @@
             <p class="text-sm font-medium text-red-700">Harga Turun</p>
         </div>
         <p class="text-3xl font-bold text-red-900">{{ $data['summary']['total_turun'] }}</p>
-        <p class="text-xs text-red-600 mt-2">Penurunan harga pada periode ini</p>
+        <p class="text-xs text-red-600 mt-2">Penurunan modal dari supplier</p>
     </div>
     <div class="bg-purple-50 border border-purple-100 rounded-2xl p-5">
         <p class="text-sm font-medium text-purple-700 mb-1">Produk Terpengaruh</p>
@@ -105,8 +73,8 @@
     </div>
 </div>
 
-<!-- Current vs Last Bought Price (Alert) - Only shown for Beli / All -->
-@if(($tipeHarga ?? '') !== 'jual' && $data['current_vs_last_bought']->isNotEmpty())
+<!-- Current vs Last Bought Price (Alert) -->
+@if($data['current_vs_last_bought']->isNotEmpty())
 <div class="bg-white rounded-2xl shadow-lg shadow-amber-500/10 border-l-4 border-l-amber-500 border-y border-r border-slate-100 p-5 mb-8">
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
         <div class="flex items-start gap-3">
@@ -115,7 +83,7 @@
             </div>
             <div>
                 <h3 class="font-bold text-slate-800 text-lg tracking-tight">Harga Beli Aktual (Restock) Berbeda dengan Master Data</h3>
-                <p class="text-xs text-slate-500 mt-0.5">Produk berikut baru saja dibeli dari supplier dengan harga berbeda dari harga beli standar (Master Data) di sistem.</p>
+                <p class="text-xs text-slate-500 mt-0.5">Produk berikut baru saja dibeli dari supplier dengan harga berbeda dari harga beli standar di sistem. Cek harga jual ke customer agar margin tetap aman.</p>
             </div>
         </div>
         {{-- Bulk sync button --}}
@@ -135,9 +103,11 @@
             <thead class="bg-slate-50">
                 <tr class="border-b border-slate-200">
                     <th class="text-left py-3 px-4 font-semibold text-slate-600 text-xs">Produk</th>
-                    <th class="text-right py-3 px-4 font-semibold text-slate-600 text-xs">Harga Master (Sistem)</th>
-                    <th class="text-right py-3 px-4 font-semibold text-slate-600 text-xs">Harga Aktual (Restock)</th>
-                    <th class="text-right py-3 px-4 font-semibold text-slate-600 text-xs">Selisih</th>
+                    <th class="text-right py-3 px-4 font-semibold text-slate-600 text-xs">Harga Beli Master</th>
+                    <th class="text-right py-3 px-4 font-semibold text-slate-600 text-xs">Harga Beli Restock</th>
+                    <th class="text-right py-3 px-4 font-semibold text-slate-600 text-xs">Selisih Modal</th>
+                    <th class="text-right py-3 px-4 font-semibold text-indigo-700 text-xs bg-indigo-50/50">Harga Jual (Customer)</th>
+                    <th class="text-right py-3 px-4 font-semibold text-slate-600 text-xs">Margin Restock</th>
                     <th class="text-center py-3 px-4 font-semibold text-slate-600 text-xs">Status</th>
                     <th class="text-center py-3 px-4 font-semibold text-slate-600 text-xs">Aksi</th>
                 </tr>
@@ -154,6 +124,13 @@
                     <td class="py-3 px-4 text-right font-bold {{ $item->tipe === 'naik' ? 'text-emerald-600' : 'text-red-600' }}">
                         {{ $item->tipe === 'naik' ? '+' : '' }}Rp {{ number_format($item->selisih, 0, ',', '.') }}
                         <span class="text-xs font-normal">({{ $item->tipe === 'naik' ? '+' : '' }}{{ $item->persen }}%)</span>
+                    </td>
+                    <td class="py-3 px-4 text-right font-bold text-indigo-700 bg-indigo-50/30">
+                        Rp {{ number_format($item->harga_jual, 0, ',', '.') }}
+                    </td>
+                    <td class="py-3 px-4 text-right font-semibold {{ $item->margin >= 0 ? 'text-emerald-600' : 'text-red-600 font-bold' }}">
+                        {{ $item->margin >= 0 ? '+' : '' }}Rp {{ number_format($item->margin, 0, ',', '.') }}
+                        <span class="text-xs font-normal block">({{ $item->margin_persen }}%)</span>
                     </td>
                     <td class="py-3 px-4 text-center">
                         <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold {{ $item->tipe === 'naik' ? 'bg-emerald-100/80 text-emerald-700 border border-emerald-200' : 'bg-red-100/80 text-red-700 border border-red-200' }}">
@@ -184,15 +161,12 @@
 </div>
 @endif
 
-<!-- Riwayat Perubahan Harga -->
+<!-- Riwayat Perubahan Harga Beli -->
 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-    <div class="p-4 border-b border-slate-100 bg-slate-50 flex flex-wrap items-center justify-between gap-2">
+    <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
         <div>
-            <h3 class="font-semibold text-slate-800">Riwayat Perubahan Harga</h3>
-            <p class="text-xs text-slate-500 mt-0.5">Semua pergerakan harga beli dan harga jual produk dari restock maupun penyesuaian master data</p>
-        </div>
-        <div class="text-xs text-slate-500 font-medium">
-            Menampilkan: <span class="font-semibold text-slate-700">{{ $tipeHarga === 'beli' ? 'Harga Beli' : ($tipeHarga === 'jual' ? 'Harga Jual' : 'Semua (Beli & Jual)') }}</span>
+            <h3 class="font-semibold text-slate-800">Riwayat Perubahan Harga Beli</h3>
+            <p class="text-xs text-slate-500 mt-0.5">Semua perubahan harga beli produk beserta harga jual ke customer saat ini</p>
         </div>
     </div>
 
@@ -202,31 +176,22 @@
         <div class="p-4">
             <div class="flex items-start justify-between gap-3 mb-2">
                 <div class="min-w-0">
-                    <div class="flex items-center gap-1.5 flex-wrap">
-                        <p class="font-medium text-slate-800 truncate">{{ $change->product_name }}</p>
-                        @if(($change->tipe_harga ?? 'beli') === 'jual')
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200">
-                                Jual
-                            </span>
-                        @else
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
-                                Beli
-                            </span>
-                        @endif
-                    </div>
+                    <p class="font-medium text-slate-800 truncate">{{ $change->product_name }}</p>
                     <p class="font-mono text-xs text-slate-400 mt-0.5">{{ $change->product_sku }} · {{ $change->category_name }}</p>
                 </div>
                 <span class="shrink-0 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold {{ $change->tipe === 'naik' ? 'bg-emerald-100/80 text-emerald-700 border border-emerald-200' : 'bg-red-100/80 text-red-700 border border-red-200' }}">
                     @if($change->tipe === 'naik')
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
-                    +{{ $change->persen }}%
+                    Modal +{{ $change->persen }}%
                     @else
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
-                    {{ $change->persen }}%
+                    Modal {{ $change->persen }}%
                     @endif
                 </span>
             </div>
-            <div class="flex items-center gap-3 text-sm mb-1.5">
+
+            <!-- Perbandingan Harga Beli -->
+            <div class="flex items-center gap-3 text-sm mb-2">
                 <span class="text-slate-400 line-through">Rp {{ number_format($change->harga_lama, 0, ',', '.') }}</span>
                 <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
                 <span class="font-bold {{ $change->tipe === 'naik' ? 'text-emerald-600' : 'text-red-600' }}">Rp {{ number_format($change->harga_baru, 0, ',', '.') }}</span>
@@ -234,6 +199,22 @@
                     ({{ $change->tipe === 'naik' ? '+' : '' }}Rp {{ number_format($change->selisih, 0, ',', '.') }})
                 </span>
             </div>
+
+            <!-- Informasi Harga Jual & Margin -->
+            <div class="p-2.5 bg-slate-50 rounded-xl mb-2 flex items-center justify-between text-xs border border-slate-100">
+                <div>
+                    <span class="text-slate-500 block text-[10px]">Harga Jual Customer:</span>
+                    <span class="font-bold text-indigo-700 text-sm">Rp {{ number_format($change->harga_jual, 0, ',', '.') }}</span>
+                </div>
+                <div class="text-right">
+                    <span class="text-slate-500 block text-[10px]">Margin Untung:</span>
+                    <span class="font-bold {{ $change->margin >= 0 ? 'text-emerald-600' : 'text-red-600' }}">
+                        {{ $change->margin >= 0 ? '+' : '' }}Rp {{ number_format($change->margin, 0, ',', '.') }}
+                        <span class="text-[11px] font-normal">({{ $change->margin_persen }}%)</span>
+                    </span>
+                </div>
+            </div>
+
             <div class="flex items-center justify-between text-xs text-slate-400">
                 <span>{{ $change->tanggal->format('d/m/Y H:i') }}</span>
                 @php
@@ -268,11 +249,12 @@
                     <th class="text-left py-3 px-4 font-semibold text-slate-600">Tanggal</th>
                     <th class="text-left py-3 px-4 font-semibold text-slate-600">Produk</th>
                     <th class="text-left py-3 px-4 font-semibold text-slate-600">Kategori</th>
-                    <th class="text-center py-3 px-4 font-semibold text-slate-600">Tipe</th>
-                    <th class="text-right py-3 px-4 font-semibold text-slate-600">Harga Lama</th>
-                    <th class="text-right py-3 px-4 font-semibold text-slate-600">Harga Baru</th>
-                    <th class="text-right py-3 px-4 font-semibold text-slate-600">Selisih</th>
+                    <th class="text-right py-3 px-4 font-semibold text-slate-600">Harga Beli Lama</th>
+                    <th class="text-right py-3 px-4 font-semibold text-slate-600">Harga Beli Baru</th>
+                    <th class="text-right py-3 px-4 font-semibold text-slate-600">Selisih Modal</th>
                     <th class="text-center py-3 px-4 font-semibold text-slate-600">Status</th>
+                    <th class="text-right py-3 px-4 font-semibold text-indigo-700 bg-indigo-50/50">Harga Jual (Customer)</th>
+                    <th class="text-right py-3 px-4 font-semibold text-slate-600">Margin</th>
                     <th class="text-center py-3 px-4 font-semibold text-slate-600">Sumber</th>
                     <th class="text-left py-3 px-4 font-semibold text-slate-600">Invoice/Ref</th>
                     <th class="text-left py-3 px-4 font-semibold text-slate-600">Pencatat</th>
@@ -287,19 +269,6 @@
                         <span class="text-xs text-slate-400 font-mono">{{ $change->product_sku }}</span>
                     </td>
                     <td class="py-3 px-4 text-slate-600">{{ $change->category_name }}</td>
-                    <td class="py-3 px-4 text-center whitespace-nowrap">
-                        @if(($change->tipe_harga ?? 'beli') === 'jual')
-                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sky-50 text-sky-700 border border-sky-200">
-                                <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
-                                Harga Jual
-                            </span>
-                        @else
-                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
-                                <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
-                                Harga Beli
-                            </span>
-                        @endif
-                    </td>
                     <td class="py-3 px-4 text-right text-slate-500 line-through">Rp {{ number_format($change->harga_lama, 0, ',', '.') }}</td>
                     <td class="py-3 px-4 text-right font-semibold text-slate-800">Rp {{ number_format($change->harga_baru, 0, ',', '.') }}</td>
                     <td class="py-3 px-4 text-right font-bold {{ $change->tipe === 'naik' ? 'text-emerald-600' : 'text-red-600' }}">
@@ -316,6 +285,13 @@
                             Turun
                             @endif
                         </span>
+                    </td>
+                    <td class="py-3 px-4 text-right font-bold text-indigo-700 bg-indigo-50/30 whitespace-nowrap">
+                        Rp {{ number_format($change->harga_jual, 0, ',', '.') }}
+                    </td>
+                    <td class="py-3 px-4 text-right font-semibold {{ $change->margin >= 0 ? 'text-emerald-600' : 'text-red-600 font-bold' }}">
+                        {{ $change->margin >= 0 ? '+' : '' }}Rp {{ number_format($change->margin, 0, ',', '.') }}
+                        <span class="text-xs font-normal block">({{ $change->margin_persen }}%)</span>
                     </td>
                     <td class="py-3 px-4 text-center">
                         @php
@@ -343,7 +319,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="11" class="py-12 text-center text-slate-400">Tidak ada perubahan harga pada periode ini.</td>
+                    <td colspan="12" class="py-12 text-center text-slate-400">Tidak ada perubahan harga pada periode ini.</td>
                 </tr>
                 @endforelse
             </tbody>

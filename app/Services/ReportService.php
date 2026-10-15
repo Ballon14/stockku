@@ -338,10 +338,10 @@ class ReportService
     }
 
     /**
-     * Rekap perubahan harga (beli & jual) produk.
+     * Rekap perubahan harga beli produk beserta harga jual ke customer & margin.
      * Reads from the dedicated price_change_logs audit trail table.
      */
-    public function getPriceChangeReport($startDate, $endDate, $productId = null, $paginate = true, $tipeHarga = null)
+    public function getPriceChangeReport($startDate, $endDate, $productId = null, $paginate = true)
     {
         // Eager load reference (morphTo) to avoid N+1 on invoice lookup
         $baseQuery = \App\Models\PriceChangeLog::with(['product.category', 'user', 'reference'])
@@ -353,33 +353,19 @@ class ReportService
             $baseQuery->where('product_id', $productId);
         }
 
-        if ($tipeHarga && in_array($tipeHarga, ['beli', 'jual'])) {
-            $baseQuery->where(function ($q) use ($tipeHarga) {
-                if ($tipeHarga === 'beli') {
-                    $q->where('tipe_harga', 'beli')->orWhereNull('tipe_harga');
-                } else {
-                    $q->where('tipe_harga', 'jual');
-                }
-            });
-        }
-
         // Summary always needs full count (unpaginated)
         $summaryQuery = (clone $baseQuery);
-        $summaryRows = $summaryQuery->get(['id', 'product_id', 'harga_lama', 'harga_baru', 'tipe_harga']);
+        $summaryRows = $summaryQuery->get(['id', 'product_id', 'harga_lama', 'harga_baru']);
 
         $totalNaik = $summaryRows->filter(fn ($r) => (float) $r->harga_baru >= (float) $r->harga_lama)->count();
         $totalTurun = $summaryRows->count() - $totalNaik;
         $totalChanges = $summaryRows->count();
-        $totalBeli = $summaryRows->filter(fn ($r) => ($r->tipe_harga ?? 'beli') === 'beli')->count();
-        $totalJual = $summaryRows->filter(fn ($r) => ($r->tipe_harga ?? 'beli') === 'jual')->count();
         $productsAffected = $summaryRows->pluck('product_id')->unique()->count();
 
         $summary = [
             'total_changes' => $totalChanges,
             'total_naik' => $totalNaik,
             'total_turun' => $totalTurun,
-            'total_beli' => $totalBeli,
-            'total_jual' => $totalJual,
             'products_affected' => $productsAffected,
         ];
 
@@ -400,21 +386,24 @@ class ReportService
                 default => ucfirst($log->sumber),
             };
 
-            $tipeHargaVal = $log->tipe_harga ?? 'beli';
-            $tipeHargaLabel = $tipeHargaVal === 'jual' ? 'Harga Jual' : 'Harga Beli';
+            $hargaJual = (float) ($log->product->harga_jual ?? 0);
+            $hargaBeliBaru = (float) $log->harga_baru;
+            $margin = $hargaJual - $hargaBeliBaru;
+            $marginPersen = $hargaJual > 0 ? round(($margin / $hargaJual) * 100, 1) : 0;
 
             return (object) [
                 'product_id' => $log->product_id,
                 'product_name' => $log->product->name ?? '-',
                 'product_sku' => $log->product->sku ?? '-',
                 'category_name' => $log->product->category->name ?? '-',
-                'tipe_harga' => $tipeHargaVal,
-                'tipe_harga_label' => $tipeHargaLabel,
                 'harga_lama' => (float) $log->harga_lama,
-                'harga_baru' => (float) $log->harga_baru,
+                'harga_baru' => $hargaBeliBaru,
                 'selisih' => $log->selisih,
                 'persen' => $log->persen,
                 'tipe' => $log->tipe,
+                'harga_jual' => $hargaJual,
+                'margin' => $margin,
+                'margin_persen' => $marginPersen,
                 'tanggal' => Carbon::parse($log->created_at),
                 'sumber' => $sumberLabel,
                 'invoice_perubahan' => $invoiceNumber ?? '-',
@@ -423,10 +412,6 @@ class ReportService
             ];
         };
 
-        $currentVsLastBought = ($tipeHarga === 'jual')
-            ? collect()
-            : $this->buildCurrentVsLastBought($startDate, $endDate, $productId);
-
         if (! $paginate) {
             // PDF export — fetch all
             $changes = $baseQuery->get()->map($mapLog);
@@ -434,7 +419,7 @@ class ReportService
             return [
                 'summary' => $summary,
                 'changes' => $changes,
-                'current_vs_last_bought' => $currentVsLastBought,
+                'current_vs_last_bought' => $this->buildCurrentVsLastBought($startDate, $endDate, $productId),
             ];
         }
 
@@ -447,7 +432,7 @@ class ReportService
         return [
             'summary' => $summary,
             'changes' => $paginatedLogs,
-            'current_vs_last_bought' => $currentVsLastBought,
+            'current_vs_last_bought' => $this->buildCurrentVsLastBought($startDate, $endDate, $productId),
         ];
     }
 
@@ -485,6 +470,10 @@ class ReportService
             return $currentVsLastBought;
         }
 
+        $isSqlite = DB::connection()->getDriverName() === 'sqlite';
+        $concatP2 = $isSqlite ? "(p2.tanggal || ' ' || p2.created_at)" : "CONCAT(p2.tanggal, ' ', p2.created_at)";
+        $concatPurchases = $isSqlite ? "(purchases.tanggal || ' ' || purchases.created_at)" : "CONCAT(purchases.tanggal, ' ', purchases.created_at)";
+
         // Batch query: get latest purchase price per product in one query
         // Using a subquery to find the max purchase date per product, then joining back
         $latestPrices = DB::table('purchase_items')
@@ -494,15 +483,15 @@ class ReportService
             ->whereIn('purchase_items.product_id', $products->pluck('id'))
             ->joinSub(
                 DB::table('purchase_items as pi2')
-                    ->select('pi2.product_id', DB::raw('MAX(CONCAT(p2.tanggal, " ", p2.created_at)) as max_key'))
+                    ->select('pi2.product_id', DB::raw("MAX({$concatP2}) as max_key"))
                     ->join('purchases as p2', 'p2.id', '=', 'pi2.purchase_id')
                     ->where('p2.status', '!=', 'cancelled')
                     ->whereIn('pi2.product_id', $products->pluck('id'))
                     ->groupBy('pi2.product_id'),
                 'latest',
-                function ($join) {
+                function ($join) use ($concatPurchases) {
                     $join->on('purchase_items.product_id', '=', 'latest.product_id')
-                        ->whereRaw('CONCAT(purchases.tanggal, " ", purchases.created_at) = latest.max_key');
+                        ->whereRaw("{$concatPurchases} = latest.max_key");
                 }
             )
             ->get()
@@ -524,6 +513,10 @@ class ReportService
             $diff = $lastBoughtPrice - $currentPrice;
             $pctChange = $currentPrice > 0 ? round(($diff / $currentPrice) * 100, 1) : 0;
 
+            $hargaJual = (float) $product->harga_jual;
+            $marginBaru = $hargaJual - $lastBoughtPrice;
+            $marginBaruPersen = $hargaJual > 0 ? round(($marginBaru / $hargaJual) * 100, 1) : 0;
+
             $currentVsLastBought->push((object) [
                 'product_id' => $product->id,
                 'product_name' => $product->name,
@@ -534,6 +527,9 @@ class ReportService
                 'selisih' => $diff,
                 'persen' => $pctChange,
                 'tipe' => $diff > 0 ? 'naik' : 'turun',
+                'harga_jual' => $hargaJual,
+                'margin' => $marginBaru,
+                'margin_persen' => $marginBaruPersen,
             ]);
         }
 
