@@ -230,7 +230,8 @@
                     </div>
 
                     <div class="mb-4">
-                        <input type="text" wire:model="catatan" class="w-full rounded-xl border border-slate-200 py-2 px-3 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-200" placeholder="Catatan transaksi (opsional)...">
+                        <label class="text-xs font-semibold text-slate-700 block mb-1">Catatan Transaksi (Opsional)</label>
+                        <input type="text" wire:model.live.debounce.300ms="catatan" class="w-full rounded-xl border border-slate-200 py-2 px-3 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-200" placeholder="Tambahkan catatan jika ada...">
                     </div>
 
                     @if($this->bayar < $this->grandTotal && $this->bayar > 0)

@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Services\SaleService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Validation\ValidationException;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class SaleServiceTest extends TestCase
@@ -200,5 +201,53 @@ class SaleServiceTest extends TestCase
             'sale_id' => $sale->id,
             'harga_beli' => 3000,
         ]);
+    }
+
+    public function test_sale_catatan_is_saved_and_displayed_in_detail_and_receipt(): void
+    {
+        $user = $this->actingAsUser();
+        Role::firstOrCreate(['name' => 'kasir', 'guard_name' => 'web']);
+        $user->assignRole('kasir');
+
+        $product = $this->makeProduct(stok: 10, hargaJual: 10000);
+
+        $sale = app(SaleService::class)->createSale(
+            [['product_id' => $product->id, 'qty' => 1, 'diskon' => 0]],
+            0,
+            10000,
+            'Pesanan meja 12 bungkus terpisah'
+        );
+
+        $this->assertDatabaseHas('sales', [
+            'id' => $sale->id,
+            'catatan' => 'Pesanan meja 12 bungkus terpisah',
+        ]);
+
+        // Detail Transaksi
+        $detailResponse = $this->actingAs($user)->get(route('sales.show', $sale));
+        $detailResponse->assertOk();
+        $detailResponse->assertSee('Catatan Transaksi');
+        $detailResponse->assertSee('Pesanan meja 12 bungkus terpisah');
+
+        // Nota / Struk
+        $receiptResponse = $this->actingAs($user)->get(route('sales.receipt', $sale));
+        $receiptResponse->assertOk();
+        $receiptResponse->assertSee('Catatan:');
+        $receiptResponse->assertSee('Pesanan meja 12 bungkus terpisah');
+    }
+
+    public function test_empty_catatan_is_stored_as_null(): void
+    {
+        $this->actingAsUser();
+        $product = $this->makeProduct(stok: 5, hargaJual: 5000);
+
+        $sale = app(SaleService::class)->createSale(
+            [['product_id' => $product->id, 'qty' => 1, 'diskon' => 0]],
+            0,
+            10000,
+            '   '
+        );
+
+        $this->assertNull($sale->fresh()->catatan);
     }
 }

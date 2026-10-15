@@ -58,6 +58,13 @@
         <tr class="bold"><td>Kembalian</td><td class="right">Rp {{ number_format($sale->kembalian, 0, ',', '.') }}</td></tr>
         <tr><td>Metode</td><td class="right">{{ $sale->payment_method === 'qris' ? 'QRIS' : 'Tunai' }}</td></tr>
     </table>
+    @if($sale->catatan)
+    <div class="line"></div>
+    <div style="margin: 4px 0; font-size: 11px; word-break: break-word;">
+        <span class="bold">Catatan:</span><br>
+        <span>{{ $sale->catatan }}</span>
+    </div>
+    @endif
     <div class="double-line"></div>
     <div class="center" style="font-size: 10px; margin-top: 10px;">
         Terima kasih atas kunjungan Anda!<br>

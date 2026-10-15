@@ -219,6 +219,8 @@ class SaleService
         ?string $catatan,
         string $paymentMethod = 'cash'
     ): Sale {
+        $catatan = ($catatan !== null && trim($catatan) !== '') ? trim($catatan) : null;
+
         for ($attempt = 0; $attempt < 3; $attempt++) {
             try {
                 return Sale::create([

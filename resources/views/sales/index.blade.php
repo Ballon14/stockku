@@ -27,6 +27,9 @@
                 <span class="px-2 py-0.5 rounded-full text-xs font-semibold {{ $sale->payment_method === 'qris' ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-slate-600' }}">{{ $sale->payment_method === 'qris' ? 'QRIS' : 'Tunai' }}</span>
                 <span class="text-xs text-slate-400">Rp {{ number_format($sale->bayar, 0, ',', '.') }}</span>
             </div>
+            @if($sale->catatan)
+            <p class="text-xs text-slate-500 italic mb-2 line-clamp-1"><span class="font-medium text-slate-600 not-italic">Catatan:</span> {{ $sale->catatan }}</p>
+            @endif
             <div class="flex items-center justify-between">
                 <p class="font-bold text-slate-800">Rp {{ number_format($sale->grand_total, 0, ',', '.') }}</p>
                 <div class="flex items-center gap-1">
@@ -58,7 +61,12 @@
             <tbody>
                 @forelse($sales as $sale)
                 <tr class="border-b border-slate-50 hover:bg-slate-50/50">
-                    <td class="py-3 px-4 font-mono text-xs font-medium text-indigo-600">{{ $sale->invoice_number }}</td>
+                    <td class="py-3 px-4">
+                        <span class="font-mono text-xs font-medium text-indigo-600 block">{{ $sale->invoice_number }}</span>
+                        @if($sale->catatan)
+                        <span class="text-xs text-slate-400 italic block truncate max-w-[180px]" title="{{ $sale->catatan }}">{{ $sale->catatan }}</span>
+                        @endif
+                    </td>
                     <td class="py-3 px-4 text-slate-600">{{ $sale->created_at->format('d/m/Y H:i') }}</td>
                     <td class="py-3 px-4 text-slate-600">{{ $sale->user->name }}</td>
                     <td class="py-3 px-4 text-right font-semibold text-slate-700">Rp {{ number_format($sale->grand_total, 0, ',', '.') }}</td>
