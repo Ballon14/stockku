@@ -17,7 +17,11 @@
         <p class="mt-1.5 text-sm text-slate-500">Masuk untuk melanjutkan ke {{ config('app.name') }}</p>
     </div>
 
-    <form method="POST" action="{{ route('login') }}" class="space-y-5">
+    @php
+        $prefilledEmail = old('email', $lastEmail ?? request()->cookie('last_login_email'));
+    @endphp
+
+    <form method="POST" action="{{ route('login') }}" class="space-y-5" autocomplete="off">
         @csrf
 
         <!-- Email Address -->
@@ -27,7 +31,7 @@
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>
                 </span>
-                <x-text-input id="email" class="block mt-0 w-full pl-11 py-2.5 transition" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" placeholder="nama@perusahaan.com" />
+                <x-text-input id="email" class="block mt-0 w-full pl-11 py-2.5 transition" type="email" name="email" :value="$prefilledEmail" required autofocus autocomplete="username" placeholder="nama@perusahaan.com" />
             </div>
         </div>
 
@@ -48,7 +52,8 @@
                 <x-text-input id="password" class="block mt-0 w-full pl-11 py-2.5 transition"
                                 type="password"
                                 name="password"
-                                required autocomplete="current-password"
+                                value=""
+                                required autocomplete="new-password"
                                 placeholder="••••••••" />
             </div>
         </div>
@@ -74,5 +79,45 @@
         Akun karyawan dibuat oleh Admin.
     </p>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
 
+            // Fallback localStorage jika cookie tidak tersedia
+            if (emailInput && !emailInput.value) {
+                const storedEmail = localStorage.getItem('stockku_last_email');
+                if (storedEmail) {
+                    emailInput.value = storedEmail;
+                }
+            }
+
+            // Pastikan password kosong dan tidak diisi otomatis oleh autofill browser
+            function clearPassword() {
+                if (passwordInput) {
+                    passwordInput.value = '';
+                }
+            }
+
+            clearPassword();
+            setTimeout(clearPassword, 50);
+            setTimeout(clearPassword, 150);
+            setTimeout(clearPassword, 350);
+
+            // Jika email sudah terisi, arahkan kursor ke input password
+            if (emailInput && emailInput.value && passwordInput) {
+                passwordInput.focus();
+            }
+
+            // Simpan email terakhir ke localStorage saat form login disubmit
+            const form = emailInput ? emailInput.closest('form') : null;
+            if (form) {
+                form.addEventListener('submit', function () {
+                    if (emailInput && emailInput.value) {
+                        localStorage.setItem('stockku_last_email', emailInput.value);
+                    }
+                });
+            }
+        });
+    </script>
 </x-guest-layout>

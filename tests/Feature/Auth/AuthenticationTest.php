@@ -28,6 +28,7 @@ class AuthenticationTest extends TestCase
 
         $this->assertAuthenticated();
         $response->assertRedirect(route('dashboard', absolute: false));
+        $response->assertCookie('last_login_email', $user->email);
     }
 
     public function test_users_can_not_authenticate_with_invalid_password(): void
@@ -50,5 +51,17 @@ class AuthenticationTest extends TestCase
 
         $this->assertGuest();
         $response->assertRedirect('/');
+        $response->assertCookie('last_login_email', $user->email);
+    }
+
+    public function test_login_screen_prefills_last_login_email_without_password(): void
+    {
+        $response = $this->withCookie('last_login_email', 'kasir@example.com')
+            ->get('/login');
+
+        $response->assertOk();
+        $response->assertSee('value="kasir@example.com"', false);
+        $response->assertSee('autocomplete="new-password"', false);
+        $response->assertDontSee('value="password"', false);
     }
 }

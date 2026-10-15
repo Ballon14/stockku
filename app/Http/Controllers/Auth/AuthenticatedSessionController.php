@@ -16,9 +16,11 @@ class AuthenticatedSessionController extends Controller
     /**
      * Display the login view.
      */
-    public function create(): View
+    public function create(Request $request): View
     {
-        return view('auth.login');
+        return view('auth.login', [
+            'lastEmail' => $request->cookie('last_login_email'),
+        ]);
     }
 
     /**
@@ -41,6 +43,8 @@ class AuthenticatedSessionController extends Controller
 
         app(ActivityLogger::class)->log('auth.login', 'Login berhasil.');
 
+        cookie()->queue('last_login_email', $request->email, 525600);
+
         $default = auth()->user()->hasRole('kasir')
             ? route('pos', absolute: false)
             : route('dashboard', absolute: false);
@@ -53,6 +57,8 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        $email = Auth::user()?->email;
+
         app(ActivityLogger::class)->log('auth.logout', 'Logout.');
 
         Auth::guard('web')->logout();
@@ -60,6 +66,10 @@ class AuthenticatedSessionController extends Controller
         $request->session()->invalidate();
 
         $request->session()->regenerateToken();
+
+        if ($email) {
+            cookie()->queue('last_login_email', $email, 525600);
+        }
 
         return redirect('/');
     }
