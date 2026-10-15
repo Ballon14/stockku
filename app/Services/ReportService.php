@@ -338,10 +338,10 @@ class ReportService
     }
 
     /**
-     * Rekap perubahan harga beli produk.
+     * Rekap perubahan harga (beli & jual) produk.
      * Reads from the dedicated price_change_logs audit trail table.
      */
-    public function getPriceChangeReport($startDate, $endDate, $productId = null, $paginate = true)
+    public function getPriceChangeReport($startDate, $endDate, $productId = null, $paginate = true, $tipeHarga = null)
     {
         // Eager load reference (morphTo) to avoid N+1 on invoice lookup
         $baseQuery = \App\Models\PriceChangeLog::with(['product.category', 'user', 'reference'])
@@ -353,19 +353,33 @@ class ReportService
             $baseQuery->where('product_id', $productId);
         }
 
+        if ($tipeHarga && in_array($tipeHarga, ['beli', 'jual'])) {
+            $baseQuery->where(function ($q) use ($tipeHarga) {
+                if ($tipeHarga === 'beli') {
+                    $q->where('tipe_harga', 'beli')->orWhereNull('tipe_harga');
+                } else {
+                    $q->where('tipe_harga', 'jual');
+                }
+            });
+        }
+
         // Summary always needs full count (unpaginated)
         $summaryQuery = (clone $baseQuery);
-        $summaryRows = $summaryQuery->get(['id', 'product_id', 'harga_lama', 'harga_baru']);
+        $summaryRows = $summaryQuery->get(['id', 'product_id', 'harga_lama', 'harga_baru', 'tipe_harga']);
 
         $totalNaik = $summaryRows->filter(fn ($r) => (float) $r->harga_baru >= (float) $r->harga_lama)->count();
         $totalTurun = $summaryRows->count() - $totalNaik;
         $totalChanges = $summaryRows->count();
+        $totalBeli = $summaryRows->filter(fn ($r) => ($r->tipe_harga ?? 'beli') === 'beli')->count();
+        $totalJual = $summaryRows->filter(fn ($r) => ($r->tipe_harga ?? 'beli') === 'jual')->count();
         $productsAffected = $summaryRows->pluck('product_id')->unique()->count();
 
         $summary = [
             'total_changes' => $totalChanges,
             'total_naik' => $totalNaik,
             'total_turun' => $totalTurun,
+            'total_beli' => $totalBeli,
+            'total_jual' => $totalJual,
             'products_affected' => $productsAffected,
         ];
 
@@ -386,11 +400,16 @@ class ReportService
                 default => ucfirst($log->sumber),
             };
 
+            $tipeHargaVal = $log->tipe_harga ?? 'beli';
+            $tipeHargaLabel = $tipeHargaVal === 'jual' ? 'Harga Jual' : 'Harga Beli';
+
             return (object) [
                 'product_id' => $log->product_id,
                 'product_name' => $log->product->name ?? '-',
                 'product_sku' => $log->product->sku ?? '-',
                 'category_name' => $log->product->category->name ?? '-',
+                'tipe_harga' => $tipeHargaVal,
+                'tipe_harga_label' => $tipeHargaLabel,
                 'harga_lama' => (float) $log->harga_lama,
                 'harga_baru' => (float) $log->harga_baru,
                 'selisih' => $log->selisih,
@@ -404,6 +423,10 @@ class ReportService
             ];
         };
 
+        $currentVsLastBought = ($tipeHarga === 'jual')
+            ? collect()
+            : $this->buildCurrentVsLastBought($startDate, $endDate, $productId);
+
         if (! $paginate) {
             // PDF export — fetch all
             $changes = $baseQuery->get()->map($mapLog);
@@ -411,7 +434,7 @@ class ReportService
             return [
                 'summary' => $summary,
                 'changes' => $changes,
-                'current_vs_last_bought' => $this->buildCurrentVsLastBought($startDate, $endDate, $productId),
+                'current_vs_last_bought' => $currentVsLastBought,
             ];
         }
 
@@ -424,7 +447,7 @@ class ReportService
         return [
             'summary' => $summary,
             'changes' => $paginatedLogs,
-            'current_vs_last_bought' => $this->buildCurrentVsLastBought($startDate, $endDate, $productId),
+            'current_vs_last_bought' => $currentVsLastBought,
         ];
     }
 

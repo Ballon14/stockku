@@ -13,10 +13,11 @@ class PriceChangeService
      * Record a price change for a product.
      *
      * @param  Product       $product        The product whose price changed.
-     * @param  float         $hargaLama      The old purchase price.
-     * @param  float         $hargaBaru      The new purchase price.
-     * @param  string        $sumber         Source: 'purchase' | 'manual_edit'.
+     * @param  float         $hargaLama      The old price.
+     * @param  float         $hargaBaru      The new price.
+     * @param  string        $sumber         Source: 'purchase' | 'manual_edit' | 'sync_master'.
      * @param  Model|null    $reference      Optional polymorphic reference (e.g. Purchase).
+     * @param  string        $tipeHarga      Price type: 'beli' | 'jual'.
      */
     public function record(
         Product $product,
@@ -24,6 +25,7 @@ class PriceChangeService
         float $hargaBaru,
         string $sumber,
         ?Model $reference = null,
+        string $tipeHarga = 'beli',
     ): ?PriceChangeLog {
         // Don't log if price didn't actually change
         if ((float) $hargaLama === (float) $hargaBaru) {
@@ -32,6 +34,7 @@ class PriceChangeService
 
         return PriceChangeLog::create([
             'product_id' => $product->id,
+            'tipe_harga' => $tipeHarga,
             'harga_lama' => $hargaLama,
             'harga_baru' => $hargaBaru,
             'sumber' => $sumber,

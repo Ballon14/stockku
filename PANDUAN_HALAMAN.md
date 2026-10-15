@@ -81,7 +81,7 @@ Mengelola dan merekam pergerakan barang secara finansial.
 - **Laba Rugi:** Menghitung total pendapatan (Revenue), Harga Pokok Penjualan (HPP/COGS), diskon, dan retur, untuk mengetahui Laba Kotor (Gross Profit).
 - **Mutasi Stok:** Laporan agregat pergerakan barang.
 - **Laporan Absensi:** Ringkasan kedisiplinan dan kehadiran per karyawan.
-- **Perubahan Harga:** Melacak produk mana saja yang mengalami kenaikan atau penurunan harga beli dari supplier dibandingkan riwayat sebelumnya, agar owner tidak rugi jika lupa menaikkan harga jual di sistem.
+- **Perubahan Harga:** Melacak riwayat perubahan harga beli dan harga jual produk, membandingkan kenaikan atau penurunan harga dari supplier (restock) maupun penyesuaian harga jual toko.
   - *Semua laporan dapat di-export ke dalam bentuk Excel maupun Cetak PDF.*
 
 ---

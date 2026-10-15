@@ -10,6 +10,7 @@ class PriceChangeLog extends Model
 {
     protected $fillable = [
         'product_id',
+        'tipe_harga',
         'harga_lama',
         'harga_baru',
         'sumber',
@@ -56,5 +57,20 @@ class PriceChangeLog extends Model
     public function getTipeAttribute(): string
     {
         return $this->selisih >= 0 ? 'naik' : 'turun';
+    }
+
+    public function getTipeHargaLabelAttribute(): string
+    {
+        return ($this->tipe_harga ?? 'beli') === 'jual' ? 'Harga Jual' : 'Harga Beli';
+    }
+
+    public function scopeBeli($query)
+    {
+        return $query->where('tipe_harga', 'beli');
+    }
+
+    public function scopeJual($query)
+    {
+        return $query->where('tipe_harga', 'jual');
     }
 }

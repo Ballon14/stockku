@@ -117,25 +117,32 @@ class ReportController extends Controller
         $startDate = $request->input('start_date', now()->startOfMonth()->toDateString());
         $endDate = $request->input('end_date', now()->toDateString());
         $productId = $request->input('product_id');
+        $tipeHarga = $request->input('tipe_harga'); // null | 'all' | 'beli' | 'jual'
 
         $products = Product::where('is_active', true)->orderBy('name')->get();
 
         if ($request->input('export') === 'pdf') {
-            $data = $this->reportService->getPriceChangeReport($startDate, $endDate, $productId, false);
+            $data = $this->reportService->getPriceChangeReport($startDate, $endDate, $productId, false, $tipeHarga);
 
             $pdf = Pdf::loadView('reports.price-change-pdf', [
                 'data' => $data,
                 'startDate' => $startDate,
                 'endDate' => $endDate,
+                'tipeHarga' => $tipeHarga,
             ])->setPaper('a4', 'landscape');
 
-            $filename = 'rekap-perubahan-harga-beli_' . $startDate . '_sd_' . $endDate . '.pdf';
+            $tipeSuffix = match ($tipeHarga) {
+                'beli' => 'harga-beli',
+                'jual' => 'harga-jual',
+                default => 'semua-harga',
+            };
+            $filename = 'rekap-perubahan-' . $tipeSuffix . '_' . $startDate . '_sd_' . $endDate . '.pdf';
             return $pdf->download($filename);
         }
 
-        $data = $this->reportService->getPriceChangeReport($startDate, $endDate, $productId, true);
+        $data = $this->reportService->getPriceChangeReport($startDate, $endDate, $productId, true, $tipeHarga);
 
-        return view('reports.price-change', compact('data', 'startDate', 'endDate', 'productId', 'products'));
+        return view('reports.price-change', compact('data', 'startDate', 'endDate', 'productId', 'products', 'tipeHarga'));
     }
 
     public function syncMasterPrice(Request $request)

@@ -34,15 +34,22 @@ class ProductService
 
     public function update(Product $product, array $data): Product
     {
-        // Detect harga_beli change before updating
+        // Detect price changes before updating
         $oldHargaBeli = (float) $product->harga_beli;
+        $oldHargaJual = (float) $product->harga_jual;
 
         $product->update($data);
 
         // Log price change if harga_beli actually changed
         if (isset($data['harga_beli'])) {
             $newHargaBeli = (float) $data['harga_beli'];
-            $this->priceChangeService->record($product, $oldHargaBeli, $newHargaBeli, 'manual_edit');
+            $this->priceChangeService->record($product, $oldHargaBeli, $newHargaBeli, 'manual_edit', null, 'beli');
+        }
+
+        // Log price change if harga_jual actually changed
+        if (isset($data['harga_jual'])) {
+            $newHargaJual = (float) $data['harga_jual'];
+            $this->priceChangeService->record($product, $oldHargaJual, $newHargaJual, 'manual_edit', null, 'jual');
         }
 
         return $product;

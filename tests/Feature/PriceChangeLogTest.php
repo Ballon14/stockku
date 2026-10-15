@@ -166,8 +166,18 @@ class PriceChangeLogTest extends TestCase
 
         $this->assertDatabaseHas('price_change_logs', [
             'product_id' => $product->id,
+            'tipe_harga' => 'beli',
             'harga_lama' => 3000,
             'harga_baru' => 4500,
+            'sumber' => 'manual_edit',
+            'user_id' => $user->id,
+        ]);
+
+        $this->assertDatabaseHas('price_change_logs', [
+            'product_id' => $product->id,
+            'tipe_harga' => 'jual',
+            'harga_lama' => 5000,
+            'harga_baru' => 6000,
             'sumber' => 'manual_edit',
             'user_id' => $user->id,
         ]);
@@ -385,5 +395,127 @@ class PriceChangeLogTest extends TestCase
         ]);
 
         $response->assertForbidden();
+    }
+
+    public function test_product_edit_tracks_only_harga_jual_when_harga_beli_unchanged(): void
+    {
+        $user = $this->adminUser();
+        $category = Category::create(['name' => 'KatJual', 'slug' => 'kat-jual-'.uniqid()]);
+        $product = Product::create([
+            'category_id' => $category->id,
+            'name' => 'Produk Jual Test',
+            'sku' => 'JUL-'.uniqid(),
+            'harga_beli' => 3000,
+            'harga_jual' => 5000,
+            'stok' => 10,
+            'min_stok' => 2,
+            'satuan' => 'pcs',
+            'is_active' => true,
+        ]);
+
+        $this->put(route('products.update', $product), [
+            'category_id' => $category->id,
+            'name' => 'Produk Jual Test',
+            'sku' => $product->sku,
+            'harga_beli' => 3000, // unchanged
+            'harga_jual' => 6500, // changed
+            'min_stok' => 2,
+            'satuan' => 'pcs',
+        ])->assertSessionHasNoErrors();
+
+        // Should NOT have harga_beli log
+        $this->assertDatabaseMissing('price_change_logs', [
+            'product_id' => $product->id,
+            'tipe_harga' => 'beli',
+        ]);
+
+        // Should have harga_jual log
+        $this->assertDatabaseHas('price_change_logs', [
+            'product_id' => $product->id,
+            'tipe_harga' => 'jual',
+            'harga_lama' => 5000,
+            'harga_baru' => 6500,
+            'sumber' => 'manual_edit',
+            'user_id' => $user->id,
+        ]);
+    }
+
+    public function test_report_service_filters_by_tipe_harga(): void
+    {
+        $this->adminUser();
+        $product = $this->createProduct();
+
+        PriceChangeLog::create([
+            'product_id' => $product->id,
+            'tipe_harga' => 'beli',
+            'harga_lama' => 3000,
+            'harga_baru' => 3500,
+            'sumber' => 'purchase',
+            'user_id' => auth()->id(),
+            'created_at' => now(),
+        ]);
+
+        PriceChangeLog::create([
+            'product_id' => $product->id,
+            'tipe_harga' => 'jual',
+            'harga_lama' => 5000,
+            'harga_baru' => 5500,
+            'sumber' => 'manual_edit',
+            'user_id' => auth()->id(),
+            'created_at' => now(),
+        ]);
+
+        $reportService = app(ReportService::class);
+
+        // All prices
+        $all = $reportService->getPriceChangeReport(now()->startOfMonth()->toDateString(), now()->toDateString(), null, false);
+        $this->assertSame(2, $all['summary']['total_changes']);
+        $this->assertSame(1, $all['summary']['total_beli']);
+        $this->assertSame(1, $all['summary']['total_jual']);
+        $this->assertCount(2, $all['changes']);
+
+        // Only Beli
+        $beliOnly = $reportService->getPriceChangeReport(now()->startOfMonth()->toDateString(), now()->toDateString(), null, false, 'beli');
+        $this->assertSame(1, $beliOnly['summary']['total_changes']);
+        $this->assertSame(1, $beliOnly['summary']['total_beli']);
+        $this->assertSame(0, $beliOnly['summary']['total_jual']);
+        $this->assertCount(1, $beliOnly['changes']);
+        $this->assertSame('beli', $beliOnly['changes']->first()->tipe_harga);
+
+        // Only Jual
+        $jualOnly = $reportService->getPriceChangeReport(now()->startOfMonth()->toDateString(), now()->toDateString(), null, false, 'jual');
+        $this->assertSame(1, $jualOnly['summary']['total_changes']);
+        $this->assertSame(0, $jualOnly['summary']['total_beli']);
+        $this->assertSame(1, $jualOnly['summary']['total_jual']);
+        $this->assertCount(1, $jualOnly['changes']);
+        $this->assertSame('jual', $jualOnly['changes']->first()->tipe_harga);
+        $this->assertTrue($jualOnly['current_vs_last_bought']->isEmpty());
+    }
+
+    public function test_report_price_change_web_and_pdf_with_tipe_harga(): void
+    {
+        $this->adminUser();
+        $product = $this->createProduct();
+
+        PriceChangeLog::create([
+            'product_id' => $product->id,
+            'tipe_harga' => 'jual',
+            'harga_lama' => 5000,
+            'harga_baru' => 6000,
+            'sumber' => 'manual_edit',
+            'user_id' => auth()->id(),
+            'created_at' => now(),
+        ]);
+
+        // Web view with filter
+        $response = $this->get(route('reports.price-change', ['tipe_harga' => 'jual']));
+        $response->assertOk();
+        $response->assertViewHas('tipeHarga', 'jual');
+        $response->assertSee('Harga Jual');
+
+        // PDF export with filter
+        $pdfResponse = $this->get(route('reports.price-change', ['tipe_harga' => 'jual', 'export' => 'pdf']));
+        $pdfResponse->assertOk();
+        $this->assertStringContainsString('rekap-perubahan-harga-jual', $pdfResponse->headers->get('content-disposition') ?? '');
     }
 }
