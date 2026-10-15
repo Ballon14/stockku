@@ -67,7 +67,7 @@
             <div class="flex items-start justify-between gap-3 mb-2">
                 <div class="min-w-0">
                     <p class="text-sm text-slate-600">{{ $mv->created_at->format('d/m/Y H:i') }}</p>
-                    <p class="text-xs text-slate-400 mt-0.5">{{ $mv->user->name }}</p>
+                    <p class="text-xs text-slate-400 mt-0.5">{{ $mv->user->name ?? '-' }}</p>
                 </div>
                 <span class="shrink-0 px-2 py-0.5 rounded-full text-xs font-semibold
                     {{ $mv->type === 'in' || $mv->type === 'return' ? 'bg-emerald-100 text-emerald-700' :
@@ -120,7 +120,7 @@
                     <td class="py-3 px-4 text-center font-semibold text-red-600">{{ $mv->type === 'out' ? '-' . $mv->qty : ($mv->type === 'adjustment' && $mv->qty < 0 ? $mv->qty : '-') }}</td>
                     <td class="py-3 px-4 text-center font-bold text-slate-800">{{ $mv->stok_sesudah }}</td>
                     <td class="py-3 px-4 text-slate-500 text-xs">{{ $mv->keterangan }}</td>
-                    <td class="py-3 px-4 text-slate-600 text-xs">{{ $mv->user->name }}</td>
+                    <td class="py-3 px-4 text-slate-600 text-xs">{{ $mv->user->name ?? '-' }}</td>
                 </tr>
                 @empty
                 <tr>
@@ -130,7 +130,9 @@
             </tbody>
         </table>
     </div>
+    @if($movements)
     <div class="px-4 py-3 border-t border-slate-100">{{ $movements->appends(request()->query())->links() }}</div>
+    @endif
 </div>
 @else
 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-12 text-center">
