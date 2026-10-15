@@ -3,11 +3,11 @@
   "appName": "StockKu",
   "webDir": "public",
   "server": {
-    "url": "https://10.10.10.21",
+    "url": "https://tokomakmur.buildsys.site",
     "cleartext": false
   },
-  "allowNavigation": ["10.10.10.21"],
+  "allowNavigation": ["https://tokomakmur.buildsys.site"],
   "android": {
-    "allowMixedContent": false
+    "allowMixedContent": true
   }
 }
