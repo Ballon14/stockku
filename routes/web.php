@@ -49,7 +49,6 @@ Route::middleware(['auth', 'ensure-attended'])->group(function () {
 
         // Stock
         Route::get('/stock', [StockController::class, 'index'])->name('stock.index');
-        Route::get('/stock/low', [StockController::class, 'lowStock'])->name('stock.low');
         Route::post('/stock/adjust', [StockController::class, 'adjust'])->name('stock.adjust');
 
         // Sale Returns
@@ -70,12 +69,13 @@ Route::middleware(['auth', 'ensure-attended'])->group(function () {
         Route::get('/activity-logs', [ActivityLogController::class, 'index'])->name('activity-logs.index');
     });
 
-    // POS - Admin & Kasir
+    // POS & Stock Alerts - Admin & Kasir
     Route::middleware('role:admin|kasir')->group(function () {
         Route::get('/pos', [SaleController::class, 'pos'])->name('pos');
         Route::get('/sales', [SaleController::class, 'index'])->name('sales.index');
         Route::get('/sales/{sale}', [SaleController::class, 'show'])->name('sales.show');
         Route::get('/sales/{sale}/receipt', [SaleController::class, 'receipt'])->name('sales.receipt');
+        Route::get('/stock/low', [StockController::class, 'lowStock'])->name('stock.low');
     });
 
     // Attendance - All authenticated users with employee data

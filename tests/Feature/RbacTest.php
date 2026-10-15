@@ -63,6 +63,7 @@ class RbacTest extends TestCase
 
         $this->get(route('pos'))->assertOk();
         $this->get(route('sales.index'))->assertOk();
+        $this->get(route('stock.low'))->assertOk();
     }
 
     public function test_karyawan_can_access_attendance_only(): void
@@ -70,6 +71,7 @@ class RbacTest extends TestCase
         $this->actingAs($this->createUserWithRole('karyawan'));
 
         $this->get(route('pos'))->assertForbidden();
+        $this->get(route('stock.low'))->assertForbidden();
         $this->get(route('reports.sales'))->assertForbidden();
         $this->get(route('categories.index'))->assertForbidden();
         $this->get(route('attendance.index'))->assertRedirect();

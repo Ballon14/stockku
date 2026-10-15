@@ -34,7 +34,13 @@
                 </span>
                 <div class="flex-1 min-w-0">
                     <p class="text-sm font-bold text-slate-800">{{ $data['low_stock_count'] }} produk stok menipis</p>
-                    <p class="text-xs text-slate-500">Segera catat pembelian agar stok tidak habis.</p>
+                    <p class="text-xs text-slate-500">
+                        @if(auth()->user()->hasRole('admin'))
+                            Segera catat pembelian agar stok tidak habis.
+                        @else
+                            Periksa produk yang menipis dan koordinasikan dengan admin.
+                        @endif
+                    </p>
                 </div>
                 <a href="{{ route('stock.low') }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-xl shadow-lg shadow-red-500/30 hover:bg-red-700 transition-colors shrink-0">
                     Lihat Stok Menipis →
@@ -164,7 +170,7 @@
             Stok Menipis
         </h3>
         <a href="{{ route('stock.low') }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-xl shadow-lg shadow-red-500/30 hover:bg-red-700 transition-colors">
-            Kelola Restock →
+            {{ auth()->user()->hasRole('admin') ? 'Kelola Restock →' : 'Lihat Semua Stok Menipis →' }}
         </a>
     </div>
         <!-- Mobile: card list -->

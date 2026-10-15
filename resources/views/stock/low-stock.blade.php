@@ -10,7 +10,13 @@
     </div>
     <div>
         <h3 class="font-bold text-amber-900 text-lg">Perhatian!</h3>
-        <p class="text-amber-800 text-sm mt-1">Produk-produk di bawah ini memiliki stok sama dengan atau kurang dari batas minimum stok (Re-order point). Segera lakukan pemesanan ke supplier.</p>
+        <p class="text-amber-800 text-sm mt-1">
+            @if(auth()->user()->hasRole('admin'))
+                Produk-produk di bawah ini memiliki stok sama dengan atau kurang dari batas minimum stok (Re-order point). Segera lakukan pemesanan ke supplier.
+            @else
+                Produk-produk di bawah ini memiliki stok sama dengan atau kurang dari batas minimum stok. Informasikan kepada Admin atau Pemilik toko untuk segera melakukan restock.
+            @endif
+        </p>
     </div>
 </div>
 
@@ -28,7 +34,13 @@
             </div>
             <div class="flex items-center justify-between">
                 <span class="text-xs text-slate-500">Min. stok: {{ $product->min_stok }} {{ $product->satuan }}</span>
-                <a href="{{ route('purchases.create') }}" class="inline-flex px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-semibold hover:bg-indigo-700 transition-colors">Catat Pembelian</a>
+                @if(auth()->user()->hasRole('admin'))
+                    <a href="{{ route('purchases.create') }}" class="inline-flex px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-semibold hover:bg-indigo-700 transition-colors">Catat Pembelian</a>
+                @else
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold {{ $product->stok <= 0 ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-amber-50 text-amber-700 border border-amber-200' }}">
+                        {{ $product->stok <= 0 ? 'Habis' : 'Menipis' }}
+                    </span>
+                @endif
             </div>
         </div>
         @empty
@@ -49,7 +61,7 @@
                     <th class="text-left py-3 px-4 font-semibold text-slate-600">Kategori</th>
                     <th class="text-center py-3 px-4 font-semibold text-slate-600">Stok Saat Ini</th>
                     <th class="text-center py-3 px-4 font-semibold text-slate-600">Min. Stok</th>
-                    <th class="text-center py-3 px-4 font-semibold text-slate-600">Aksi</th>
+                    <th class="text-center py-3 px-4 font-semibold text-slate-600">{{ auth()->user()->hasRole('admin') ? 'Aksi' : 'Status' }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -65,9 +77,15 @@
                     </td>
                     <td class="py-3 px-4 text-center font-medium text-slate-600">{{ $product->min_stok }} {{ $product->satuan }}</td>
                     <td class="py-3 px-4 text-center">
-                        <a href="{{ route('purchases.create') }}" class="inline-flex px-3 py-1 bg-indigo-50 text-indigo-600 rounded-lg text-xs font-semibold hover:bg-indigo-100 transition-colors">
-                            Catat Pembelian
-                        </a>
+                        @if(auth()->user()->hasRole('admin'))
+                            <a href="{{ route('purchases.create') }}" class="inline-flex px-3 py-1 bg-indigo-50 text-indigo-600 rounded-lg text-xs font-semibold hover:bg-indigo-100 transition-colors">
+                                Catat Pembelian
+                            </a>
+                        @else
+                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold {{ $product->stok <= 0 ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-amber-50 text-amber-700 border border-amber-200' }}">
+                                {{ $product->stok <= 0 ? 'Stok Habis' : 'Stok Menipis' }}
+                            </span>
+                        @endif
                     </td>
                 </tr>
                 @empty
