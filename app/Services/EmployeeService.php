@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\Employee;
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 class EmployeeService
 {
@@ -25,58 +25,67 @@ class EmployeeService
 
     public function store(array $data, ?array $userData = null): Employee
     {
-        if ($userData) {
-            $user = User::create([
-                'name' => $data['nama'],
-                'email' => $userData['email'],
-                'password' => Hash::make($userData['password']),
-            ]);
-            $user->assignRole($userData['role'] ?? 'karyawan');
-            $data['user_id'] = $user->id;
-        }
+        return DB::transaction(function () use ($data, $userData) {
+            if ($userData) {
+                $user = User::create([
+                    'name' => $data['nama'],
+                    'email' => $userData['email'],
+                    'password' => $userData['password'],
+                ]);
+                $user->assignRole($userData['role'] ?? 'karyawan');
+                $data['user_id'] = $user->id;
+            }
 
-        return Employee::create($data);
+            return Employee::create($data);
+        });
     }
 
     public function update(Employee $employee, array $data, ?array $userData = null): Employee
     {
-        $employee->update($data);
+        return DB::transaction(function () use ($employee, $data, $userData) {
+            $employee->update($data);
 
-        if ($userData && $employee->user) {
-            $updateData = ['email' => $userData['email']];
-            if (! empty($userData['password'])) {
-                $updateData['password'] = Hash::make($userData['password']);
+            if ($userData && $employee->user) {
+                $updateData = [
+                    'email' => $userData['email'],
+                    'name' => $data['nama'] ?? $employee->nama,
+                ];
+                if (! empty($userData['password'])) {
+                    $updateData['password'] = $userData['password'];
+                }
+                $employee->user->update($updateData);
+
+                if (! empty($userData['role'])) {
+                    $employee->user->syncRoles([$userData['role']]);
+                }
+            } elseif ($userData && ! $employee->user) {
+                // Buat akun user baru untuk karyawan yang belum punya akun
+                if (empty($userData['password'])) {
+                    throw new \RuntimeException('Password wajib diisi untuk membuat akun baru.');
+                }
+
+                $user = User::create([
+                    'name' => $data['nama'] ?? $employee->nama,
+                    'email' => $userData['email'],
+                    'password' => $userData['password'],
+                ]);
+                $user->assignRole($userData['role'] ?? 'karyawan');
+                $employee->update(['user_id' => $user->id]);
             }
-            $employee->user->update($updateData);
 
-            if (! empty($userData['role'])) {
-                $employee->user->syncRoles([$userData['role']]);
-            }
-        } elseif ($userData && ! $employee->user) {
-            // Buat akun user baru untuk karyawan yang belum punya akun
-            if (empty($userData['password'])) {
-                throw new \RuntimeException('Password wajib diisi untuk membuat akun baru.');
-            }
-
-            $user = User::create([
-                'name' => $data['nama'] ?? $employee->nama,
-                'email' => $userData['email'],
-                'password' => Hash::make($userData['password']),
-            ]);
-            $user->assignRole($userData['role'] ?? 'karyawan');
-            $employee->update(['user_id' => $user->id]);
-        }
-
-        return $employee;
+            return $employee;
+        });
     }
 
     public function delete(Employee $employee): bool
     {
-        if ($employee->user) {
-            $employee->user->update(['is_active' => false]);
-            \DB::table('sessions')->where('user_id', $employee->user->id)->delete();
-        }
+        return DB::transaction(function () use ($employee) {
+            if ($employee->user) {
+                $employee->user->update(['is_active' => false]);
+                DB::table('sessions')->where('user_id', $employee->user->id)->delete();
+            }
 
-        return $employee->delete();
+            return $employee->delete();
+        });
     }
 }

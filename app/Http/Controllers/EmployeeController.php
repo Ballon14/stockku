@@ -35,7 +35,7 @@ class EmployeeController extends Controller
         ];
 
         $employee = $this->employeeService->store($request->only([
-            'nama', 'jabatan', 'no_kontak', 'email', 'alamat', 'tanggal_masuk', 'is_active',
+            'nama', 'jabatan', 'no_kontak', 'email', 'alamat', 'tanggal_masuk',
         ]), $userData);
 
         app(ActivityLogger::class)->log('employee.create', 'Karyawan "'.$employee->nama.'" ('.$employee->jabatan.') ditambahkan.');
@@ -45,7 +45,7 @@ class EmployeeController extends Controller
 
     public function edit(Employee $employee)
     {
-        $employee->load('user');
+        $employee->load('user.roles');
 
         return view('employees.edit', compact('employee'));
     }
@@ -59,7 +59,7 @@ class EmployeeController extends Controller
         ];
 
         $this->employeeService->update($employee, $request->only([
-            'nama', 'jabatan', 'no_kontak', 'email', 'alamat', 'tanggal_masuk', 'is_active',
+            'nama', 'jabatan', 'no_kontak', 'email', 'alamat', 'tanggal_masuk',
         ]), $userData);
 
         app(ActivityLogger::class)->log('employee.update', 'Karyawan "'.$employee->nama.'" diperbarui.');
