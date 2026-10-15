@@ -322,180 +322,183 @@
                     },
                 }
             }
+
+            function productLiveSearch(config) {
+                return {
+                    search: config.search || '',
+                    categoryId: config.categoryId || '',
+                    baseUrl: config.baseUrl,
+                    loading: false,
+                    abortController: null,
+
+                    init() {
+                        const container = this.$refs.tableContainer;
+                        if (container) {
+                            container.addEventListener('click', (e) => {
+                                const link = e.target.closest('a');
+                                if (link && link.href && (link.closest('nav') || link.closest('.pagination') || link.getAttribute('rel') === 'prev' || link.getAttribute('rel') === 'next')) {
+                                    e.preventDefault();
+                                    this.fetchResults(link.href);
+                                }
+                            });
+                        }
+
+                        window.addEventListener('popstate', () => {
+                            const params = new URLSearchParams(window.location.search);
+                            this.search = params.get('search') || '';
+                            this.categoryId = params.get('category_id') || '';
+                            this.fetchResults(window.location.href, false);
+                        });
+                    },
+
+                    clearSearch() {
+                        this.search = '';
+                        this.fetchResults();
+                        this.$nextTick(() => {
+                            this.$refs.searchInput?.focus();
+                        });
+                    },
+
+                    resetFilters() {
+                        this.search = '';
+                        this.categoryId = '';
+                        this.fetchResults();
+                        this.$nextTick(() => {
+                            this.$refs.searchInput?.focus();
+                        });
+                    },
+
+                    fetchResults(customUrl = null, updateHistory = true) {
+                        let url;
+                        if (customUrl) {
+                            url = new URL(customUrl, window.location.origin);
+                        } else {
+                            url = new URL(this.baseUrl, window.location.origin);
+                            if (this.search && this.search.trim()) {
+                                url.searchParams.set('search', this.search.trim());
+                            }
+                            if (this.categoryId) {
+                                url.searchParams.set('category_id', this.categoryId);
+                            }
+                        }
+
+                        if (this.abortController) {
+                            this.abortController.abort();
+                        }
+                        this.abortController = new AbortController();
+
+                        this.loading = true;
+
+                        if (updateHistory) {
+                            window.history.replaceState({}, '', url.toString());
+                        }
+
+                        fetch(url.toString(), {
+                            signal: this.abortController.signal,
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Accept': 'text/html'
+                            }
+                        })
+                        .then(res => {
+                            if (!res.ok) throw new Error('Gagal memuat data produk.');
+                            return res.text();
+                        })
+                        .then(html => {
+                            const target = document.getElementById('products-table-content');
+                            if (target) {
+                                target.innerHTML = html;
+                            }
+                            this.loading = false;
+                        })
+                        .catch(err => {
+                            if (err.name !== 'AbortError') {
+                                console.error('Live search error:', err);
+                                this.loading = false;
+                            }
+                        });
+                    }
+                };
+            }
         </script>
     @endpush
 
-    <!-- Filter -->
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 mb-6">
-        <form method="GET" class="flex flex-wrap gap-3 items-end">
-            <div class="flex-1 min-w-[200px]">
-                <label class="text-xs font-medium text-slate-500">Cari</label>
-                <input type="text" name="search" value="{{ $search }}" placeholder="Nama / SKU"
-                    class="w-full mt-1 rounded-xl border-slate-200 text-sm focus:border-indigo-500 focus:ring-indigo-200">
-            </div>
-            <div class="w-48">
-                <label class="text-xs font-medium text-slate-500">Kategori</label>
-                <select name="category_id"
-                    class="w-full mt-1 rounded-xl border-slate-200 text-sm focus:border-indigo-500 focus:ring-indigo-200">
-                    <option value="">Semua</option>
-                    @foreach ($categories as $cat)
-                        <option value="{{ $cat->id }}" {{ $categoryId == $cat->id ? 'selected' : '' }}>
-                            {{ $cat->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <button type="submit"
-                class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium">Filter</button>
-            <a href="{{ route('products.index') }}"
-                class="px-4 py-2 bg-slate-100 text-slate-600 rounded-xl text-sm font-medium">Reset</a>
-        </form>
-    </div>
-
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-        <!-- Mobile: card list -->
-        <div class="md:hidden divide-y divide-slate-100">
-            @forelse($products as $product)
-                <div class="p-4">
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="w-11 h-11 rounded-lg bg-slate-100 flex items-center justify-center shrink-0">
-                            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+    <div x-data="productLiveSearch({
+        search: @js($search ?? ''),
+        categoryId: @js($categoryId ?? ''),
+        baseUrl: @js(route('products.index'))
+    })" x-init="init()">
+        <!-- Filter -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 mb-6">
+            <form method="GET" action="{{ route('products.index') }}" @submit.prevent="fetchResults()" class="flex flex-wrap gap-3 items-end">
+                <div class="flex-1 min-w-[240px]">
+                    <label class="text-xs font-medium text-slate-500">Cari Produk</label>
+                    <div class="relative mt-1">
+                        <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                        <input 
+                            x-ref="searchInput"
+                            type="text" 
+                            name="search" 
+                            x-model="search"
+                            @input.debounce.300ms="fetchResults()"
+                            @keydown.enter.prevent="fetchResults()"
+                            placeholder="Ketik nama, SKU, atau kategori..."
+                            class="w-full pl-10 pr-9 rounded-xl border-slate-200 text-sm focus:border-indigo-500 focus:ring-indigo-200 transition-all">
+                        
+                        <!-- Clear button (X) when search has value -->
+                        <button 
+                            type="button" 
+                            x-show="search.length > 0" 
+                            @click="clearSearch()"
+                            x-cloak
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors p-0.5 rounded-md"
+                            title="Hapus pencarian">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                             </svg>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="font-medium text-slate-700 truncate">{{ $product->name }}</p>
-                            <p class="font-mono text-xs text-slate-400 mt-0.5">{{ $product->sku }} ·
-                                {{ $product->category->name }}</p>
-                        </div>
-                        <span
-                            class="shrink-0 px-2 py-0.5 rounded-full text-xs font-bold {{ $product->isLowStock() ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700' }}">{{ $product->stok }}</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <div class="text-xs text-slate-500">
-                            <p>Beli: <span class="font-semibold text-slate-700">Rp
-                                    {{ number_format($product->harga_beli, 0, ',', '.') }}</span></p>
-                            <p>Jual: <span class="font-semibold text-slate-700">Rp
-                                    {{ number_format($product->harga_jual, 0, ',', '.') }}</span></p>
-                        </div>
-                        <div class="flex items-center gap-1">
-                            <a href="{{ route('products.show', $product) }}"
-                                class="p-1.5 rounded-lg text-slate-400 hover:bg-indigo-50 hover:text-indigo-600"
-                                title="Detail"><svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg></a>
-                            <a href="{{ route('products.edit', $product) }}"
-                                class="p-1.5 rounded-lg text-slate-400 hover:bg-indigo-50 hover:text-indigo-600"><svg
-                                    class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                </svg></a>
-                            <form method="POST" action="{{ route('products.destroy', $product) }}"
-                                onsubmit="return confirmForm(this, 'Yakin hapus produk ini?')">
-                                @csrf @method('DELETE')
-                                <button class="p-1.5 rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-600"><svg
-                                        class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg></button>
-                            </form>
-                        </div>
+                        </button>
                     </div>
                 </div>
-            @empty
-                <div class="py-8 text-center text-slate-400">Belum ada produk.</div>
-            @endforelse
+                <div class="w-48">
+                    <label class="text-xs font-medium text-slate-500">Kategori</label>
+                    <select name="category_id"
+                        x-model="categoryId"
+                        @change="fetchResults()"
+                        class="w-full mt-1 rounded-xl border-slate-200 text-sm focus:border-indigo-500 focus:ring-indigo-200 transition-all">
+                        <option value="">Semua</option>
+                        @foreach ($categories as $cat)
+                            <option value="{{ $cat->id }}" {{ $categoryId == $cat->id ? 'selected' : '' }}>
+                                {{ $cat->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <button type="submit"
+                    class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium hover:bg-indigo-700 transition-colors shadow-sm shadow-indigo-500/20">Filter</button>
+                <a href="{{ route('products.index') }}"
+                    @click.prevent="resetFilters()"
+                    class="px-4 py-2 bg-slate-100 text-slate-600 rounded-xl text-sm font-medium hover:bg-slate-200 transition-colors">Reset</a>
+            </form>
         </div>
 
-        <!-- Desktop: table -->
-        <div class="hidden md:block overflow-x-auto">
-            <table class="w-full text-sm">
-                <thead class="bg-slate-50 border-b border-slate-100">
-                    <tr>
-                        <th class="text-left py-3 px-4 font-semibold text-slate-600">#</th>
-                        <th class="text-left py-3 px-4 font-semibold text-slate-600">Produk</th>
-                        <th class="text-left py-3 px-4 font-semibold text-slate-600">SKU</th>
-                        <th class="text-left py-3 px-4 font-semibold text-slate-600">Kategori</th>
-                        <th class="text-right py-3 px-4 font-semibold text-slate-600">Harga Beli</th>
-                        <th class="text-right py-3 px-4 font-semibold text-slate-600">Harga Jual</th>
-                        <th class="text-center py-3 px-4 font-semibold text-slate-600">Stok</th>
-                        <th class="text-center py-3 px-4 font-semibold text-slate-600">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($products as $i => $product)
-                        <tr class="border-b border-slate-50 hover:bg-slate-50/50">
-                            <td class="py-3 px-4 text-slate-500">{{ $products->firstItem() + $i }}</td>
-                            <td class="py-3 px-4">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
-                                        <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                                        </svg>
-                                    </div>
-                                    <span class="font-medium text-slate-700">{{ $product->name }}</span>
-                                </div>
-                            </td>
-                            <td class="py-3 px-4 text-slate-500 font-mono text-xs">{{ $product->sku }}</td>
-                            <td class="py-3 px-4 text-slate-500">{{ $product->category->name }}</td>
-                            <td class="py-3 px-4 text-right text-slate-600">Rp
-                                {{ number_format($product->harga_beli, 0, ',', '.') }}</td>
-                            <td class="py-3 px-4 text-right font-semibold text-slate-700">Rp
-                                {{ number_format($product->harga_jual, 0, ',', '.') }}</td>
-                            <td class="py-3 px-4 text-center">
-                                <span
-                                    class="px-2 py-0.5 rounded-full text-xs font-bold {{ $product->isLowStock() ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700' }}">{{ $product->stok }}</span>
-                            </td>
-                            <td class="py-3 px-4 text-center">
-                                <div class="flex items-center justify-center gap-1">
-                                    <a href="{{ route('products.show', $product) }}"
-                                        class="p-1.5 rounded-lg text-slate-400 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
-                                        title="Detail">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                        </svg>
-                                    </a>
-                                    <a href="{{ route('products.edit', $product) }}"
-                                        class="p-1.5 rounded-lg text-slate-400 hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                        </svg>
-                                    </a>
-                                    <form method="POST" action="{{ route('products.destroy', $product) }}"
-                                        onsubmit="return confirmForm(this, 'Yakin hapus produk ini?')">
-                                        @csrf @method('DELETE')
-                                        <button
-                                            class="p-1.5 rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-600 transition-colors">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                            </svg>
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="8" class="py-8 text-center text-slate-400">Belum ada produk.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+        <!-- Table Container -->
+        <div x-ref="tableContainer" class="relative bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+            <!-- Subtle loading overlay when fetching live search -->
+            <div x-show="loading" x-cloak class="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center z-20 transition-opacity">
+                <div class="flex items-center gap-2 px-4 py-2 bg-white rounded-xl shadow-lg border border-slate-100 text-xs font-semibold text-slate-700">
+                    <svg class="animate-spin w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>Mencari produk...</span>
+                </div>
+            </div>
+
+            <!-- Table & Card content -->
+            <div id="products-table-content">
+                @include('products._table')
+            </div>
         </div>
-        <div class="px-4 py-3 border-t border-slate-100">{{ $products->appends(request()->query())->links() }}</div>
     </div>
 </x-app-layout>

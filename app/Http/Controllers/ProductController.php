@@ -24,6 +24,10 @@ class ProductController extends Controller
         $products = $this->productService->getAll($search, $categoryId);
         $categories = $this->categoryService->getActive();
 
+        if (request()->ajax()) {
+            return view('products._table', compact('products'));
+        }
+
         return view('products.index', compact('products', 'categories', 'search', 'categoryId'));
     }
 
