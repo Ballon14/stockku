@@ -20,9 +20,9 @@
     </div>
 </x-slot>
 
-<div class="max-w-5xl">
+<div class="w-full space-y-6">
     {{-- Header Banner Card --}}
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden mb-6">
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
         <div class="bg-gradient-to-r from-rose-600 to-amber-600 px-6 py-5 text-white">
             <div class="flex flex-wrap gap-4 items-center justify-between">
                 <div class="flex items-center gap-4">
@@ -78,7 +78,7 @@
     </div>
 
     {{-- Items Card --}}
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden mb-6">
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
         <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
             <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
                 <svg class="w-5 h-5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
