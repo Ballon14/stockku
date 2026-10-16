@@ -91,17 +91,38 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Tanggal <span class="text-red-500">*</span></label>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Tanggal Pembelian <span class="text-red-500">*</span></label>
                         <input type="date" wire:model.live="tanggal" class="w-full rounded-xl border-slate-200 text-sm py-2 focus:border-indigo-500 focus:ring-indigo-200" required>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Keterangan</label>
-                        <input type="text" wire:model.live="keterangan" placeholder="No. ref / surat jalan..." class="w-full rounded-xl border-slate-200 text-sm py-2 focus:border-indigo-500 focus:ring-indigo-200">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Tipe Pembayaran <span class="text-red-500">*</span></label>
+                        <select wire:model.live="paymentType" class="w-full rounded-xl border-slate-200 text-sm py-2 font-medium focus:border-indigo-500 focus:ring-indigo-200">
+                            <option value="cash">💵 Tunai Langsung (Lunas)</option>
+                            <option value="credit">⏳ Tempo / Kredit (Hutang)</option>
+                        </select>
+                    </div>
+
+                    @if($paymentType === 'credit')
+                    <div>
+                        <label class="block text-xs font-semibold text-amber-700 mb-1">Jatuh Tempo <span class="text-red-500">*</span></label>
+                        <input type="date" wire:model.live="dueDate" class="w-full rounded-xl border-amber-300 bg-amber-50/50 text-sm py-2 font-medium text-amber-900 focus:border-amber-500 focus:ring-amber-200" required>
+                    </div>
+                    @endif
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">No. Faktur Supplier</label>
+                        <input type="text" wire:model.live="supplierInvoice" placeholder="Contoh: INV-SUP-2026/01" class="w-full rounded-xl border-slate-200 text-sm py-2 focus:border-indigo-500 focus:ring-indigo-200">
+                    </div>
+
+                    <div class="{{ $paymentType === 'credit' ? 'sm:col-span-1 lg:col-span-1' : 'sm:col-span-2 lg:col-span-1' }}">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Keterangan / Catatan</label>
+                        <input type="text" wire:model.live="keterangan" placeholder="Surat jalan, nomor PO, dll..." class="w-full rounded-xl border-slate-200 text-sm py-2 focus:border-indigo-500 focus:ring-indigo-200">
                     </div>
                 </div>
+
                 <div class="mt-3" x-data="{ preview: null }">
                     <label class="block text-xs font-semibold text-slate-600 mb-1">
-                        Foto Nota
+                        Foto Nota / Faktur
                         <span class="text-xs text-slate-400 font-normal">(maks 2MB)</span>
                     </label>
                     <div class="flex items-center gap-3">

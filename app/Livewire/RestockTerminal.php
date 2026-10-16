@@ -26,6 +26,12 @@ class RestockTerminal extends Component
 
     public string $keterangan = '';
 
+    public string $paymentType = 'cash';
+
+    public ?string $dueDate = null;
+
+    public ?string $supplierInvoice = null;
+
     public $fotoNota;
 
     public bool $updateHargaMaster = false;
@@ -35,12 +41,13 @@ class RestockTerminal extends Component
     public function mount(): void
     {
         $this->tanggal = date('Y-m-d');
+        $this->dueDate = date('Y-m-d', strtotime('+30 days'));
         $this->restoreCartFromSession();
     }
 
     public function updated($name): void
     {
-        if (in_array($name, ['cart', 'supplierId', 'tanggal', 'keterangan', 'updateHargaMaster'], true)) {
+        if (in_array($name, ['cart', 'supplierId', 'tanggal', 'keterangan', 'paymentType', 'dueDate', 'supplierInvoice', 'updateHargaMaster'], true)) {
             $this->saveCartToSession();
         }
     }
@@ -131,6 +138,9 @@ class RestockTerminal extends Component
         $this->cart = [];
         $this->supplierId = '';
         $this->tanggal = date('Y-m-d');
+        $this->paymentType = 'cash';
+        $this->dueDate = date('Y-m-d', strtotime('+30 days'));
+        $this->supplierInvoice = null;
         $this->keterangan = '';
         $this->fotoNota = null;
         $this->updateHargaMaster = false;
@@ -168,6 +178,12 @@ class RestockTerminal extends Component
             return;
         }
 
+        if ($this->paymentType === 'credit' && empty($this->dueDate)) {
+            session()->flash('restock-error', 'Tanggal jatuh tempo wajib diisi untuk pembelian tempo / kredit.');
+
+            return;
+        }
+
         $items = [];
         foreach ($this->cart as $item) {
             $items[] = [
@@ -190,14 +206,17 @@ class RestockTerminal extends Component
                 $this->tanggal,
                 $items,
                 $this->keterangan ?: null,
-                $fotoNotaFile
+                $fotoNotaFile,
+                $this->paymentType,
+                $this->paymentType === 'credit' ? $this->dueDate : null,
+                $this->supplierInvoice ?: null
             );
 
             $this->lastPurchaseId = $purchase->id;
 
             app(ActivityLogger::class)->log(
                 'purchase.create',
-                'Pembelian '.$purchase->invoice_number.' dicatat (Total: Rp '.number_format($purchase->total, 0, ',', '.').').'
+                'Pembelian '.$purchase->invoice_number.' dicatat (Total: Rp '.number_format($purchase->total, 0, ',', '.').', Tipe: '.($purchase->payment_type === 'credit' ? 'Tempo' : 'Tunai').').'
             );
 
             $this->clearCart();
@@ -217,6 +236,9 @@ class RestockTerminal extends Component
             'cart' => $this->cart,
             'supplierId' => $this->supplierId,
             'tanggal' => $this->tanggal,
+            'paymentType' => $this->paymentType,
+            'dueDate' => $this->dueDate,
+            'supplierInvoice' => $this->supplierInvoice,
             'keterangan' => $this->keterangan,
             'updateHargaMaster' => $this->updateHargaMaster,
         ]);
@@ -258,6 +280,9 @@ class RestockTerminal extends Component
         $this->cart = $validated;
         $this->supplierId = $data['supplierId'] ?? '';
         $this->tanggal = $data['tanggal'] ?? date('Y-m-d');
+        $this->paymentType = $data['paymentType'] ?? 'cash';
+        $this->dueDate = $data['dueDate'] ?? date('Y-m-d', strtotime('+30 days'));
+        $this->supplierInvoice = $data['supplierInvoice'] ?? null;
         $this->keterangan = (string) ($data['keterangan'] ?? '');
         $this->updateHargaMaster = (bool) ($data['updateHargaMaster'] ?? false);
 

@@ -52,9 +52,13 @@
             <div class="flex items-start justify-between gap-3 mb-2">
                 <div class="min-w-0">
                     <p class="font-mono text-xs font-medium text-indigo-600">{{ $purchase->invoice_number }}</p>
+                    @if($purchase->supplier_invoice)
+                    <p class="text-[11px] text-slate-500 font-mono">Faktur: {{ $purchase->supplier_invoice }}</p>
+                    @endif
                     <p class="text-xs text-slate-400 mt-0.5">{{ \Carbon\Carbon::parse($purchase->tanggal)->format('d/m/Y') }} · {{ $purchase->user->name }}</p>
                 </div>
                 <div class="flex items-center gap-1">
+                    <a href="{{ route('supplier-bills.show', $purchase) }}" class="p-1.5 rounded-lg text-teal-600 hover:bg-teal-50" title="Status Tagihan"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg></a>
                     @if($purchase->status !== 'returned' && $purchase->items->contains(fn($i) => ($i->qty - $i->returned_qty) > 0))
                     <a href="{{ route('purchase-returns.create', $purchase) }}" class="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50" title="Retur ke Supplier"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3"/></svg></a>
                     @endif
@@ -62,7 +66,18 @@
                 </div>
             </div>
             <div class="flex items-center justify-between">
-                <p class="text-xs text-slate-500 truncate">Supplier: <span class="text-slate-700 font-medium">{{ $purchase->supplier->name }}</span></p>
+                <div>
+                    <p class="text-xs text-slate-500 truncate">Supplier: <span class="text-slate-700 font-medium">{{ $purchase->supplier->name }}</span></p>
+                    <div class="mt-1">
+                        @if($purchase->payment_status === 'paid')
+                        <span class="inline-block text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded">Lunas</span>
+                        @elseif($purchase->payment_status === 'partial')
+                        <span class="inline-block text-[10px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded">Sisa: Rp {{ number_format($purchase->remaining_bill, 0, ',', '.') }}</span>
+                        @else
+                        <span class="inline-block text-[10px] font-semibold text-rose-700 bg-rose-50 border border-rose-200 px-1.5 py-0.5 rounded {{ $purchase->is_overdue ? 'bg-rose-100 font-bold' : '' }}">Hutang: Rp {{ number_format($purchase->remaining_bill, 0, ',', '.') }}</span>
+                        @endif
+                    </div>
+                </div>
                 <div class="text-right ml-3">
                     <p class="font-bold text-slate-800">Rp {{ number_format($purchase->total, 0, ',', '.') }}</p>
                     @if($purchase->status === 'returned')
@@ -83,11 +98,11 @@
         <table class="w-full text-sm">
             <thead class="bg-slate-50 border-b border-slate-100">
                 <tr>
-                    <th class="text-left py-3 px-4 font-semibold text-slate-600">Invoice / Referensi</th>
+                    <th class="text-left py-3 px-4 font-semibold text-slate-600">Invoice / Faktur</th>
                     <th class="text-left py-3 px-4 font-semibold text-slate-600">Tanggal</th>
                     <th class="text-left py-3 px-4 font-semibold text-slate-600">Supplier</th>
-                    <th class="text-left py-3 px-4 font-semibold text-slate-600">Dicatat Oleh</th>
-                    <th class="text-center py-3 px-4 font-semibold text-slate-600">Status</th>
+                    <th class="text-center py-3 px-4 font-semibold text-slate-600">Pembayaran</th>
+                    <th class="text-center py-3 px-4 font-semibold text-slate-600">Status Barang</th>
                     <th class="text-right py-3 px-4 font-semibold text-slate-600">Total Pembelian</th>
                     <th class="text-center py-3 px-4 font-semibold text-slate-600">Aksi</th>
                 </tr>
@@ -96,11 +111,38 @@
                 @forelse($purchases as $purchase)
                 <tr class="border-b border-slate-50 hover:bg-slate-50/50">
                     <td class="py-3 px-4">
-                        <span class="font-mono text-xs font-medium text-indigo-600 block">{{ $purchase->invoice_number }}</span>
+                        <span class="font-mono text-xs font-semibold text-indigo-600 block">{{ $purchase->invoice_number }}</span>
+                        @if($purchase->supplier_invoice)
+                        <span class="font-mono text-[11px] text-slate-400 block">Faktur: {{ $purchase->supplier_invoice }}</span>
+                        @endif
                     </td>
                     <td class="py-3 px-4 text-slate-600">{{ \Carbon\Carbon::parse($purchase->tanggal)->format('d/m/Y') }}</td>
                     <td class="py-3 px-4 text-slate-700 font-medium">{{ $purchase->supplier->name }}</td>
-                    <td class="py-3 px-4 text-slate-600">{{ $purchase->user->name }}</td>
+                    <td class="py-3 px-4 text-center">
+                        @if($purchase->payment_status === 'paid')
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            ✓ Lunas
+                        </span>
+                        @elseif($purchase->payment_status === 'partial')
+                        <div class="inline-flex flex-col items-center">
+                            <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                                Sisa Rp {{ number_format($purchase->remaining_bill, 0, ',', '.') }}
+                            </span>
+                            @if($purchase->due_date)
+                            <span class="text-[10px] text-slate-400 mt-0.5">Tempo: {{ \Carbon\Carbon::parse($purchase->due_date)->format('d/m/y') }}</span>
+                            @endif
+                        </div>
+                        @else
+                        <div class="inline-flex flex-col items-center">
+                            <span class="px-2 py-0.5 rounded-full text-xs font-semibold {{ $purchase->is_overdue ? 'bg-rose-100 text-rose-800 border border-rose-300 font-bold' : 'bg-rose-50 text-rose-700 border border-rose-200' }}">
+                                {{ $purchase->is_overdue ? '⚠ Lewat Tempo' : 'Belum Lunas' }}
+                            </span>
+                            @if($purchase->due_date)
+                            <span class="text-[10px] {{ $purchase->is_overdue ? 'text-rose-600 font-semibold' : 'text-slate-400' }} mt-0.5">Tempo: {{ \Carbon\Carbon::parse($purchase->due_date)->format('d/m/y') }}</span>
+                            @endif
+                        </div>
+                        @endif
+                    </td>
                     <td class="py-3 px-4 text-center">
                         @if($purchase->status === 'returned')
                         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">Diretur Penuh</span>
@@ -113,6 +155,9 @@
                     <td class="py-3 px-4 text-right font-semibold text-slate-800">Rp {{ number_format($purchase->total, 0, ',', '.') }}</td>
                     <td class="py-3 px-4 text-center">
                         <div class="flex items-center justify-center gap-1">
+                            <a href="{{ route('supplier-bills.show', $purchase) }}" class="inline-flex p-1.5 rounded-lg text-teal-600 hover:bg-teal-50 hover:text-teal-700 transition-colors" title="Status Tagihan & Pembayaran">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                            </a>
                             <a href="{{ route('purchases.show', $purchase) }}" class="inline-flex p-1.5 rounded-lg text-slate-400 hover:bg-indigo-50 hover:text-indigo-600 transition-colors" title="Lihat Detail">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                             </a>

@@ -13,6 +13,11 @@ class Purchase extends Model
         'supplier_id',
         'user_id',
         'tanggal',
+        'payment_type',
+        'due_date',
+        'supplier_invoice',
+        'payment_status',
+        'paid_amount',
         'total',
         'status',
         'keterangan',
@@ -21,7 +26,9 @@ class Purchase extends Model
 
     protected $casts = [
         'tanggal' => 'date',
+        'due_date' => 'date',
         'total' => 'decimal:2',
+        'paid_amount' => 'decimal:2',
     ];
 
     public function supplier(): BelongsTo
@@ -42,6 +49,32 @@ class Purchase extends Model
     public function returns(): HasMany
     {
         return $this->hasMany(PurchaseReturn::class);
+    }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(PurchasePayment::class)->orderBy('tanggal_bayar', 'desc')->orderBy('created_at', 'desc');
+    }
+
+    public function getTotalReturnsAmountAttribute(): float
+    {
+        return (float) $this->returns->sum('total_nilai');
+    }
+
+    public function getRemainingBillAttribute(): float
+    {
+        $totalReturns = (float) $this->returns->sum('total_nilai');
+        $sisa = (float) $this->total - $totalReturns - (float) $this->paid_amount;
+        return max(0, round($sisa, 2));
+    }
+
+    public function getIsOverdueAttribute(): bool
+    {
+        if ($this->payment_status === 'paid') {
+            return false;
+        }
+
+        return $this->due_date && $this->due_date->isPast();
     }
 
     public static function generateInvoiceNumber(): string

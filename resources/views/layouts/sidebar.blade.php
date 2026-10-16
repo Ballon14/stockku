@@ -85,6 +85,24 @@
             <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z"/></svg>
             Retur Pembelian
         </a>
+
+        @php
+            $overdueBillsCount = \App\Models\Purchase::where('payment_status', '!=', 'paid')
+                ->whereNotNull('due_date')
+                ->whereDate('due_date', '<', now()->toDateString())
+                ->count();
+        @endphp
+        <a href="{{ route('supplier-bills.index') }}" class="flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 {{ Str::startsWith($currentRoute, 'supplier-bills') ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 sidebar-active' : 'text-slate-300 hover:bg-slate-700/50 hover:text-white' }}">
+            <div class="flex items-center gap-3 min-w-0">
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z"/></svg>
+                <span class="truncate">Tagihan Supplier</span>
+            </div>
+            @if($overdueBillsCount > 0)
+            <span class="shrink-0 px-2 py-0.5 rounded-full text-[11px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                {{ $overdueBillsCount }}
+            </span>
+            @endif
+        </a>
         @endif
 
         <a href="{{ route('sales.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 {{ Str::startsWith($currentRoute, 'sales') ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 sidebar-active' : 'text-slate-300 hover:bg-slate-700/50 hover:text-white' }}">

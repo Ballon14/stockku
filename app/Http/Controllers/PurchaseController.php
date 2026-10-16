@@ -38,7 +38,10 @@ class PurchaseController extends Controller
             $request->input('tanggal'),
             $request->input('items'),
             $request->input('keterangan'),
-            $request->file('foto_nota')
+            $request->file('foto_nota'),
+            $request->input('payment_type', 'cash'),
+            $request->input('due_date'),
+            $request->input('supplier_invoice')
         );
 
         app(ActivityLogger::class)->log('purchase.create', 'Pembelian '.$purchase->invoice_number.' dicatat (Total: Rp '.number_format($purchase->total, 0, ',', '.').').');
@@ -48,7 +51,7 @@ class PurchaseController extends Controller
 
     public function show(Purchase $purchase)
     {
-        $purchase->load(['supplier', 'user', 'items.product', 'returns.processedBy']);
+        $purchase->load(['supplier', 'user', 'items.product', 'returns.processedBy', 'payments.createdBy']);
 
         return view('purchases.show', compact('purchase'));
     }

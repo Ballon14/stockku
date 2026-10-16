@@ -14,6 +14,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\SaleReturnController;
 use App\Http\Controllers\StockController;
+use App\Http\Controllers\SupplierBillController;
 use App\Http\Controllers\SupplierController;
 use Illuminate\Support\Facades\Route;
 
@@ -53,6 +54,11 @@ Route::middleware(['auth', 'ensure-attended'])->group(function () {
         Route::get('/purchases/{purchase}/returns/create', [PurchaseReturnController::class, 'create'])->name('purchase-returns.create');
         Route::post('/purchases/{purchase}/returns', [PurchaseReturnController::class, 'store'])->name('purchase-returns.store');
         Route::get('/purchase-returns/{purchaseReturn}', [PurchaseReturnController::class, 'show'])->name('purchase-returns.show');
+
+        // Supplier Bills (Tagihan & Hutang Pembelian Supplier)
+        Route::get('/supplier-bills', [SupplierBillController::class, 'index'])->name('supplier-bills.index');
+        Route::get('/supplier-bills/{purchase}', [SupplierBillController::class, 'show'])->name('supplier-bills.show');
+        Route::post('/supplier-bills/{purchase}/payments', [SupplierBillController::class, 'storePayment'])->name('supplier-bills.payments.store');
 
         // Stock
         Route::get('/stock', [StockController::class, 'index'])->name('stock.index');
